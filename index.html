@@ -3,15 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Loja (Conectada ao Firebase)</title>
+    <title>Sua Loja de Lingerie</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #fdf7f9; /* Um rosa bem claro */
+            color: #333;
+        }
+
+        header {
+            background-color: #d8a0b0; /* Rosa mais escuro */
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h2 {
+            text-align: center;
+            color: #b76e86;
+            margin-bottom: 2rem;
+        }
+
+        #product-grid {
+            display: grid;
+            /* Cria colunas responsivas */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 300px; /* Altura fixa para as imagens */
+            object-fit: cover; /* Garante que a imagem cubra o espaço sem distorcer */
+        }
+
+        .product-card h3 {
+            font-size: 1.25rem;
+            color: #333;
+            padding: 1rem 1rem 0.5rem 1rem;
+            margin: 0;
+        }
+
+        .product-card .description {
+            font-size: 0.9rem;
+            color: #666;
+            padding: 0 1rem 1rem 1rem;
+            flex-grow: 1; /* Faz a descrição ocupar o espaço disponível */
+        }
+
+        .product-card .price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #b76e86;
+            padding: 0 1rem 1rem 1rem;
+        }
+
+        .product-card .buy-button {
+            display: block;
+            background-color: #b76e86;
+            color: white;
+            text-align: center;
+            padding: 0.8rem 1rem;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .product-card .buy-button:hover {
+            background-color: #a35f75;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #e0e0e0;
+            color: #777;
+            margin-top: 2rem;
+        }
+    </style>
 </head>
 <body>
 
-    <h1>Meu site está aqui</h1>
-    <p>Agora estamos conectados ao Firebase Storage.</p>
+    <header>
+        <h1>Minha Loja de Lingerie</h1>
+        <p>As peças mais exclusivas, direto para você.</p>
+    </header>
+
+    <main>
+        <h2>Nossa Coleção</h2>
+        <div id="product-grid">
+            </div>
+    </main>
+
+    <footer>
+        <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
+    </footer>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
       // O SEU CÓDIGO DE CONFIGURAÇÃO
@@ -28,11 +139,78 @@
       // 3. Inicializar o Firebase
       firebase.initializeApp(firebaseConfig);
 
-      // 4. Criar uma referência ao Storage (agora você pode usá-lo!)
-      const storage = firebase.storage();
+      // 4. Criar referências para os serviços
+      const storage = firebase.storage(); // Para guardar imagens
+      const db = firebase.firestore(); // Para guardar dados (nome, preço, etc.)
 
-      console.log("Firebase e Storage conectados com sucesso!");
+      console.log("Firebase (Storage e Firestore) conectados com sucesso!");
     </script>
 
-    </body>
+    <script>
+        // Aguarda a página HTML carregar completamente
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Função para buscar os produtos no "backend"
+            async function fetchProducts() {
+                try {
+                    // *** DADOS DE EXEMPLO ***
+                    // Estes são os produtos de exemplo.
+                    // No futuro, eles virão do seu painel de controle (CMS).
+                    const products = [
+                        {
+                            "id": 1,
+                            "name": "Conjunto Renda Premium",
+                            "description": "Conjunto luxuoso em renda importada, perfeito para momentos especiais. Conforto e sensualidade.",
+                            "price": "149,90",
+                            "imageUrl": "https://via.placeholder.com/300x300/d8a0b0/ffffff?text=Lingerie+1" // Imagem de exemplo
+                        },
+                        {
+                            "id": 2,
+                            "name": "Sutiã Conforto Total",
+                            "description": "Sutiã sem bojo e sem aro, feito em algodão macio. Ideal para o dia a dia, não marca na roupa.",
+                            "price": "89,90",
+                            "imageUrl": "https://via.placeholder.com/300x300/b76e86/ffffff?text=Lingerie+2" // Imagem de exemplo
+                        },
+                        {
+                            "id": 3,
+                            "name": "Calcinha Fio Duplo",
+                            "description": "Calcinha modelo fio duplo em microfibra, super confortável e não marca. Cores variadas.",
+                            "price": "45,00",
+                            "imageUrl": "https://via.placeholder.com/300x300/fdf7f9/333333?text=Lingerie+3" // Imagem de exemplo
+                        }
+                    ];
+
+                    // Pega o 'grid' de produtos no HTML
+                    const productGrid = document.getElementById('product-grid');
+                    productGrid.innerHTML = ''; // Limpa o grid
+
+                    // Cria um card HTML para cada produto
+                    products.forEach(product => {
+                        const card = document.createElement('div');
+                        card.className = 'product-card';
+                        
+                        card.innerHTML = `
+                            <img src="${product.imageUrl}" alt="${product.name}">
+                            <h3>${product.name}</h3>
+                            <p class="description">${product.description}</p>
+                            <p class="price">R$ ${product.price}</p>
+                            <a href="#" class="buy-button">Ver Detalhes</a>
+                        `;
+                        
+                        // Adiciona o card criado ao grid na página
+                        productGrid.appendChild(card);
+                    });
+
+                } catch (error) {
+                    console.error('Erro ao buscar produtos:', error);
+                    const productGrid = document.getElementById('product-grid');
+                    productGrid.innerHTML = '<p>Não foi possível carregar os produtos. Tente novamente mais tarde.</p>';
+                }
+            }
+
+            // Chama a função para carregar os produtos
+            fetchProducts();
+        });
+    </script>
+</body>
 </html>
