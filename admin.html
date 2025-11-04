@@ -47,7 +47,7 @@
             margin-bottom: 1rem;
             border: 1px solid #ddd;
             border-radius: 4px;
-            box-sizing: border-box; /* Importante para o padding funcionar bem */
+            box-sizing: border-box; 
         }
         textarea {
             min-height: 100px;
@@ -128,7 +128,11 @@
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script> <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> <script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
+
+    <script>
       const firebaseConfig = {
         apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
         authDomain: "loja3marias-50204.firebaseapp.com",
@@ -159,7 +163,7 @@
 
         // Adicionar um "escutador" para quando o botão "Salvar" for clicado
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Impede o formulário de recarregar a página
+            e.preventDefault(); 
 
             // 1. Pegar os dados do formulário
             const nome = document.getElementById('nome').value;
@@ -173,16 +177,16 @@
                 return;
             }
 
-            // 3. Desabilitar o botão e mostrar status (como na sua foto)
+            // 3. Desabilitar o botão e mostrar status
             btnSalvar.disabled = true;
-            showStatus('Enviando foto...', 'loading'); // "Enviando foto..."
+            showStatus('Enviando foto...', 'loading'); 
 
             try {
                 // 4. PASSO 1: Enviar a foto para o Firebase Storage
-                const fileName = `${Date.now()}-${file.name}`; // Cria um nome único
-                const storageRef = storage.ref(`produtos/${fileName}`); // Pasta "produtos"
+                const fileName = `${Date.now()}-${file.name}`; 
+                const storageRef = storage.ref(`produtos/${fileName}`); 
                 
-                await storageRef.put(file); // Espera o upload terminar
+                await storageRef.put(file); 
                 
                 showStatus('Foto enviada. Obtendo link...', 'loading');
 
@@ -197,21 +201,21 @@
                     name: nome,
                     description: descricao,
                     price: preco,
-                    imageUrl: imageUrl, // O link da foto
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp() // Data de criação
+                    imageUrl: imageUrl, 
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp() 
                 });
 
                 // 7. SUCESSO!
                 showStatus('Produto salvo com sucesso!', 'success');
-                form.reset(); // Limpa o formulário
+                form.reset(); 
 
             } catch (error) {
-                // 8. Se der erro
+                // 8. Se der erro (ex: Regras de segurança bloqueando)
                 console.error('Erro ao salvar produto:', error);
-                showStatus(`Erro: ${error.message}`, 'error');
+                showStatus(`Erro ao salvar: ${error.message}`, 'error');
 
             } finally {
-                // 9. Re-habilitar o botão, não importa se deu certo ou errado
+                // 9. Re-habilitar o botão
                 btnSalvar.disabled = false;
             }
         });
@@ -219,11 +223,11 @@
         // Função para mostrar mensagens de status
         function showStatus(message, type) {
             statusDiv.textContent = message;
-            statusDiv.className = type; // (success, error, loading)
+            statusDiv.className = type; 
         }
         
-        // Função do botão de Logout
-        btnLogout.addEventListener('click', ()_=> {
+        // Função do botão de Logout (CORRIGIDA)
+        btnLogout.addEventListener('click', () => { // AQUI ESTÁ A CORREÇÃO!
             // No futuro, isso fará o logout de verdade. 
             // Por enquanto, apenas te leva de volta para a loja.
             alert('Você será deslogado (função de login/logout será implementada).');
@@ -234,3 +238,4 @@
 
 </body>
 </html>
+
