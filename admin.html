@@ -6,6 +6,7 @@
     <title>Admin - Adicionar Produto</title>
     
     <style>
+        /* Estilos CSS (inalterados para manter seu layout) */
         body {
             font-family: Arial, sans-serif;
             background-color: #f9f9f9;
@@ -106,16 +107,19 @@
         
         <form id="formProduto">
             <label for="nome">Nome do Produto:</label>
-            <input type="text" id="nome" placeholder="Ex: Teste lingerie" required>
+            <input type="text" id="nome" placeholder="Ex: Conjunto Renda Premium" required>
             
             <label for="descricao">Descrição:</label>
-            <textarea id="descricao" placeholder="Ex: Teste texto" required></textarea>
+            <textarea id="descricao" placeholder="Ex: Conjunto luxuoso..." required></textarea>
             
-            <label for="preco">Preço:</label>
-            <input type="text" id="preco" placeholder="Ex: ¥4.900" required>
+            <label for="preco">Preço (¥):</label>
+            <input type="text" id="preco" placeholder="Ex: 4900 (apenas o número)" required>
             
-            <label for="foto">Foto do Produto:</label>
+            <label for="foto">Foto do Produto (Principal):</label>
             <input type="file" id="foto" accept="image/*" required>
+            
+            <label for="galeria">Fotos Adicionais (URLs Separadas por Vírgula):</label>
+            <textarea id="galeria" placeholder="Cole URLs HTTPS do Storage, separadas por vírgula. Ex: url1,url2,url3"></textarea>
             
             <button type="submit" id="btnSalvar">Salvar Produto</button>
         </form>
@@ -133,6 +137,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
 
     <script>
+      // 1. CONFIGURAÇÃO (Suas Chaves Reais)
       const firebaseConfig = {
         apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
         authDomain: "loja3marias-50204.firebaseapp.com",
@@ -143,13 +148,11 @@
         measurementId: "G-TK877V6P0S"
       };
 
-      // 3. Inicializar o Firebase
+      // 2. Inicialização
       firebase.initializeApp(firebaseConfig);
-
-      // 4. Criar referências para os serviços que vamos usar
-      const storage = firebase.storage();
       const db = firebase.firestore();
-      const auth = firebase.auth();
+      const storage = firebase.storage();
+      // const auth = firebase.auth(); // Mantido caso implemente login no futuro
 
       console.log("Admin: Firebase conectado.");
     </script>
@@ -161,6 +164,12 @@
         const btnSalvar = document.getElementById('btnSalvar');
         const btnLogout = document.getElementById('btnLogout');
 
+        // Função para mostrar mensagens de status
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = type; 
+        }
+
         // Adicionar um "escutador" para quando o botão "Salvar" for clicado
         form.addEventListener('submit', async (e) => {
             e.preventDefault(); 
@@ -170,19 +179,20 @@
             const descricao = document.getElementById('descricao').value;
             const preco = document.getElementById('preco').value;
             const file = document.getElementById('foto').files[0];
+            const galeriaTexto = document.getElementById('galeria').value; // NOVO
 
             // 2. Verificar se uma foto foi selecionada
             if (!file) {
-                showStatus('Por favor, escolha uma foto.', 'error');
+                showStatus('Por favor, escolha uma foto principal.', 'error');
                 return;
             }
 
             // 3. Desabilitar o botão e mostrar status
             btnSalvar.disabled = true;
-            showStatus('Enviando foto...', 'loading'); 
+            showStatus('Enviando foto principal...', 'loading'); 
 
             try {
-                // 4. PASSO 1: Enviar a foto para o Firebase Storage
+                // 4. PASSO 1: Enviar a foto principal para o Firebase Storage
                 const fileName = `${Date.now()}-${file.name}`; 
                 const storageRef = storage.ref(`produtos/${fileName}`); 
                 
@@ -190,10 +200,16 @@
                 
                 showStatus('Foto enviada. Obtendo link...', 'loading');
 
-                // 5. PASSO 2: Pegar o link (URL) da foto que acabamos de enviar
+                // 5. PASSO 2: Pegar o link (URL) da foto principal
                 const imageUrl = await storageRef.getDownloadURL();
 
-                // 6. PASSO 3: Salvar os dados (texto + link) no Firebase Firestore
+                // 6. PASSO 3: Processar as URLs da galeria
+                // Converte a string separada por vírgula em um Array limpo
+                const galeriaArray = galeriaTexto 
+                    ? galeriaTexto.split(',').map(url => url.trim()).filter(url => url.length > 0)
+                    : [];
+
+                // 7. PASSO 4: Salvar os dados (texto + links) no Firebase Firestore
                 showStatus('Salvando dados do produto...', 'loading');
                 
                 // Vamos salvar na coleção "products"
@@ -201,35 +217,31 @@
                     name: nome,
                     description: descricao,
                     price: preco,
+                    // Garante a capitalização correta (imageUrl com U maiúsculo)
                     imageUrl: imageUrl, 
+                    // Novo Array com as fotos adicionais
+                    galeria: galeriaArray, 
                     createdAt: firebase.firestore.FieldValue.serverTimestamp() 
                 });
 
-                // 7. SUCESSO!
-                showStatus('Produto salvo com sucesso!', 'success');
-                form.reset(); 
+                // 8. SUCESSO!
+                showStatus('Produto salvo com sucesso! Atualize a Home.', 'success');
+                form.reset(); // Limpa o formulário
 
             } catch (error) {
-                // 8. Se der erro (ex: Regras de segurança bloqueando)
+                // 9. Se der erro (ex: Regras de segurança bloqueando)
                 console.error('Erro ao salvar produto:', error);
                 showStatus(`Erro ao salvar: ${error.message}`, 'error');
 
             } finally {
-                // 9. Re-habilitar o botão
+                // 10. Re-habilitar o botão
                 btnSalvar.disabled = false;
             }
         });
 
-        // Função para mostrar mensagens de status
-        function showStatus(message, type) {
-            statusDiv.textContent = message;
-            statusDiv.className = type; 
-        }
-        
-        // Função do botão de Logout (CORRIGIDA)
-        btnLogout.addEventListener('click', () => { // AQUI ESTÁ A CORREÇÃO!
-            // No futuro, isso fará o logout de verdade. 
-            // Por enquanto, apenas te leva de volta para a loja.
+        // Função do botão de Logout
+        btnLogout.addEventListener('click', () => { 
+            // Implementação futura do logout, por enquanto apenas redireciona
             alert('Você será deslogado (função de login/logout será implementada).');
             window.location.href = 'index.html'; // Redireciona para a home
         });
@@ -238,4 +250,3 @@
 
 </body>
 </html>
-
