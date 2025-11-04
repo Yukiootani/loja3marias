@@ -6,7 +6,6 @@
     <title>Sua Loja de Lingerie</title>
     
     <style>
-        /* [SEUS ESTILOS CSS ESTÃO AQUI] */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -54,8 +53,8 @@
 
         .product-card img {
             width: 100%;
-            height: 300px; 
-            object-fit: cover; 
+            height: 300px;
+            object-fit: cover;
         }
 
         .product-card h3 {
@@ -69,7 +68,7 @@
             font-size: 0.9rem;
             color: #666;
             padding: 0 1rem 1rem 1rem;
-            flex-grow: 1; 
+            flex-grow: 1;
         }
 
         .product-card .price {
@@ -113,7 +112,7 @@
     <main>
         <h2>Nossa Coleção</h2>
         <div id="product-grid">
-            <p style="text-align: center;">Iniciando conexão com o Firebase...</p>
+            <p style="text-align: center;">Carregando produtos do Firebase...</p>
         </div>
     </main>
 
@@ -125,7 +124,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-        // 2. CONFIGURAÇÃO COM SUAS CHAVES REAIS
+        // 2. CONFIGURAÇÃO (Com as suas chaves reais)
         const firebaseConfig = {
             apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
             authDomain: "loja3marias-50204.firebaseapp.com",
@@ -136,66 +135,54 @@
             measurementId: "G-TK877V6P0S"
         };
 
-        // 3. LÓGICA DE INICIALIZAÇÃO E BUSCA DENTRO DO DOMContentLoaded
+        // 3. Inicializar o Firebase e o Firestore
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(); 
+
+        console.log("Firebase conectado com sucesso!");
+        
+        // 4. LÓGICA DE BUSCA DE PRODUTOS DO FIREBASE
         document.addEventListener('DOMContentLoaded', () => {
             const productGrid = document.getElementById('product-grid');
-            let db; 
+            const COLECAO_PRODUTOS = "products";
 
-            try {
-                // CORREÇÃO DE TIMING: Inicialização do Firebase
-                const app = firebase.initializeApp(firebaseConfig);
-                db = app.firestore();
-                console.log("Firebase Inicializado com sucesso!");
-                
-                // INICIA A BUSCA DE PRODUTOS
-                fetchProductsFromFirestore();
-
-            } catch (e) {
-                console.error("Erro fatal ao inicializar o Firebase:", e);
-                productGrid.innerHTML = '<p style="color: red;">Não foi possível conectar ao Firebase. Verifique as chaves no console.</p>';
-            }
-
-            // FUNÇÃO PARA BUSCAR E RENDERIZAR
-            async function fetchProductsFromFirestore() { 
-                const COLECAO_PRODUTOS = "products";
-                productGrid.innerHTML = '<p style="text-align: center;">Buscando produtos do Firebase...</p>';
-                
-                // Imagem de "Sem Imagem" em Base64 para evitar ERR_NAME_NOT_RESOLVED
-                const NO_IMAGE_SRC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAACNDJcAAAAjklEQVR42u3BAQEAAAABIP6fHhkQAAICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACYtC6zAAH0fKzPAAAAAElFTkSuQmCC';
+            async function fetchProductsFromFirestore() {
+                productGrid.innerHTML = '<p style="text-align: center;">Carregando produtos do Firebase...</p>';
 
                 try {
-                    const snapshot = await db.collection(COLECAO_PRODUTOS).get();
+                    const snapshot = await db.collection(COLECAO_PRODUTOS).get(); 
                     
                     if (snapshot.empty) {
                         productGrid.innerHTML = '<h2>Nenhum produto cadastrado.</h2>';
                         return;
                     }
 
-                    productGrid.innerHTML = ''; // Limpa o carregamento
+                    productGrid.innerHTML = '';
                     
                     snapshot.forEach(doc => {
                         const product = doc.data();
                         
-                        // CORREÇÃO FINAL: Garante que a URL seja HTTPS e válida, senão usa a imagem local.
-                        const validImageUrl = (product.imageurl && product.imageurl.startsWith('https://'))
+                        // 🎯 LEITURA DO CAMPO DE IMAGEM
+                        const imageUrl = product.imageurl 
                             ? product.imageurl 
-                            : NO_IMAGE_SRC; 
-                            
+                            : 'https://via.placeholder.com/300x300/ff69b4/ffffff?text=Sem+Imagem';
+                        
+                        // ⭐️ LINHA DE DIAGNÓSTICO PARA VERIFICAR O LINK ⭐️
+                        console.log(`Produto ${product.name}: URL da Imagem lida:`, imageUrl); 
+                        
                         const name = product.name || 'Produto Sem Nome';
                         const description = product.description || 'Descrição não disponível.';
                         const price = product.price || '0';
                         
-                        // Formatação do preço
+                        // Formatação para Iene (¥) - Ajuste opcional para o seu contexto
                         const priceValue = parseFloat(price.toString().replace(',', '.')); 
-                        const precoFormatado = priceValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
+                        const precoFormatado = priceValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); // Mantendo R$ por enquanto
 
                         const card = document.createElement('div');
                         card.className = 'product-card';
                         
-                        // O nome do produto é usado no 'alt' da imagem
                         card.innerHTML = `
-                            <img src="${validImageUrl}" alt="Imagem do produto ${name}">
+                            <img src="${imageUrl}" alt="Imagem de ${name}">
                             <h3>${name}</h3>
                             <p class="description">${description}</p>
                             <p class="price">${precoFormatado}</p>
@@ -206,13 +193,13 @@
                     });
 
                 } catch (error) {
-                    console.error('Erro de BUSCA ou Permissão no Firebase:', error);
-                    // Esta mensagem deve aparecer se a Regra de Segurança estiver incorreta
-                    productGrid.innerHTML = '<p style="text-align: center; color: red;">⚠️ Erro ao carregar. Confirme que a coleção "products" tem permissão de leitura pública.</p>';
+                    console.error('Erro ao buscar produtos do Firebase:', error);
+                    productGrid.innerHTML = '<p style="text-align: center; color: red;">⚠️ Erro ao carregar os produtos. Verifique o console.</p>';
                 }
             }
+
+            fetchProductsFromFirestore();
         });
     </script>
 </body>
 </html>
-
