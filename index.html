@@ -6,15 +6,16 @@
     <title>Sua Loja de Lingerie</title>
     
     <style>
+        /* [SEUS ESTILOS CSS ESTÃO AQUI] */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background-color: #fdf7f9; /* Um rosa bem claro */
+            background-color: #fdf7f9;
             color: #333;
         }
 
         header {
-            background-color: #d8a0b0; /* Rosa mais escuro */
+            background-color: #d8a0b0;
             color: white;
             text-align: center;
             padding: 2rem 1rem;
@@ -138,10 +139,10 @@
         // 3. LÓGICA DE INICIALIZAÇÃO E BUSCA DENTRO DO DOMContentLoaded
         document.addEventListener('DOMContentLoaded', () => {
             const productGrid = document.getElementById('product-grid');
-            let db; // Variável para o Firestore
+            let db; 
 
             try {
-                // INICIALIZAÇÃO DO FIREBASE
+                // CORREÇÃO DE TIMING: Inicialização do Firebase
                 const app = firebase.initializeApp(firebaseConfig);
                 db = app.firestore();
                 console.log("Firebase Inicializado com sucesso!");
@@ -151,13 +152,16 @@
 
             } catch (e) {
                 console.error("Erro fatal ao inicializar o Firebase:", e);
-                productGrid.innerHTML = '<p style="color: red;">Não foi possível conectar ao Firebase. Verifique as chaves e o Console.</p>';
+                productGrid.innerHTML = '<p style="color: red;">Não foi possível conectar ao Firebase. Verifique as chaves no console.</p>';
             }
 
             // FUNÇÃO PARA BUSCAR E RENDERIZAR
             async function fetchProductsFromFirestore() { 
                 const COLECAO_PRODUTOS = "products";
                 productGrid.innerHTML = '<p style="text-align: center;">Buscando produtos do Firebase...</p>';
+                
+                // Imagem de "Sem Imagem" em Base64 para evitar ERR_NAME_NOT_RESOLVED
+                const NO_IMAGE_SRC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAACNDJcAAAAjklEQVR42u3BAQEAAAABIP6fHhkQAAICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACYtC6zAAH0fKzPAAAAAElFTkSuQmCC';
 
                 try {
                     const snapshot = await db.collection(COLECAO_PRODUTOS).get();
@@ -172,10 +176,10 @@
                     snapshot.forEach(doc => {
                         const product = doc.data();
                         
-                        // Garante a leitura do campo correto e fallback de imagem
-                        const imageUrl = product.imageurl 
+                        // CORREÇÃO FINAL: Garante que a URL seja HTTPS e válida, senão usa a imagem local.
+                        const validImageUrl = (product.imageurl && product.imageurl.startsWith('https://'))
                             ? product.imageurl 
-                            : 'https://via.placeholder.com/300x300/ff69b4/ffffff?text=Sem+Imagem'; 
+                            : NO_IMAGE_SRC; 
                             
                         const name = product.name || 'Produto Sem Nome';
                         const description = product.description || 'Descrição não disponível.';
@@ -189,8 +193,9 @@
                         const card = document.createElement('div');
                         card.className = 'product-card';
                         
+                        // O nome do produto é usado no 'alt' da imagem
                         card.innerHTML = `
-                            <img src="${imageUrl}" alt="Imagem de ${name}">
+                            <img src="${validImageUrl}" alt="Imagem do produto ${name}">
                             <h3>${name}</h3>
                             <p class="description">${description}</p>
                             <p class="price">${precoFormatado}</p>
@@ -210,3 +215,4 @@
     </script>
 </body>
 </html>
+
