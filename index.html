@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Loja (Conectada ao Firebase)</title>
+</head>
+<body>
+
+    <h1>Meu site está aqui</h1>
+    <p>Agora estamos conectados ao Firebase Storage.</p>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <script>
+      // O SEU CÓDIGO DE CONFIGURAÇÃO
+      const firebaseConfig = {
+        apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
+        authDomain: "loja3marias-50204.firebaseapp.com",
+        projectId: "loja3marias-50204",
+        storageBucket: "loja3marias-50204.firebasestorage.app",
+        messagingSenderId: "405330133487",
+        appId: "1:405330133487:web:606de41211df52245f761a",
+        measurementId: "G-TK877V6P0S"
+      };
+
+      // 3. Inicializar o Firebase
+      firebase.initializeApp(firebaseConfig);
+
+      // 4. Criar uma referência ao Storage (agora você pode usá-lo!)
+      const storage = firebase.storage();
+
+      console.log("Firebase e Storage conectados com sucesso!");
+    </script>
+
+    </body>
+</html>
