@@ -6,7 +6,6 @@
     <title>Admin - Adicionar Produto</title>
     
     <style>
-        /* Estilos CSS (inalterados para manter seu layout) */
         body {
             font-family: Arial, sans-serif;
             background-color: #f9f9f9;
@@ -41,14 +40,17 @@
             margin-bottom: 0.5rem;
         }
         input[type="text"],
-        textarea,
-        input[type="file"] {
+        textarea {
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 1rem;
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box; 
+        }
+        /* Estiliza o campo de upload file */
+        input[type="file"] {
+            padding: 0.5rem 0;
         }
         textarea {
             min-height: 100px;
@@ -85,6 +87,7 @@
             margin-top: 1rem;
             padding: 0.5rem;
             border-radius: 4px;
+            min-height: 1.5rem; /* Para evitar quebra de layout ao exibir status */
         }
         #status.success {
             color: #28a745;
@@ -115,11 +118,14 @@
             <label for="preco">Preço (¥):</label>
             <input type="text" id="preco" placeholder="Ex: 4900 (apenas o número)" required>
             
-            <label for="foto">Foto do Produto (Principal):</label>
-            <input type="file" id="foto" accept="image/*" required>
-            
-            <label for="galeria">Fotos Adicionais (URLs Separadas por Vírgula):</label>
-            <textarea id="galeria" placeholder="Cole URLs HTTPS do Storage, separadas por vírgula. Ex: url1,url2,url3"></textarea>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 1rem 0;">
+
+            <label for="fotoPrincipal">Foto Principal (Destaque):</label>
+            <input type="file" id="fotoPrincipal" accept="image/*" required>
+
+            <label for="galeriaUpload">Fotos Adicionais (Galeria):</label>
+            <input type="file" id="galeriaUpload" accept="image/*" multiple>
+            <p style="font-size: 0.8rem; color: #777;">Você pode selecionar várias fotos de uma vez para a galeria.</p>
             
             <button type="submit" id="btnSalvar">Salvar Produto</button>
         </form>
@@ -152,7 +158,6 @@
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
       const storage = firebase.storage();
-      // const auth = firebase.auth(); // Mantido caso implemente login no futuro
 
       console.log("Admin: Firebase conectado.");
     </script>
@@ -162,15 +167,22 @@
         const form = document.getElementById('formProduto');
         const statusDiv = document.getElementById('status');
         const btnSalvar = document.getElementById('btnSalvar');
-        const btnLogout = document.getElementById('btnLogout');
 
-        // Função para mostrar mensagens de status
         function showStatus(message, type) {
             statusDiv.textContent = message;
             statusDiv.className = type; 
         }
+        
+        // Função ASSÍNCRONA para UPLOAD de um único arquivo
+        async function uploadFileAndGetUrl(file, folder = 'produtos') {
+            const fileName = `${Date.now()}-${file.name}`; 
+            const storageRef = storage.ref(`${folder}/${fileName}`); 
+            await storageRef.put(file);
+            return storageRef.getDownloadURL();
+        }
 
-        // Adicionar um "escutador" para quando o botão "Salvar" for clicado
+
+        // EVENTO DE SUBMISSÃO DO FORMULÁRIO
         form.addEventListener('submit', async (e) => {
             e.preventDefault(); 
 
@@ -178,72 +190,64 @@
             const nome = document.getElementById('nome').value;
             const descricao = document.getElementById('descricao').value;
             const preco = document.getElementById('preco').value;
-            const file = document.getElementById('foto').files[0];
-            const galeriaTexto = document.getElementById('galeria').value; // NOVO
+            const fotoPrincipalFile = document.getElementById('fotoPrincipal').files[0];
+            const galeriaFiles = document.getElementById('galeriaUpload').files;
 
-            // 2. Verificar se uma foto foi selecionada
-            if (!file) {
+            if (!fotoPrincipalFile) {
                 showStatus('Por favor, escolha uma foto principal.', 'error');
                 return;
             }
 
-            // 3. Desabilitar o botão e mostrar status
             btnSalvar.disabled = true;
-            showStatus('Enviando foto principal...', 'loading'); 
+            showStatus('Iniciando uploads...', 'loading'); 
 
             try {
-                // 4. PASSO 1: Enviar a foto principal para o Firebase Storage
-                const fileName = `${Date.now()}-${file.name}`; 
-                const storageRef = storage.ref(`produtos/${fileName}`); 
+                // 2. UPLOAD DA FOTO PRINCIPAL
+                showStatus('1/2 - Enviando foto principal...', 'loading');
+                const imageUrl = await uploadFileAndGetUrl(fotoPrincipalFile, 'produtos');
+
+                // 3. UPLOAD DAS FOTOS DA GALERIA (Assíncrono e Múltiplo)
+                const uploadPromises = [];
+                if (galeriaFiles.length > 0) {
+                    showStatus(`2/2 - Enviando ${galeriaFiles.length} fotos da galeria...`, 'loading');
+                    // Cria uma Array de Promessas de Upload
+                    for (const file of galeriaFiles) {
+                        uploadPromises.push(uploadFileAndGetUrl(file, 'produtos/galeria'));
+                    }
+                }
                 
-                await storageRef.put(file); 
-                
-                showStatus('Foto enviada. Obtendo link...', 'loading');
+                // Espera TODOS os uploads da galeria terminarem
+                const galeriaArray = await Promise.all(uploadPromises);
 
-                // 5. PASSO 2: Pegar o link (URL) da foto principal
-                const imageUrl = await storageRef.getDownloadURL();
-
-                // 6. PASSO 3: Processar as URLs da galeria
-                // Converte a string separada por vírgula em um Array limpo
-                const galeriaArray = galeriaTexto 
-                    ? galeriaTexto.split(',').map(url => url.trim()).filter(url => url.length > 0)
-                    : [];
-
-                // 7. PASSO 4: Salvar os dados (texto + links) no Firebase Firestore
+                // 4. SALVAR TUDO NO FIRESTORE
                 showStatus('Salvando dados do produto...', 'loading');
                 
-                // Vamos salvar na coleção "products"
                 await db.collection('products').add({
                     name: nome,
                     description: descricao,
                     price: preco,
-                    // Garante a capitalização correta (imageUrl com U maiúsculo)
-                    imageUrl: imageUrl, 
-                    // Novo Array com as fotos adicionais
-                    galeria: galeriaArray, 
+                    imageUrl: imageUrl, // URL da foto principal
+                    galeria: galeriaArray, // Array de URLs das fotos adicionais
                     createdAt: firebase.firestore.FieldValue.serverTimestamp() 
                 });
 
-                // 8. SUCESSO!
-                showStatus('Produto salvo com sucesso! Atualize a Home.', 'success');
-                form.reset(); // Limpa o formulário
+                // 5. SUCESSO!
+                showStatus('Produto salvo com sucesso! (Fotos salvas automaticamente)', 'success');
+                form.reset(); 
 
             } catch (error) {
-                // 9. Se der erro (ex: Regras de segurança bloqueando)
-                console.error('Erro ao salvar produto:', error);
-                showStatus(`Erro ao salvar: ${error.message}`, 'error');
+                console.error('Erro no processo de salvamento:', error);
+                showStatus(`Erro: Falha no upload ou na permissão: ${error.message}`, 'error');
 
             } finally {
-                // 10. Re-habilitar o botão
                 btnSalvar.disabled = false;
             }
         });
 
         // Função do botão de Logout
-        btnLogout.addEventListener('click', () => { 
-            // Implementação futura do logout, por enquanto apenas redireciona
-            alert('Você será deslogado (função de login/logout será implementada).');
-            window.location.href = 'index.html'; // Redireciona para a home
+        document.getElementById('btnLogout').addEventListener('click', () => { 
+            alert('Função de login/logout será implementada. Redirecionando para a loja.');
+            window.location.href = 'index.html';
         });
         
     </script>
