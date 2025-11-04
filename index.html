@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sua Loja de Lingerie</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #fdf7f9; color: #333; }
+        header { background-color: #d8a0b0; color: white; text-align: center; padding: 2rem 1rem; }
+        header h1 { margin: 0; }
+        main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        h2 { text-align: center; color: #b76e86; margin-bottom: 2rem; }
+        #product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .product-card { background-color: #fff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); overflow: hidden; display: flex; flex-direction: column; }
+        .product-card img { width: 100%; height: 300px; object-fit: cover; }
+        .product-card h3 { font-size: 1.25rem; color: #333; padding: 1rem 1rem 0.5rem 1rem; margin: 0; }
+        .product-card .description { font-size: 0.9rem; color: #666; padding: 0 1rem 1rem 1rem; flex-grow: 1; }
+        .product-card .price { font-size: 1.2rem; font-weight: bold; color: #b76e86; padding: 0 1rem 1rem 1rem; }
+        .product-card .buy-button { display: block; background-color: #b76e86; color: white; text-align: center; padding: 0.8rem 1rem; text-decoration: none; font-weight: bold; transition: background-color 0.3s ease; }
+        .product-card .buy-button:hover { background-color: #a35f75; }
+        footer { text-align: center; padding: 1rem; background-color: #e0e0e0; color: #777; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Minha Loja de Lingerie</h1>
+        <p>As peças mais exclusivas, direto para você.</p>
+    </header>
+    <main>
+        <h2>Nossa Coleção</h2>
+        <div id="product-grid">
+            </div>
+    </main>
+    <footer>
+        <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productGrid = document.getElementById('product-grid');
+            async function fetchProducts() {
+                try {
+                    const response = await fetch('/_data/produtos.json');
+                    if (!response.ok) { throw new Error('Arquivo de produtos não encontrado.'); }
+                    const products = await response.json();
+                    productGrid.innerHTML = ''; 
+                    if (!products || products.length === 0) {
+                         productGrid.innerHTML = '<p>Nenhum produto cadastrado no momento.</p>';
+                         return;
+                    }
+                    products.forEach(product => {
+                        const card = document.createElement('div');
+                        card.className = 'product-card';
+                        card.innerHTML = `
+                            <img src="${product.imageUrl}" alt="${product.name}">
+                            <h3>${product.name}</h3>
+                            <p class="description">${product.description}</p>
+                            <p class="price">R$ ${product.price}</p>
+                            <a href="#" class="buy-button">Ver Detalhes</a>
+                        `;
+                        productGrid.appendChild(card);
+                    });
+                } catch (error) {
+                    console.error('Erro ao buscar produtos:', error);
+                    productGrid.innerHTML = '<p style="text-align: center;">Nenhum produto cadastrado ainda. Adicione o primeiro no painel /admin!</p>';
+                }
+            }
+            fetchProducts();
+        });
+    </script>
+</body>
+</html>
