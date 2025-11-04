@@ -6,6 +6,7 @@
     <title>Sua Loja de Lingerie</title>
     
     <style>
+        /* [Seus Estilos CSS (Não alterados)] */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -139,8 +140,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(); 
 
-        console.log("Firebase conectado com sucesso!");
-        
         // 4. LÓGICA DE BUSCA DE PRODUTOS DO FIREBASE
         document.addEventListener('DOMContentLoaded', () => {
             const productGrid = document.getElementById('product-grid');
@@ -162,21 +161,24 @@
                     snapshot.forEach(doc => {
                         const product = doc.data();
                         
-                        // 🎯 LEITURA DO CAMPO DE IMAGEM
+                        // 🎯 LEITURA DA IMAGEM: Leitura flexível do campo 'imageurl'
+                        // (Garante que se o campo estiver vazio, use o fallback)
                         const imageUrl = product.imageurl 
                             ? product.imageurl 
-                            : 'https://via.placeholder.com/300x300/ff69b4/ffffff?text=Sem+Imagem';
-                        
-                        // ⭐️ LINHA DE DIAGNÓSTICO PARA VERIFICAR O LINK ⭐️
-                        console.log(`Produto ${product.name}: URL da Imagem lida:`, imageUrl); 
+                            : 'https://via.placeholder.com/300x300/ff69b4/ffffff?text=SEM IMAGEM';
                         
                         const name = product.name || 'Produto Sem Nome';
                         const description = product.description || 'Descrição não disponível.';
                         const price = product.price || '0';
                         
-                        // Formatação para Iene (¥) - Ajuste opcional para o seu contexto
+                        // 💰 FORMATAÇÃO PARA IENE (¥)
+                        // Converte o preço para número e formata para Iene, sem casas decimais.
                         const priceValue = parseFloat(price.toString().replace(',', '.')); 
-                        const precoFormatado = priceValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); // Mantendo R$ por enquanto
+                        const precoFormatado = priceValue.toLocaleString('ja-JP', { 
+                            style: 'currency', 
+                            currency: 'JPY',
+                            maximumFractionDigits: 0
+                        });
 
                         const card = document.createElement('div');
                         card.className = 'product-card';
