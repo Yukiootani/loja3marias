@@ -161,10 +161,9 @@
                     snapshot.forEach(doc => {
                         const product = doc.data();
                         
-                        // 🎯 LEITURA DA IMAGEM: Leitura flexível do campo 'imageurl'
-                        // (Garante que se o campo estiver vazio, use o fallback)
-                        const imageUrl = product.imageurl 
-                            ? product.imageurl 
+                        // 🎯 CORREÇÃO: Leitura do campo 'imageUrl' (com U maiúsculo)
+                        const imageUrl = product.imageUrl 
+                            ? product.imageUrl 
                             : 'https://via.placeholder.com/300x300/ff69b4/ffffff?text=SEM IMAGEM';
                         
                         const name = product.name || 'Produto Sem Nome';
@@ -172,7 +171,6 @@
                         const price = product.price || '0';
                         
                         // 💰 FORMATAÇÃO PARA IENE (¥)
-                        // Converte o preço para número e formata para Iene, sem casas decimais.
                         const priceValue = parseFloat(price.toString().replace(',', '.')); 
                         const precoFormatado = priceValue.toLocaleString('ja-JP', { 
                             style: 'currency', 
