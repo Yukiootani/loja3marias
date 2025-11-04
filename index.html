@@ -1,22 +1,132 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    </head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sua Loja de Lingerie</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #fdf7f9; /* Um rosa bem claro */
+            color: #333;
+        }
+
+        header {
+            background-color: #d8a0b0; /* Rosa mais escuro */
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h2 {
+            text-align: center;
+            color: #b76e86;
+            margin-bottom: 2rem;
+        }
+
+        #product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 300px; 
+            object-fit: cover; 
+        }
+
+        .product-card h3 {
+            font-size: 1.25rem;
+            color: #333;
+            padding: 1rem 1rem 0.5rem 1rem;
+            margin: 0;
+        }
+
+        .product-card .description {
+            font-size: 0.9rem;
+            color: #666;
+            padding: 0 1rem 1rem 1rem;
+            flex-grow: 1; 
+        }
+
+        .product-card .price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #b76e86;
+            padding: 0 1rem 1rem 1rem;
+        }
+
+        .product-card .buy-button {
+            display: block;
+            background-color: #b76e86;
+            color: white;
+            text-align: center;
+            padding: 0.8rem 1rem;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .product-card .buy-button:hover {
+            background-color: #a35f75;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #e0e0e0;
+            color: #777;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
 <body>
+
+    <header>
+        <h1>Minha Loja de Lingerie</h1>
+        <p>As peças mais exclusivas, direto para você.</p>
+    </header>
+
     <main>
         <h2>Nossa Coleção</h2>
         <div id="product-grid">
-            <p style="text-align: center;">Carregando produtos do Firebase...</p>
+            <p style="text-align: center;">Iniciando conexão com o Firebase...</p>
         </div>
     </main>
+
+    <footer>
+        <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
+    </footer>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-        // CONFIGURAÇÃO COM SUAS CHAVES REAIS
+        // 2. CONFIGURAÇÃO COM SUAS CHAVES REAIS
         const firebaseConfig = {
-            // Chaves que você forneceu estão aqui
-            apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI", 
+            apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
             authDomain: "loja3marias-50204.firebaseapp.com",
             projectId: "loja3marias-50204",
             storageBucket: "loja3marias-50204.firebasestorage.app",
@@ -25,21 +135,78 @@
             measurementId: "G-TK877V6P0S"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(); 
-
-        // FUNÇÃO QUE BUSCA OS PRODUTOS NO FIRESTORE
-        // (Esta função substitui a lista de exemplos hardcoded)
+        // 3. LÓGICA DE INICIALIZAÇÃO E BUSCA DENTRO DO DOMContentLoaded
         document.addEventListener('DOMContentLoaded', () => {
             const productGrid = document.getElementById('product-grid');
-            const COLECAO_PRODUTOS = "products";
+            let db; // Variável para o Firestore
 
-            async function fetchProductsFromFirestore() {
-                // ... (Lógica de busca e renderização) ...
+            try {
+                // INICIALIZAÇÃO DO FIREBASE
+                const app = firebase.initializeApp(firebaseConfig);
+                db = app.firestore();
+                console.log("Firebase Inicializado com sucesso!");
+                
+                // INICIA A BUSCA DE PRODUTOS
+                fetchProductsFromFirestore();
+
+            } catch (e) {
+                console.error("Erro fatal ao inicializar o Firebase:", e);
+                productGrid.innerHTML = '<p style="color: red;">Não foi possível conectar ao Firebase. Verifique as chaves e o Console.</p>';
             }
-            fetchProductsFromFirestore();
+
+            // FUNÇÃO PARA BUSCAR E RENDERIZAR
+            async function fetchProductsFromFirestore() { 
+                const COLECAO_PRODUTOS = "products";
+                productGrid.innerHTML = '<p style="text-align: center;">Buscando produtos do Firebase...</p>';
+
+                try {
+                    const snapshot = await db.collection(COLECAO_PRODUTOS).get();
+                    
+                    if (snapshot.empty) {
+                        productGrid.innerHTML = '<h2>Nenhum produto cadastrado.</h2>';
+                        return;
+                    }
+
+                    productGrid.innerHTML = ''; // Limpa o carregamento
+                    
+                    snapshot.forEach(doc => {
+                        const product = doc.data();
+                        
+                        // Garante a leitura do campo correto e fallback de imagem
+                        const imageUrl = product.imageurl 
+                            ? product.imageurl 
+                            : 'https://via.placeholder.com/300x300/ff69b4/ffffff?text=Sem+Imagem'; 
+                            
+                        const name = product.name || 'Produto Sem Nome';
+                        const description = product.description || 'Descrição não disponível.';
+                        const price = product.price || '0';
+                        
+                        // Formatação do preço
+                        const priceValue = parseFloat(price.toString().replace(',', '.')); 
+                        const precoFormatado = priceValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+
+                        const card = document.createElement('div');
+                        card.className = 'product-card';
+                        
+                        card.innerHTML = `
+                            <img src="${imageUrl}" alt="Imagem de ${name}">
+                            <h3>${name}</h3>
+                            <p class="description">${description}</p>
+                            <p class="price">${precoFormatado}</p>
+                            <a href="#" class="buy-button">Ver Detalhes</a>
+                        `;
+                        
+                        productGrid.appendChild(card);
+                    });
+
+                } catch (error) {
+                    console.error('Erro de BUSCA ou Permissão no Firebase:', error);
+                    // Esta mensagem deve aparecer se a Regra de Segurança estiver incorreta
+                    productGrid.innerHTML = '<p style="text-align: center; color: red;">⚠️ Erro ao carregar. Confirme que a coleção "products" tem permissão de leitura pública.</p>';
+                }
+            }
         });
     </script>
 </body>
 </html>
-
