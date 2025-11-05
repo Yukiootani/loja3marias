@@ -60,7 +60,8 @@
             object-fit: cover;
         }
         #main-media-display video {
-            object-fit: contain;
+            /* IMPORTANTE: Aqui garantimos que o player de vídeo apareça com o botão de play */
+            object-fit: contain; 
         }
 
 
@@ -90,7 +91,7 @@
             border-radius: 4px;
         }
         
-        /* NOVO: ÍCONE DE VÍDEO (Overlay) */
+        /* ÍCONE DE VÍDEO (Overlay) */
         .video-overlay {
             position: absolute;
             top: 0;
@@ -107,7 +108,7 @@
             font-weight: bold;
         }
         .video-overlay::before {
-            content: '▶'; /* Símbolo de play */
+            content: '▶';
             padding: 5px;
             background-color: rgba(255, 255, 255, 0.5);
             border-radius: 50%;
@@ -224,7 +225,7 @@
                 
                 let allMediaUrls = [];
 
-                // 🚨 CORREÇÃO: Coloca a MÍDIA PRINCIPAL (VÍDEO) como o primeiro item da lista de exibição
+                // Coloca a MÍDIA PRINCIPAL (VÍDEO) como o primeiro item da lista de exibição
                 if (videoUrl) {
                     allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl }); // Usa imageUrl como thumb do vídeo
                 }
@@ -275,8 +276,9 @@
                     // Define a mídia inicial (primeiro item)
                     if (isActive) {
                         if (media.type === 'video') {
+                             // 🚨 MUDANÇA AQUI: Removemos 'muted' e 'autoplay'. O vídeo só inicia ao clicar no botão de play, mas com áudio.
                              mainMediaHTML = `
-                                <video src="${media.url}" controls loop muted autoplay style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                                <video src="${media.url}" controls loop style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                                     Seu navegador não suporta o formato de vídeo.
                                 </video>
                             `;
@@ -311,14 +313,15 @@
                 
                 thumbContainers.forEach(container => {
                     container.addEventListener('click', () => {
-                        const newSrc = container.dataset.fullSrc;
+                        const newSrc = container.dataset.full-src;
                         const mediaType = container.dataset.type;
 
                         mainMediaDisplay.innerHTML = ''; // Limpa o display
                         
                         if (mediaType === 'video') {
+                            // 🚨 MUDANÇA AQUI: Removemos 'muted' e 'autoplay'.
                             mainMediaDisplay.innerHTML = `
-                                <video src="${newSrc}" controls loop muted autoplay style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                                <video src="${newSrc}" controls loop style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                                     Seu navegador não suporta o formato de vídeo.
                                 </video>
                             `;
