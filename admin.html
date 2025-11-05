@@ -31,29 +31,23 @@
             margin-top: 0;
             margin-bottom: 1.5rem;
         }
-        form {
-            display: flex;
-            flex-direction: column;
+        h2 {
+            text-align: center;
+            color: #b76e86;
+            margin-top: 0;
+            margin-bottom: 1rem;
         }
         label {
             font-weight: bold;
             margin-bottom: 0.5rem;
         }
-        input[type="text"],
-        textarea {
+        input[type="text"], input[type="password"], textarea, input[type="file"] {
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 1rem;
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box; 
-        }
-        /* Estiliza o campo de upload file */
-        input[type="file"] {
-            padding: 0.5rem 0;
-        }
-        textarea {
-            min-height: 100px;
             resize: vertical;
         }
         button {
@@ -65,76 +59,83 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
-        #btnSalvar {
+        #btnSalvar, #btnLogin {
             background-color: #b76e86;
             color: white;
             margin-bottom: 0.5rem;
         }
-        #btnSalvar:hover {
+        #btnSalvar:hover, #btnLogin:hover {
             background-color: #a35f75;
-        }
-        #btnSalvar:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
         }
         #btnLogout {
             background-color: #777;
             color: white;
         }
-        #status {
+        #status, #loginStatus {
             text-align: center;
             font-weight: bold;
             margin-top: 1rem;
             padding: 0.5rem;
             border-radius: 4px;
-            min-height: 1.5rem; /* Para evitar quebra de layout ao exibir status */
+            min-height: 1.5rem; 
         }
-        #status.success {
-            color: #28a745;
-            background-color: #e9f7ec;
-        }
-        #status.error {
-            color: #dc3545;
-            background-color: #fdeeee;
-        }
-        #status.loading {
-            color: #007bff;
-            background-color: #e6f2ff;
-        }
+        .status.success { color: #28a745; background-color: #e9f7ec; }
+        .status.error { color: #dc3545; background-color: #fdeeee; }
+        .status.loading { color: #007bff; background-color: #e6f2ff; }
+
+        /* Estilos específicos para o formulário de login */
+        #login-section { display: none; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Adicionar Novo Produto</h1>
-        
-        <form id="formProduto">
-            <label for="nome">Nome do Produto:</label>
-            <input type="text" id="nome" placeholder="Ex: Conjunto Renda Premium" required>
-            
-            <label for="descricao">Descrição:</label>
-            <textarea id="descricao" placeholder="Ex: Conjunto luxuoso..." required></textarea>
-            
-            <label for="preco">Preço (¥):</label>
-            <input type="text" id="preco" placeholder="Ex: 4900 (apenas o número)" required>
-            
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 1rem 0;">
+        <h1>Administração da Loja</h1>
 
-            <label for="fotoPrincipal">Foto Principal (Destaque):</label>
-            <input type="file" id="fotoPrincipal" accept="image/*" required>
+        <section id="login-section">
+            <h2>Acesso Restrito</h2>
+            <form id="loginForm">
+                <label for="login-email">Email:</label>
+                <input type="text" id="login-email" placeholder="Seu email de admin" required>
+                
+                <label for="login-password">Senha:</label>
+                <input type="password" id="login-password" placeholder="Sua senha" required>
+                
+                <button type="submit" id="btnLogin">Entrar</button>
+            </form>
+            <div id="loginStatus" class="status"></div>
+        </section>
 
-            <label for="galeriaUpload">Fotos Adicionais (Galeria):</label>
-            <input type="file" id="galeriaUpload" accept="image/*" multiple>
-            <p style="font-size: 0.8rem; color: #777;">Você pode selecionar várias fotos de uma vez para a galeria.</p>
+        <section id="product-section" style="display: none;">
+            <h2>Adicionar Novo Produto</h2>
+            <form id="formProduto">
+                <label for="nome">Nome do Produto:</label>
+                <input type="text" id="nome" placeholder="Ex: Conjunto Renda Premium" required>
+                
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" placeholder="Ex: Conjunto luxuoso..." required></textarea>
+                
+                <label for="preco">Preço (¥):</label>
+                <input type="text" id="preco" placeholder="Ex: 4900 (apenas o número)" required>
+                
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 1rem 0;">
+
+                <label for="fotoPrincipal">Foto Principal (Destaque):</label>
+                <input type="file" id="fotoPrincipal" accept="image/*" required>
+
+                <label for="galeriaUpload">Fotos Adicionais (Galeria):</label>
+                <input type="file" id="galeriaUpload" accept="image/*" multiple>
+                <p style="font-size: 0.8rem; color: #777;">Você pode selecionar várias fotos de uma vez para a galeria.</p>
+                
+                <button type="submit" id="btnSalvar">Salvar Produto</button>
+            </form>
             
-            <button type="submit" id="btnSalvar">Salvar Produto</button>
-        </form>
-        
-        <div id="status"></div>
+            <div id="status" class="status"></div>
 
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 1.5rem 0;">
-        
-        <button id="btnLogout">Sair (Logout)</button>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 1.5rem 0;">
+            
+            <button id="btnLogout">Sair (Logout)</button>
+        </section>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -158,22 +159,30 @@
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
       const storage = firebase.storage();
+      const auth = firebase.auth(); 
 
       console.log("Admin: Firebase conectado.");
     </script>
 
     <script>
-        // Pegar os elementos do HTML
-        const form = document.getElementById('formProduto');
+        // Elementos do HTML
+        const loginSection = document.getElementById('login-section');
+        const productSection = document.getElementById('product-section');
+        const loginForm = document.getElementById('loginForm');
+        const loginStatusDiv = document.getElementById('loginStatus');
+        const formProduto = document.getElementById('formProduto');
         const statusDiv = document.getElementById('status');
         const btnSalvar = document.getElementById('btnSalvar');
+        const btnLogout = document.getElementById('btnLogout');
 
-        function showStatus(message, type) {
-            statusDiv.textContent = message;
-            statusDiv.className = type; 
+        function showStatus(div, message, type) {
+            div.textContent = message;
+            div.className = 'status ' + type; 
         }
-        
-        // Função ASSÍNCRONA para UPLOAD de um único arquivo
+
+        // --- FUNÇÕES PRINCIPAIS ---
+
+        // Função de Upload 
         async function uploadFileAndGetUrl(file, folder = 'produtos') {
             const fileName = `${Date.now()}-${file.name}`; 
             const storageRef = storage.ref(`${folder}/${fileName}`); 
@@ -181,12 +190,32 @@
             return storageRef.getDownloadURL();
         }
 
+        // 1. LÓGICA DE LOGIN
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
 
-        // EVENTO DE SUBMISSÃO DO FORMULÁRIO
-        form.addEventListener('submit', async (e) => {
+            showStatus(loginStatusDiv, 'Tentando entrar...', 'loading');
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                // O onAuthStateChanged irá atualizar a interface
+            } catch (error) {
+                console.error('Erro de Login:', error);
+                showStatus(loginStatusDiv, `Erro de Acesso: ${error.message}`, 'error');
+            }
+        });
+
+        // 2. LÓGICA DE SALVAMENTO DE PRODUTO 
+        formProduto.addEventListener('submit', async (e) => {
             e.preventDefault(); 
+            
+            if (!auth.currentUser) {
+                showStatus(statusDiv, 'Erro: Você não está logado.', 'error');
+                return;
+            }
 
-            // 1. Pegar os dados do formulário
             const nome = document.getElementById('nome').value;
             const descricao = document.getElementById('descricao').value;
             const preco = document.getElementById('preco').value;
@@ -194,60 +223,72 @@
             const galeriaFiles = document.getElementById('galeriaUpload').files;
 
             if (!fotoPrincipalFile) {
-                showStatus('Por favor, escolha uma foto principal.', 'error');
+                showStatus(statusDiv, 'Por favor, escolha uma foto principal.', 'error');
                 return;
             }
 
             btnSalvar.disabled = true;
-            showStatus('Iniciando uploads...', 'loading'); 
+            showStatus(statusDiv, 'Iniciando uploads...', 'loading'); 
 
             try {
-                // 2. UPLOAD DA FOTO PRINCIPAL
-                showStatus('1/2 - Enviando foto principal...', 'loading');
+                // UPLOAD DA FOTO PRINCIPAL
+                showStatus(statusDiv, '1/2 - Enviando foto principal...', 'loading');
                 const imageUrl = await uploadFileAndGetUrl(fotoPrincipalFile, 'produtos');
 
-                // 3. UPLOAD DAS FOTOS DA GALERIA (Assíncrono e Múltiplo)
+                // UPLOAD DAS FOTOS DA GALERIA (Assíncrono e Múltiplo)
                 const uploadPromises = [];
                 if (galeriaFiles.length > 0) {
-                    showStatus(`2/2 - Enviando ${galeriaFiles.length} fotos da galeria...`, 'loading');
-                    // Cria uma Array de Promessas de Upload
+                    showStatus(statusDiv, `2/2 - Enviando ${galeriaFiles.length} fotos da galeria...`, 'loading');
                     for (const file of galeriaFiles) {
                         uploadPromises.push(uploadFileAndGetUrl(file, 'produtos/galeria'));
                     }
                 }
-                
-                // Espera TODOS os uploads da galeria terminarem
                 const galeriaArray = await Promise.all(uploadPromises);
 
-                // 4. SALVAR TUDO NO FIRESTORE
-                showStatus('Salvando dados do produto...', 'loading');
+                // SALVAR TUDO NO FIRESTORE
+                showStatus(statusDiv, 'Salvando dados do produto...', 'loading');
                 
                 await db.collection('products').add({
                     name: nome,
                     description: descricao,
                     price: preco,
-                    imageUrl: imageUrl, // URL da foto principal
-                    galeria: galeriaArray, // Array de URLs das fotos adicionais
+                    imageUrl: imageUrl, 
+                    galeria: galeriaArray, 
                     createdAt: firebase.firestore.FieldValue.serverTimestamp() 
                 });
 
-                // 5. SUCESSO!
-                showStatus('Produto salvo com sucesso! (Fotos salvas automaticamente)', 'success');
-                form.reset(); 
+                showStatus(statusDiv, 'Produto salvo com sucesso! (Fotos salvas automaticamente)', 'success');
+                formProduto.reset(); 
 
             } catch (error) {
                 console.error('Erro no processo de salvamento:', error);
-                showStatus(`Erro: Falha no upload ou na permissão: ${error.message}`, 'error');
+                showStatus(statusDiv, `Erro: Falha no upload ou na permissão: ${error.message}`, 'error');
 
             } finally {
                 btnSalvar.disabled = false;
             }
         });
 
-        // Função do botão de Logout
-        document.getElementById('btnLogout').addEventListener('click', () => { 
-            alert('Função de login/logout será implementada. Redirecionando para a loja.');
-            window.location.href = 'index.html';
+        // 3. LÓGICA DE LOGOUT
+        btnLogout.addEventListener('click', async () => {
+            await auth.signOut();
+            window.location.reload(); 
+        });
+
+
+        // 4. VERIFICAÇÃO DE ESTADO DE AUTENTICAÇÃO 
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Usuário LOGADO: Mostra a seção de produtos
+                loginSection.style.display = 'none';
+                productSection.style.display = 'block';
+                showStatus(loginStatusDiv, `Bem-vindo, ${user.email}!`, 'success');
+            } else {
+                // Usuário DESLOGADO: Mostra a seção de login
+                loginSection.style.display = 'block';
+                productSection.style.display = 'none';
+                loginStatusDiv.textContent = ''; // Limpa o status
+            }
         });
         
     </script>
