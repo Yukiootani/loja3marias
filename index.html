@@ -161,7 +161,7 @@
                     snapshot.forEach(doc => {
                         const product = doc.data();
                         
-                        // 🎯 CORREÇÃO: Leitura do campo 'imageUrl' (com U maiúsculo)
+                        // Leitura do campo 'imageUrl' (com U maiúsculo)
                         const imageUrl = product.imageUrl 
                             ? product.imageUrl 
                             : 'https://via.placeholder.com/300x300/ff69b4/ffffff?text=SEM IMAGEM';
@@ -170,7 +170,7 @@
                         const description = product.description || 'Descrição não disponível.';
                         const price = product.price || '0';
                         
-                        // 💰 FORMATAÇÃO PARA IENE (¥)
+                        // FORMATAÇÃO PARA IENE (¥)
                         const priceValue = parseFloat(price.toString().replace(',', '.')); 
                         const precoFormatado = priceValue.toLocaleString('ja-JP', { 
                             style: 'currency', 
@@ -186,7 +186,7 @@
                             <h3>${name}</h3>
                             <p class="description">${description}</p>
                             <p class="price">${precoFormatado}</p>
-                            <a href="#" class="buy-button">Ver Detalhes</a>
+                            <a href="detalhes.html?id=${doc.id}" class="buy-button">Ver Detalhes</a>
                         `;
                         
                         productGrid.appendChild(card);
