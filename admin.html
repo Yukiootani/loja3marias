@@ -18,7 +18,7 @@
         }
         .container {
             width: 100%;
-            max-width: 800px; /* Aumentado para melhor visualização da lista */
+            max-width: 800px; 
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -26,7 +26,8 @@
             margin: 1rem;
         }
         h1 { text-align: center; color: #b76e86; margin-top: 0; margin-bottom: 1.5rem; }
-        h2, h3 { color: #b76e86; text-align: center; margin-bottom: 1rem; }
+        h2 { color: #b76e86; text-align: center; margin-top: 0; margin-bottom: 1rem; }
+        h3 { color: #b76e86; text-align: center; margin-bottom: 1rem; }
         label { font-weight: bold; margin-bottom: 0.5rem; }
         input[type="text"], input[type="password"], textarea, input[type="file"] {
             width: 100%;
@@ -47,40 +48,12 @@
         .logo-admin { display: block; margin: 0 auto 20px auto; max-width: 150px; height: auto; }
         #login-section { display: none; }
         
-        /* Estilos da nova tabela de gerenciamento */
-        #product-management-list {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        #product-management-list th, #product-management-list td {
-            border: 1px solid #eee;
-            padding: 10px;
-            text-align: left;
-            vertical-align: middle;
-        }
-        #product-management-list th {
-            background-color: #f4f4f4;
-            color: #555;
-            font-size: 0.9em;
-        }
-        #product-management-list img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-            padding: 5px 10px;
-            font-weight: normal;
-            font-size: 0.9em;
-            width: auto;
-        }
-        .delete-btn:hover {
-            background-color: #c82333;
-        }
+        /* Estilos da tabela de gerenciamento */
+        #product-management-list { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        #product-management-list th, #product-management-list td { border: 1px solid #eee; padding: 10px; text-align: left; vertical-align: middle; }
+        #product-management-list th { background-color: #f4f4f4; color: #555; font-size: 0.9em; }
+        #product-management-list img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+        .delete-btn { background-color: #dc3545; color: white; padding: 5px 10px; font-weight: normal; font-size: 0.9em; width: auto; }
     </style>
 </head>
 <body>
@@ -124,6 +97,10 @@
 
                 <label for="fotoPrincipal">Foto Principal (Destaque):</label>
                 <input type="file" id="fotoPrincipal" accept="image/*" required>
+                
+                <label for="videoFile">Upload do Vídeo Curto (Opcional):</label>
+                <input type="file" id="videoFile" accept="video/mp4,video/quicktime,video/webm">
+                <p style="font-size: 0.8rem; color: #777;">Selecione um arquivo de vídeo (MP4, MOV, etc.)</p>
 
                 <label for="galeriaUpload">Fotos Adicionais (Galeria):</label>
                 <input type="file" id="galeriaUpload" accept="image/*" multiple>
@@ -199,7 +176,6 @@
         const productsTableBody = document.getElementById('products-table-body');
         const loadingListDiv = document.getElementById('loading-list');
 
-
         function showStatus(div, message, type) {
             div.textContent = message;
             div.className = 'status ' + type; 
@@ -215,9 +191,9 @@
             return storageRef.getDownloadURL();
         }
 
-        // Função que lista e exibe os produtos (NOVA)
+        // Função que lista e exibe os produtos (mantida)
         async function listProductsForManagement() {
-            productsTableBody.innerHTML = ''; // Limpa a lista
+            productsTableBody.innerHTML = ''; 
             loadingListDiv.style.display = 'block';
 
             try {
@@ -255,18 +231,17 @@
             }
         }
         
-        // Função para excluir um produto (NOVA)
+        // Função para excluir um produto (mantida)
         async function deleteProduct(id) {
             if (!confirm('Tem certeza que deseja EXCLUIR este produto? Essa ação é IRREVERSÍVEL.')) {
                 return;
             }
             showStatus(statusDiv, 'Excluindo produto...', 'loading');
             try {
-                // 🚨 O método delete() do Firestore
                 await db.collection(COLECAO_PRODUTOS).doc(id).delete();
                 
                 showStatus(statusDiv, 'Produto excluído com sucesso!', 'success');
-                listProductsForManagement(); // Atualiza a lista após a exclusão
+                listProductsForManagement(); 
             } catch (error) {
                 console.error('Erro ao excluir:', error);
                 showStatus(statusDiv, `Falha ao excluir: ${error.message}`, 'error');
@@ -275,7 +250,7 @@
 
         // --- EVENTOS ---
 
-        // 1. EVENTO DE CLIQUE DO BOTÃO EXCLUIR (Delega o evento para o corpo da tabela)
+        // 1. EVENTO DE CLIQUE DO BOTÃO EXCLUIR
         productsTableBody.addEventListener('click', (e) => {
             if (e.target.classList.contains('delete-btn')) {
                 const productId = e.target.dataset.id;
@@ -313,6 +288,7 @@
             const descricao = document.getElementById('descricao').value;
             const preco = document.getElementById('preco').value;
             const fotoPrincipalFile = document.getElementById('fotoPrincipal').files[0];
+            const videoFile = document.getElementById('videoFile').files[0]; // NOVO: Pegando o arquivo de vídeo
             const galeriaFiles = document.getElementById('galeriaUpload').files;
 
             if (!fotoPrincipalFile) {
@@ -323,19 +299,32 @@
             btnSalvar.disabled = true;
             showStatus(statusDiv, 'Iniciando uploads...', 'loading'); 
 
+            let videoUrl = null;
+            let stepCounter = 1;
+            const totalSteps = 2 + (videoFile ? 1 : 0) + (galeriaFiles.length > 0 ? 1 : 0); // Cálculo aproximado para as mensagens
+
             try {
-                showStatus(statusDiv, '1/2 - Enviando foto principal...', 'loading');
+                // A) UPLOAD DO VÍDEO CURTO (Se existir)
+                if (videoFile) {
+                    showStatus(statusDiv, `Passo ${stepCounter++}/${totalSteps} - Enviando vídeo...`, 'loading');
+                    videoUrl = await uploadFileAndGetUrl(videoFile, 'produtos/videos'); // Novo folder para vídeos
+                }
+
+                // B) UPLOAD DA FOTO PRINCIPAL
+                showStatus(statusDiv, `Passo ${stepCounter++}/${totalSteps} - Enviando foto principal...`, 'loading');
                 const imageUrl = await uploadFileAndGetUrl(fotoPrincipalFile, 'produtos');
 
+                // C) UPLOAD DAS FOTOS DA GALERIA
                 const uploadPromises = [];
                 if (galeriaFiles.length > 0) {
-                    showStatus(statusDiv, `2/2 - Enviando ${galeriaFiles.length} fotos da galeria...`, 'loading');
+                    showStatus(statusDiv, `Passo ${stepCounter++}/${totalSteps} - Enviando ${galeriaFiles.length} fotos da galeria...`, 'loading');
                     for (const file of galeriaFiles) {
                         uploadPromises.push(uploadFileAndGetUrl(file, 'produtos/galeria'));
                     }
                 }
                 const galeriaArray = await Promise.all(uploadPromises);
 
+                // D) SALVAR TUDO NO FIRESTORE
                 showStatus(statusDiv, 'Salvando dados do produto...', 'loading');
                 
                 await db.collection('products').add({
@@ -343,13 +332,14 @@
                     description: descricao,
                     price: preco,
                     imageUrl: imageUrl, 
+                    videoUrl: videoUrl, // Salva a URL do vídeo do Storage
                     galeria: galeriaArray, 
                     createdAt: firebase.firestore.FieldValue.serverTimestamp() 
                 });
 
                 showStatus(statusDiv, 'Produto salvo com sucesso!', 'success');
                 formProduto.reset();
-                listProductsForManagement(); // Atualiza a lista após salvar
+                listProductsForManagement(); 
 
             } catch (error) {
                 console.error('Erro no processo de salvamento:', error);
@@ -375,7 +365,6 @@
                 productSection.style.display = 'block';
                 welcomeMessage.textContent = 'Bem-vinda de volta, Harumi Ichimura!';
                 
-                // 🚨 CARREGA A LISTA DE PRODUTOS QUANDO O ADMIN LOGA
                 listProductsForManagement(); 
             } else {
                 // Usuário DESLOGADO
