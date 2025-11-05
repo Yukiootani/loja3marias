@@ -71,18 +71,50 @@
             padding-bottom: 10px; 
         }
 
-        .thumb {
+        .thumb-container {
+            position: relative;
             width: 80px;
             height: 80px;
-            object-fit: cover;
             border-radius: 4px;
-            border: 2px solid transparent;
             cursor: pointer;
+            border: 2px solid transparent;
             transition: border 0.3s;
         }
-        .thumb.active {
+        .thumb-container.active {
             border: 2px solid #b76e86;
         }
+        .thumb-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        /* NOVO: ÍCONE DE VÍDEO (Overlay) */
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .video-overlay::before {
+            content: '▶'; /* Símbolo de play */
+            padding: 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            line-height: 1;
+            color: #b76e86;
+        }
+
 
         /* 2. Área das Informações */
         .info-area {
@@ -186,26 +218,29 @@
                 const description = product.description || 'Descrição não disponível.';
                 const price = product.price || '0';
                 const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=IMAGEM+PRINCIPAL';
-                const videoUrl = product.videoUrl;
+                const videoUrl = product.videoUrl; 
                 
                 let galleryUrls = product.galeria || [];
                 
-                // Se o vídeo existir, ele é o display principal, e a imagem principal é a miniatura de retorno.
-                // A ordem de exibição é: VÍDEO (Se houver) -> FOTO PRINCIPAL -> GALERIA
                 let allMediaUrls = [];
 
+                // 🚨 CORREÇÃO: Coloca a MÍDIA PRINCIPAL (VÍDEO) como o primeiro item da lista de exibição
                 if (videoUrl) {
-                    // Adiciona o vídeo como o primeiro item, usando a URL da imagem como thumbnail
-                    allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl });
+                    allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl }); // Usa imageUrl como thumb do vídeo
                 }
                 
-                // Adiciona a foto principal (se não for a thumbnail do vídeo, ou se não houver vídeo)
-                allMediaUrls.push({ type: 'image', url: imageUrl, thumb: imageUrl });
-                
+                // Adiciona a foto principal (se ainda não estiver lá como thumb do vídeo)
+                if (!allMediaUrls.some(m => m.url === imageUrl)) {
+                     allMediaUrls.push({ type: 'image', url: imageUrl, thumb: imageUrl });
+                }
+
                 // Adiciona as fotos da galeria
                 galleryUrls.forEach(url => {
                     allMediaUrls.push({ type: 'image', url: url, thumb: url });
                 });
+
+                // Remove duplicatas
+                allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i);
 
 
                 // 6. FORMATAÇÃO PARA IENE (¥)
@@ -220,20 +255,21 @@
                 let mainMediaHTML = '';
                 let galleryHTML = '';
                 
-                allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i); // Remove duplicatas
-
                 allMediaUrls.forEach((media, index) => {
                     const isActive = index === 0;
-
+                    
+                    // Adiciona a classe e o overlay se for o thumbnail do vídeo
+                    const isVideoThumb = media.type === 'video';
+                    const thumbClasses = isVideoThumb ? 'video-thumb' : '';
+                    
                     // Cria as miniaturas (thumbs)
                     galleryHTML += `
-                        <img 
-                            src="${media.thumb}" 
-                            class="thumb ${isActive ? 'active' : ''}" 
-                            data-type="${media.type}"
-                            data-full-src="${media.url}" 
-                            alt="Mídia ${index + 1}"
-                        >
+                        <div class="thumb-container ${isActive ? 'active' : ''} ${thumbClasses}" 
+                             data-type="${media.type}"
+                             data-full-src="${media.url}">
+                            <img src="${media.thumb}" alt="Mídia ${index + 1}">
+                            ${isVideoThumb ? '<div class="video-overlay"></div>' : ''}
+                        </div>
                     `;
 
                     // Define a mídia inicial (primeiro item)
@@ -271,12 +307,12 @@
 
                 // 9. FUNCIONALIDADE DA GALERIA (Troca de Mídia)
                 const mainMediaDisplay = document.getElementById('main-media-display');
-                const thumbs = document.querySelectorAll('.thumb');
+                const thumbContainers = document.querySelectorAll('.thumb-container');
                 
-                thumbs.forEach(thumb => {
-                    thumb.addEventListener('click', () => {
-                        const newSrc = thumb.dataset.fullSrc;
-                        const mediaType = thumb.dataset.type;
+                thumbContainers.forEach(container => {
+                    container.addEventListener('click', () => {
+                        const newSrc = container.dataset.fullSrc;
+                        const mediaType = container.dataset.type;
 
                         mainMediaDisplay.innerHTML = ''; // Limpa o display
                         
@@ -293,8 +329,8 @@
                         }
                         
                         // Atualiza o estado ativo
-                        thumbs.forEach(t => t.classList.remove('active'));
-                        thumb.classList.add('active');
+                        thumbContainers.forEach(t => t.classList.remove('active'));
+                        container.classList.add('active');
                     });
                 });
 
