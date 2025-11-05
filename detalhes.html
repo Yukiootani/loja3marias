@@ -36,26 +36,40 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
         
-        /* 1. Área das Imagens */
-        .image-gallery {
+        /* 1. Área das Imagens/Vídeo */
+        .media-area {
             flex: 1 1 45%; 
             min-width: 300px;
         }
 
-        #main-image {
+        #main-media-display {
             width: 100%;
             height: 400px;
-            object-fit: cover;
-            border-radius: 6px;
+            /* Usa flex para centralizar o player de vídeo, se for o caso */
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
             margin-bottom: 15px;
-            transition: opacity 0.3s;
+            border-radius: 6px;
+            background-color: #eee;
         }
+        
+        #main-media-display img, #main-media-display video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #main-media-display video {
+            object-fit: contain; /* Garante que o vídeo inteiro seja visível */
+        }
+
 
         #thumbnails {
             display: flex;
             gap: 10px;
             overflow-x: auto;
-            padding-bottom: 10px;
+            padding-bottom: 10px; 
         }
 
         .thumb {
@@ -142,7 +156,6 @@
 
         // 4. LÓGICA DE CARREGAMENTO
         document.addEventListener('DOMContentLoaded', () => {
-            // Pega o ID do produto da URL (ex: detalhes.html?id=SEUIDAQUI)
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
 
@@ -158,7 +171,6 @@
 
         async function fetchProductDetails(id) {
             try {
-                // Busca o documento específico usando o ID
                 const doc = await db.collection("products").doc(id).get(); 
 
                 if (!doc.exists) {
@@ -170,17 +182,16 @@
 
                 const product = doc.data();
                 
-                // 5. PROCESSAMENTO DE DADOS (Flexível)
-                // O código da Home já garante que este campo é imageUrl (com U maiúsculo)
-                const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=IMAGEM+PRINCIPAL';
+                // 5. PROCESSAMENTO DE DADOS E MÍDIA
                 const name = product.name || 'Produto Sem Nome';
                 const description = product.description || 'Descrição não disponível.';
                 const price = product.price || '0';
+                const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=IMAGEM+PRINCIPAL';
+                const videoUrl = product.videoUrl; // URL do vídeo do Storage (novo campo)
                 
-                // O código do Admin salva as URLs adicionais no Array 'galeria'
                 let galleryUrls = product.galeria || [];
                 
-                // Se a foto principal não está no array (o que deve acontecer), insere no início
+                // A foto principal deve ser a primeira miniatura
                 if (!galleryUrls.includes(imageUrl)) {
                     galleryUrls.unshift(imageUrl);
                 }
@@ -193,16 +204,36 @@
                     maximumFractionDigits: 0
                 });
 
-                // 7. MONTAGEM DO HTML DA GALERIA
+                // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL (IMAGEM OU VÍDEO)
+                let mainMediaHTML = '';
+                let isVideo = false;
+
+                if (videoUrl) {
+                    isVideo = true;
+                    // Player de vídeo: controls, loop e muted para melhor UX
+                    mainMediaHTML = `
+                        <video src="${videoUrl}" controls loop muted autoplay style="width: 100%; height: 100%; border-radius: 6px;">
+                            Seu navegador não suporta o formato de vídeo.
+                        </video>
+                    `;
+                } else {
+                    // Imagem principal
+                    mainMediaHTML = `<img id="main-image" src="${imageUrl}" alt="${name}">`;
+                }
+
+
+                // 8. MONTAGEM DO HTML COMPLETO
                 let galleryHTML = '';
                 galleryUrls.forEach((url, index) => {
-                    galleryHTML += `<img src="${url}" class="thumb ${index === 0 ? 'active' : ''}" data-full-src="${url}" alt="Miniatura ${index + 1}">`;
+                    galleryHTML += `<img src="${url}" class="thumb ${index === 0 && !isVideo ? 'active' : ''}" data-full-src="${url}" alt="Miniatura ${index + 1}">`;
                 });
 
 
                 detailsContainer.innerHTML = `
-                    <div class="image-gallery">
-                        <img id="main-image" src="${imageUrl}" alt="${name}">
+                    <div class="media-area">
+                        <div id="main-media-display">
+                            ${mainMediaHTML}
+                        </div>
                         <div id="thumbnails">
                             ${galleryHTML}
                         </div>
@@ -216,14 +247,16 @@
                     </div>
                 `;
 
-                // 8. FUNCIONALIDADE DA GALERIA
-                const mainImage = document.getElementById('main-image');
+                // 9. FUNCIONALIDADE DA GALERIA (TROCA DE MÍDIA)
+                const mainMediaDisplay = document.getElementById('main-media-display');
                 const thumbs = document.querySelectorAll('.thumb');
                 
                 thumbs.forEach(thumb => {
                     thumb.addEventListener('click', () => {
-                        // Troca a imagem principal
-                        mainImage.src = thumb.dataset.fullSrc;
+                        const newSrc = thumb.dataset.fullSrc;
+                        
+                        // Troca a mídia principal para a imagem clicada
+                        mainMediaDisplay.innerHTML = `<img id="main-image" src="${newSrc}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">`;
                         
                         // Atualiza o estado ativo
                         thumbs.forEach(t => t.classList.remove('active'));
