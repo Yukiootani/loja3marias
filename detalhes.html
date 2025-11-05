@@ -60,7 +60,6 @@
             object-fit: cover;
         }
         #main-media-display video {
-            /* IMPORTANTE: Aqui garantimos que o player de vídeo apareça com o botão de play */
             object-fit: contain; 
         }
 
@@ -276,7 +275,6 @@
                     // Define a mídia inicial (primeiro item)
                     if (isActive) {
                         if (media.type === 'video') {
-                             // 🚨 MUDANÇA AQUI: Removemos 'muted' e 'autoplay'. O vídeo só inicia ao clicar no botão de play, mas com áudio.
                              mainMediaHTML = `
                                 <video src="${media.url}" controls loop style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                                     Seu navegador não suporta o formato de vídeo.
@@ -313,13 +311,13 @@
                 
                 thumbContainers.forEach(container => {
                     container.addEventListener('click', () => {
-                        const newSrc = container.dataset.full-src;
+                        // 🚨 CORREÇÃO: Usamos 'dataset.fullSrc' (camelCase) em vez de 'dataset.full-src' (com hífen)
+                        const newSrc = container.dataset.fullSrc; 
                         const mediaType = container.dataset.type;
 
                         mainMediaDisplay.innerHTML = ''; // Limpa o display
                         
                         if (mediaType === 'video') {
-                            // 🚨 MUDANÇA AQUI: Removemos 'muted' e 'autoplay'.
                             mainMediaDisplay.innerHTML = `
                                 <video src="${newSrc}" controls loop style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                                     Seu navegador não suporta o formato de vídeo.
