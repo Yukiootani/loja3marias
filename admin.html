@@ -83,13 +83,29 @@
         .status.error { color: #dc3545; background-color: #fdeeee; }
         .status.loading { color: #007bff; background-color: #e6f2ff; }
 
-        /* Estilos específicos para o formulário de login */
-        #login-section { display: none; }
+        /* Estilos para o logo */
+        .logo-admin {
+            display: block; 
+            margin: 0 auto 20px auto; 
+            max-width: 150px; 
+            height: auto;
+        }
+        
+        /* Estilo da mensagem de boas-vindas */
+        #welcomeMessage {
+            font-size: 1.5em;
+            margin-bottom: 25px;
+            color: #b76e86;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        
+        <img src="https://i.imgur.com/LG2KiJh.png" alt="Logo 3 Marias Moda Feminina" class="logo-admin">
+
         <h1>Administração da Loja</h1>
 
         <section id="login-section">
@@ -107,7 +123,10 @@
         </section>
 
         <section id="product-section" style="display: none;">
-            <h2>Adicionar Novo Produto</h2>
+            
+            <h2 id="welcomeMessage"></h2> 
+
+            <h3>Adicionar Novo Produto</h3>
             <form id="formProduto">
                 <label for="nome">Nome do Produto:</label>
                 <input type="text" id="nome" placeholder="Ex: Conjunto Renda Premium" required>
@@ -174,6 +193,7 @@
         const statusDiv = document.getElementById('status');
         const btnSalvar = document.getElementById('btnSalvar');
         const btnLogout = document.getElementById('btnLogout');
+        const welcomeMessage = document.getElementById('welcomeMessage'); 
 
         function showStatus(div, message, type) {
             div.textContent = message;
@@ -282,12 +302,13 @@
                 // Usuário LOGADO: Mostra a seção de produtos
                 loginSection.style.display = 'none';
                 productSection.style.display = 'block';
-                showStatus(loginStatusDiv, `Bem-vindo, ${user.email}!`, 'success');
+                // SAUDAÇÃO CORRIGIDA PARA "BEM-VINDA"
+                welcomeMessage.textContent = 'Bem-vinda de volta, Harumi Ichimura!'; 
             } else {
                 // Usuário DESLOGADO: Mostra a seção de login
                 loginSection.style.display = 'block';
                 productSection.style.display = 'none';
-                loginStatusDiv.textContent = ''; // Limpa o status
+                loginStatusDiv.textContent = ''; 
             }
         });
         
