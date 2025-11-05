@@ -45,7 +45,6 @@
         #main-media-display {
             width: 100%;
             height: 400px;
-            /* Usa flex para centralizar o player de vídeo, se for o caso */
             display: flex; 
             justify-content: center;
             align-items: center;
@@ -61,7 +60,7 @@
             object-fit: cover;
         }
         #main-media-display video {
-            object-fit: contain; /* Garante que o vídeo inteiro seja visível */
+            object-fit: contain;
         }
 
 
@@ -187,15 +186,28 @@
                 const description = product.description || 'Descrição não disponível.';
                 const price = product.price || '0';
                 const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=IMAGEM+PRINCIPAL';
-                const videoUrl = product.videoUrl; // URL do vídeo do Storage (novo campo)
+                const videoUrl = product.videoUrl;
                 
                 let galleryUrls = product.galeria || [];
                 
-                // A foto principal deve ser a primeira miniatura
-                if (!galleryUrls.includes(imageUrl)) {
-                    galleryUrls.unshift(imageUrl);
+                // Se o vídeo existir, ele é o display principal, e a imagem principal é a miniatura de retorno.
+                // A ordem de exibição é: VÍDEO (Se houver) -> FOTO PRINCIPAL -> GALERIA
+                let allMediaUrls = [];
+
+                if (videoUrl) {
+                    // Adiciona o vídeo como o primeiro item, usando a URL da imagem como thumbnail
+                    allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl });
                 }
                 
+                // Adiciona a foto principal (se não for a thumbnail do vídeo, ou se não houver vídeo)
+                allMediaUrls.push({ type: 'image', url: imageUrl, thumb: imageUrl });
+                
+                // Adiciona as fotos da galeria
+                galleryUrls.forEach(url => {
+                    allMediaUrls.push({ type: 'image', url: url, thumb: url });
+                });
+
+
                 // 6. FORMATAÇÃO PARA IENE (¥)
                 const priceValue = parseFloat(price.toString().replace(',', '.')); 
                 const precoFormatado = priceValue.toLocaleString('ja-JP', { 
@@ -204,31 +216,41 @@
                     maximumFractionDigits: 0
                 });
 
-                // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL (IMAGEM OU VÍDEO)
+                // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL e MINIATURAS
                 let mainMediaHTML = '';
-                let isVideo = false;
-
-                if (videoUrl) {
-                    isVideo = true;
-                    // Player de vídeo: controls, loop e muted para melhor UX
-                    mainMediaHTML = `
-                        <video src="${videoUrl}" controls loop muted autoplay style="width: 100%; height: 100%; border-radius: 6px;">
-                            Seu navegador não suporta o formato de vídeo.
-                        </video>
-                    `;
-                } else {
-                    // Imagem principal
-                    mainMediaHTML = `<img id="main-image" src="${imageUrl}" alt="${name}">`;
-                }
-
-
-                // 8. MONTAGEM DO HTML COMPLETO
                 let galleryHTML = '';
-                galleryUrls.forEach((url, index) => {
-                    galleryHTML += `<img src="${url}" class="thumb ${index === 0 && !isVideo ? 'active' : ''}" data-full-src="${url}" alt="Miniatura ${index + 1}">`;
+                
+                allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i); // Remove duplicatas
+
+                allMediaUrls.forEach((media, index) => {
+                    const isActive = index === 0;
+
+                    // Cria as miniaturas (thumbs)
+                    galleryHTML += `
+                        <img 
+                            src="${media.thumb}" 
+                            class="thumb ${isActive ? 'active' : ''}" 
+                            data-type="${media.type}"
+                            data-full-src="${media.url}" 
+                            alt="Mídia ${index + 1}"
+                        >
+                    `;
+
+                    // Define a mídia inicial (primeiro item)
+                    if (isActive) {
+                        if (media.type === 'video') {
+                             mainMediaHTML = `
+                                <video src="${media.url}" controls loop muted autoplay style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                                    Seu navegador não suporta o formato de vídeo.
+                                </video>
+                            `;
+                        } else {
+                            mainMediaHTML = `<img id="main-image" src="${media.url}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">`;
+                        }
+                    }
                 });
-
-
+                
+                // 8. MONTAGEM DO HTML COMPLETO
                 detailsContainer.innerHTML = `
                     <div class="media-area">
                         <div id="main-media-display">
@@ -239,7 +261,7 @@
                         </div>
                     </div>
                     <div class="info-area">
-                        <h1>${name}</h1>
+                        <h1 id="product-name">${name}</h1>
                         <p class="price">${precoFormatado}</p>
                         <h3>Descrição</h3>
                         <p>${description}</p>
@@ -247,16 +269,28 @@
                     </div>
                 `;
 
-                // 9. FUNCIONALIDADE DA GALERIA (TROCA DE MÍDIA)
+                // 9. FUNCIONALIDADE DA GALERIA (Troca de Mídia)
                 const mainMediaDisplay = document.getElementById('main-media-display');
                 const thumbs = document.querySelectorAll('.thumb');
                 
                 thumbs.forEach(thumb => {
                     thumb.addEventListener('click', () => {
                         const newSrc = thumb.dataset.fullSrc;
+                        const mediaType = thumb.dataset.type;
+
+                        mainMediaDisplay.innerHTML = ''; // Limpa o display
                         
-                        // Troca a mídia principal para a imagem clicada
-                        mainMediaDisplay.innerHTML = `<img id="main-image" src="${newSrc}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">`;
+                        if (mediaType === 'video') {
+                            mainMediaDisplay.innerHTML = `
+                                <video src="${newSrc}" controls loop muted autoplay style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                                    Seu navegador não suporta o formato de vídeo.
+                                </video>
+                            `;
+                        } else {
+                            mainMediaDisplay.innerHTML = `
+                                <img src="${newSrc}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+                            `;
+                        }
                         
                         // Atualiza o estado ativo
                         thumbs.forEach(t => t.classList.remove('active'));
