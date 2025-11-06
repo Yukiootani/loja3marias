@@ -9,94 +9,74 @@
         /* Estilos de Estrutura BASE */
         body { font-family: Arial, sans-serif; margin: 0; background-color: #fdf7f9; color: #333; }
         
-        /* NOVO HEADER: Minimalista, focado apenas no título principal */
+        /* HEADER: Título Fixo e Limpo */
         header { 
-            background-color: white; /* Fundo branco ou neutro */
-            color: #b76e86; /* Cor do logo/título */
+            background-color: white; 
+            color: #b76e86; 
             text-align: center; 
             padding: 1rem 0; 
-            border-bottom: 1px solid #eee; /* Linha sutil de separação */
+            border-bottom: 1px solid #eee; 
+            position: relative; 
         }
         header h1 { 
             margin: 0; 
-            font-size: 1.8em; /* Título menor e mais discreto */
+            font-size: 1.8em; 
             color: #b76e86;
         }
 
-        /* Banner Principal (Carrossel Estático) */
+        /* Banner Principal - Foco no Design Limpo */
         #main-banner {
             width: 100%;
-            height: 350px; /* Altura grande */
-            background-image: url('https://via.placeholder.com/1000x400/d8a0b0/ffffff?text=SEU+BANNER+PRINCIPAL'); 
+            height: 350px; 
+            /* URL TEMPORÁRIA: SUBSTITUA POR UMA IMAGEM DA SUA LOJA */
+            background-image: url('https://via.placeholder.com/1000x400/d8a0b0/ffffff?text=SEU+BANNER+PRINCIPAL+AQUI'); 
             background-size: cover;
             background-position: center;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 2em;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* Texto de Impacto no Banner */
+        #banner-text {
+            font-size: 1.4em; /* Fonte um pouco maior */
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); /* Sombra para destacar */
+            line-height: 1.4;
+            margin-top: 10px;
         }
         
         main { 
             max-width: 1200px; 
-            margin: 0 auto; 
+            margin: 20px auto; /* Adiciona margem superior e inferior */
             padding: 0 15px; 
         }
 
-        /* Área de Conteúdo de Duas Colunas */
-        #content-wrapper {
-            display: flex;
-            flex-direction: row; /* Começa como coluna no mobile */
-            gap: 20px;
-        }
-
-        /* Coluna Lateral/Filtros (1/3 da tela em desktop) */
-        #sidebar-filters {
-            width: 100%; /* Largura total no mobile */
-            padding-top: 10px;
-        }
-
-        /* Coluna Principal/Produtos (2/3 da tela em desktop) */
-        #main-products-area {
-            width: 100%; /* Largura total no mobile */
-        }
-        
-        /* Desktop: Duas Colunas Ativas */
-        @media (min-width: 768px) {
-            #content-wrapper {
-                flex-direction: row; 
-            }
-            #sidebar-filters {
-                width: 300px; /* Largura fixa para a coluna de filtros */
-                flex-shrink: 0;
-            }
-            #main-products-area {
-                flex-grow: 1; /* Ocupa o restante */
-            }
-            /* Garantir que os botões de filtro não fiquem muito largos na sidebar */
-            #controls {
-                max-width: none;
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .filter-button {
-                max-width: none;
-            }
-        }
-        
-        /* Controles de Filtro (Botões) - Estilo Minimalista */
+        /* Seção de Filtros */
         #controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             padding: 15px;
             background-color: #fff;
-            border-radius: 4px;
-            box-shadow: none;
-            border: 1px solid #eee;
-            margin-bottom: 20px;
-            
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra leve */
+            margin-bottom: 25px;
+        }
+        
+        /* Estilo dos Títulos de Seção */
+        .section-title {
+            color: #b76e86;
+            font-size: 1.2em;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 15px;
         }
 
+        /* Botões de Filtro - Novo Estilo Minimalista e Responsivo */
         .filter-button {
             background-color: #f7f7f7; 
             color: #333;
@@ -104,31 +84,49 @@
             box-shadow: none;
             font-size: 1em;
             font-weight: normal;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
         }
 
         .filter-button.active {
-            background-color: #b76e86; /* Cor da Loja quando ativo */
+            background-color: #b76e86;
             color: white;
             border-color: #b76e86;
+            font-weight: bold;
         }
         
-        /* Área dos Produtos */
+        /* Área dos Produtos - Grid Responsivo */
         #product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 250px para caber em 2 colunas */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
             gap: 20px;
-            margin-top: 20px;
         }
-
-        /* Estilos de Cartão (Adaptados) */
-        .product-card { border: 1px solid #eee; }
-        .product-card img { height: 300px; }
         
-        .product-info h3 { font-size: 1.1em; }
-        .product-info .price { font-size: 1.3em; color: #b76e86; }
+        /* Estilos de Cartão */
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            text-decoration: none;
+            color: #333;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .product-card:hover { transform: translateY(-3px); }
+        .product-card img { height: 300px; object-fit: cover; }
+        
+        .product-info { padding: 1rem; }
+        .product-info h3 { font-size: 1.1em; color: #b76e86; }
+        .product-info .price { font-size: 1.3em; color: #333; font-weight: bold; }
         .buy-button { background-color: #b76e86; }
-        
-        /* Estilo para garantir que o cabeçalho seja clicável */
+
+
+        /* Estilo para atalho Admin */
         #admin-trigger {
             cursor: pointer; 
             user-select: none; 
@@ -144,31 +142,28 @@
     </header>
 
     <div id="main-banner">
-        <p>Sinta-se linda e segura. Do Brasil para você.</p>
+        <div id="banner-text">
+            <p style="font-size: 1em; font-weight: bold; margin: 0;">PRODUTOS À PRONTA-ENTREGA</p>
+            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Sinta-se linda e segura. Do Brasil para você.</p>
+        </div>
     </div>
 
     <main>
-        <div id="content-wrapper">
-            
-            <div id="sidebar-filters">
-                <div id="controls">
-                    <h2 style="color:#333; font-size:1.1em; margin-bottom:15px; text-align:left;">FILTRAR POR DISPONIBILIDADE</h2>
+        
+        <div id="controls">
+            <h2 class="section-title">FILTRAR POR DISPONIBILIDADE</h2>
 
-                    <button class="filter-button active" data-filter="pronta-entrega">Toyohashi e Região<br>(Pronta Entrega)</button>
-                    <button class="filter-button" data-filter="sob-encomenda">Receba em 3-5 dias. Qualquer lugar do Japão (Sob Encomenda)</button>
-                </div>
-            </div>
-
-            <div id="main-products-area">
-                <h2 style="color:#b76e86; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">Nossa Coleção</h2>
-                
-                <div id="product-grid">
-                    </div>
-                
-                <p id="loading-status" style="text-align: center; margin-top: 40px; font-weight: bold;">Carregando produtos...</p>
-            </div>
-            
+            <button class="filter-button active" data-filter="pronta-entrega">Toyohashi e Região (Pronta Entrega)</button>
+            <button class="filter-button" data-filter="sob-encomenda">Receba em 3-5 dias. Qualquer lugar do Japão (Sob Encomenda)</button>
         </div>
+
+        <h2 class="section-title">Nossa Coleção</h2>
+        
+        <div id="product-grid">
+            </div>
+        
+        <p id="loading-status" style="text-align: center; margin-top: 40px; font-weight: bold;">Carregando produtos...</p>
+        
     </main>
     <footer>
         <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
@@ -178,7 +173,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> 
 
     <script>
-        // 1. CONFIGURAÇÃO (Copiada do seu código, garantindo a conexão)
+        // 1. CONFIGURAÇÃO (Copiada do seu código)
         const firebaseConfig = {
             apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
             authDomain: "loja3marias-50204.firebaseapp.com",
@@ -199,7 +194,7 @@
     </script>
 
     <script>
-        // --- CÓDIGO DO ATALHO ADMIN ---
+        // --- CÓDIGO DO ATALHO ADMIN (Mantido) ---
         const ADMIN_URL = "admin.html";
         const ADMIN_TRIGGER = document.getElementById('admin-trigger');
         let clickCount = 0;
@@ -223,7 +218,7 @@
         });
         // --- FIM DO CÓDIGO DO ATALHO ADMIN ---
 
-        // --- CÓDIGO DE CARREGAMENTO DE PRODUTOS ---
+        // --- CÓDIGO DE CARREGAMENTO DE PRODUTOS (Mantido) ---
         const productGrid = document.getElementById('product-grid');
         const filterButtons = document.querySelectorAll('.filter-button');
         const loadingStatus = document.getElementById('loading-status');
