@@ -6,32 +6,33 @@
     <title>3 Marias Loja</title>
     
     <style>
-        /* Variáveis de Cor OTIMIZADAS PARA ELEGÂNCIA EXTREMA */
+        /* Variáveis de Cor OTIMIZADAS PARA O VISUAL LABELLY */
         :root {
-            --primary-color: #b76e86; /* Rosa/Bordô Principal (para acentos e botões ativos) */
-            --accent-color: #DAA520; /* DOURADO FOSCO (Linhas e Bordas Chics) */
-            --text-color: #333; /* Texto Principal (Preto) */
-            --bg-color: #fcfcfc; /* Quase Branco (Limpo) */
-            --border-color: #eee; /* Cinza sutil */
+            --primary-color: #333; /* Preto Chumbo/Texto Principal */
+            --accent-color: #999; /* Cinza Metalizado/Acentos (como o "IB" na foto) */
+            --bg-color: #fcfcfc; /* Fundo Branco Limpo */
+            --border-color: #ddd; /* Cinza sutil */
+            --filter-bg: #f9f9f9; /* Fundo dos botões de filtro (cinza claro) */
         }
 
         /* Estilos de Estrutura BASE */
-        body { font-family: Arial, sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); }
+        body { font-family: Arial, sans-serif; margin: 0; background-color: var(--bg-color); color: var(--primary-color); }
         
-        /* HEADER: Fundo Branco e Linha Dourada */
+        /* HEADER: Título Preto e Fundo Branco */
         header { 
             background-color: white; 
-            color: var(--text-color); 
+            color: var(--primary-color); 
             text-align: center; 
             padding: 1.2rem 0; 
-            border-bottom: 2px solid var(--accent-color); /* Linha DOURADA sutil */
+            border-bottom: 1px solid var(--border-color); 
             position: relative; 
         }
         header h1 { 
             margin: 0; 
             font-size: 1.6em; 
-            color: var(--text-color); 
+            color: var(--primary-color); 
             letter-spacing: 2px; 
+            font-weight: 300; /* Fonte mais leve para elegância */
         }
         
         main { 
@@ -44,57 +45,60 @@
         #filter-instruction {
             text-align: center;
             font-size: 1em; 
-            font-weight: normal;
-            color: var(--text-color);
+            font-weight: 400; /* Normal */
+            color: var(--primary-color); 
             margin-bottom: 25px; 
             padding: 10px 0;
-            border-bottom: 1px solid var(--accent-color); /* Linha Dourada para o separador */
+            border-bottom: 1px solid var(--border-color);
         }
 
-        /* Seção de Filtros */
+        /* Seção de Filtros (Estilo como a barra "FILTRAR / ORDENAR") */
         #controls {
             display: flex;
-            gap: 0; /* Remove gap */
+            gap: 0; 
             padding: 0;
-            border: 1px solid var(--border-color); /* Borda fina ao redor dos botões */
+            border: 1px solid var(--border-color); /* Borda fina */
             border-radius: 4px;
             overflow: hidden;
             margin-bottom: 35px; 
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra super sutil */
+            background-color: var(--filter-bg); /* Fundo Cinza Claro */
         }
 
         /* Estilo dos Títulos de Seção */
         .section-title {
-            color: var(--text-color); 
+            color: var(--primary-color); 
             font-size: 1.4em;
             padding-bottom: 10px;
-            border-bottom: 1px solid var(--accent-color); /* Linha DOURADA */
+            border-bottom: 1px solid var(--border-color); /* Linha Fina Cinza */
             margin-bottom: 20px;
             text-align: left;
             font-weight: bold;
             letter-spacing: 1px;
         }
 
-        /* Botões de Filtro - Duas colunas CHICS */
+        /* Botões de Filtro - Duas colunas Labelly Style */
         .filter-button {
-            background-color: white; 
-            color: var(--text-color);
+            background-color: var(--filter-bg); 
+            color: var(--primary-color);
             border-right: 1px solid var(--border-color); /* Separador sutil */
             box-shadow: none;
             font-size: 1em;
-            font-weight: normal;
+            font-weight: 500;
             padding: 12px;
             cursor: pointer;
             width: 50%;
             transition: all 0.2s;
         }
-        .filter-button:last-child { border-right: none; } /* Remove borda do último */
+        .filter-button:last-child { border-right: none; } 
 
         .filter-button.active {
-            background-color: var(--primary-color); 
-            color: white;
-            font-weight: bold;
+            background-color: white; /* Fundo Branco para o ativo */
+            color: var(--primary-color);
+            font-weight: 600;
+            border: 1px solid var(--primary-color); /* Destaque forte na borda (opcional) */
+            z-index: 1; /* Para sobrepor a borda do inativo */
         }
+        .filter-button.active:first-child { border-left: 1px solid var(--primary-color); }
 
         /* Produtos */
         #product-grid {
@@ -103,12 +107,12 @@
             gap: 25px; 
         }
         
-        /* Estilos de Cartão - Elegantemente Flutuante */
+        /* Estilos de Cartão - Clean */
         .product-card {
             background-color: white;
-            border-radius: 6px; /* Borda leve para o minimalismo */
-            border: 1px solid var(--border-color); 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* Sombra ainda mais suave */
+            border-radius: 0; /* Sem bordas arredondadas (Clean) */
+            border: none; /* Sem borda visível */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); 
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
         }
@@ -121,32 +125,33 @@
         }
         .product-info h3 { 
             font-size: 1.1em; 
-            color: var(--text-color); /* Título Preto (Chic) */
+            color: var(--primary-color); 
             margin-bottom: 5px;
+            font-weight: 500;
         }
         .product-info .price { 
             font-size: 1.3em; 
-            color: var(--primary-color); /* Preço Rosa (Acento) */
-            font-weight: bold; 
+            color: var(--accent-color); /* PREÇO CINZA METALIZADO/SUTIL */
+            font-weight: 600; 
         }
         
-        /* Botão Melhorado - Toque Final de Elegância */
+        /* Botão "Ver Detalhes" - Minimalista e Sutil */
         .buy-button { 
-            background-color: white; /* Fundo Branco (Elegância) */
-            color: var(--primary-color); /* Texto Rosa */
+            background-color: white; 
+            color: var(--primary-color); 
             padding: 8px 12px;
             font-size: 1em;
-            font-weight: normal; /* Menos negrito */
-            border-radius: 4px; 
-            border: 1px solid var(--accent-color); /* BORDA FINA DOURADA */
-            box-shadow: none; /* Sem sombra para minimalismo */
+            font-weight: 500;
+            border-radius: 0; /* Sem bordas arredondadas */
+            border: 1px solid var(--accent-color); /* Borda FINA Cinza/Metalizada */
+            box-shadow: none; 
             display: block;
             margin-top: 15px;
             transition: background-color 0.3s ease, color 0.3s;
         }
         
         .buy-button:hover { 
-            background-color: var(--primary-color); 
+            background-color: var(--primary-color); /* Fundo Preto no hover */
             color: white;
         }
         
@@ -207,7 +212,7 @@
     </script>
 
     <script>
-        // --- CÓDIGO DO ATALHO ADMIN ---
+        // --- CÓDIGO DO ATALHO ADMIN (Mantido) ---
         const ADMIN_URL = "admin.html";
         const ADMIN_TRIGGER = document.getElementById('admin-trigger');
         let clickCount = 0;
@@ -231,7 +236,7 @@
         });
         // --- FIM DO CÓDIGO DO ATALHO ADMIN ---
 
-        // --- CÓDIGO DE CARREGAMENTO DE PRODUTOS ---
+        // --- CÓDIGO DE CARREGAMENTO DE PRODUTOS (Mantido) ---
         const productGrid = document.getElementById('product-grid');
         const filterButtons = document.querySelectorAll('.filter-button');
         const loadingStatus = document.getElementById('loading-status');
