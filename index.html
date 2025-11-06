@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 MARIAS MODA FEMININA</title>
+    <title>3 Marias Loja</title>
     
     <style>
         body {
@@ -11,153 +11,257 @@
             margin: 0;
             background-color: #fdf7f9;
             color: #333;
+            overflow-x: hidden; /* Evita scroll horizontal por elementos animados */
         }
 
         header {
             background-color: #d8a0b0;
             color: white;
+            padding: 1rem 0;
             text-align: center;
-            padding: 2rem 1rem;
+            position: relative; /* Para posicionar as estrelas */
+            overflow: hidden; /* Assegura que as estrelas desapareçam sem scroll */
         }
 
         header h1 {
             margin: 0;
+            font-size: 2.5em; /* Aumentado para dar mais destaque */
+            position: relative;
+            z-index: 2; /* Para que o texto fique acima das estrelas */
+        }
+        
+        header p {
+            font-size: 1.1em; /* Ajuste para o subtítulo */
+            position: relative;
+            z-index: 2;
         }
 
         main {
             max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        h2 {
-            text-align: center;
-            color: #b76e86;
-            margin-bottom: 2rem;
+            margin: 30px auto;
+            padding: 0 15px;
         }
         
-        /* Estilo da Seção de Filtros/Botões */
-        #filter-controls {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
+        /* Controles de Filtro e Admin */
+        #controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
-        .filter-button {
-            padding: 10px 20px;
-            margin: 0 5px;
-            border: 2px solid #b76e86;
-            background-color: transparent;
-            color: #b76e86;
-            cursor: pointer;
-            border-radius: 25px;
+
+        #controls label {
             font-weight: bold;
-            transition: all 0.3s ease;
+            margin-right: 10px;
         }
-        .filter-button.active, .filter-button:hover {
+        
+        #source-filter, #admin-link {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        
+        #admin-link {
             background-color: #b76e86;
             color: white;
+            text-decoration: none;
+            border: none;
+            text-align: center;
         }
-        
-        /* Estilo do Selo de Disponibilidade */
-        .source-tag {
-            font-size: 0.75em;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 8px;
+        #admin-link:hover {
+            background-color: #8c4c61;
         }
-        .pronta-entrega { background-color: #d4edda; color: #155724; } /* Verde Claro */
-        .sob-encomenda { background-color: #fff3cd; color: #856404; } /* Amarelo Claro */
 
-        /* Layout do Grid de Produtos */
-        #product-grid {
+        /* Área dos Produtos */
+        #products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         .product-card {
-            background-color: #fff;
+            background-color: white;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            text-decoration: none;
+            color: #333;
+            transition: transform 0.2s;
             position: relative; /* Para posicionar o selo */
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
         }
 
         .product-card img {
             width: 100%;
-            height: 300px;
+            height: 250px;
             object-fit: cover;
         }
 
-        .product-card h3 {
-            font-size: 1.25rem;
-            color: #333;
-            padding: 1rem 1rem 0.5rem 1rem;
-            margin: 0;
+        .product-info {
+            padding: 15px;
         }
 
-        .product-card .description {
-            font-size: 0.9rem;
-            color: #666;
-            padding: 0 1rem 1rem 1rem;
-            flex-grow: 1;
-        }
-
-        .product-card .price {
-            font-size: 1.2rem;
-            font-weight: bold;
+        .product-info h2 {
+            margin-top: 0;
+            font-size: 1.2em;
             color: #b76e86;
-            padding: 0 1rem 1rem 1rem;
+            min-height: 40px;
         }
 
-        .product-card .buy-button {
-            display: block;
-            background-color: #b76e86;
-            color: white;
-            text-align: center;
-            padding: 0.8rem 1rem;
-            text-decoration: none;
+        .product-info .price {
+            font-size: 1.4em;
             font-weight: bold;
-            transition: background-color 0.3s ease;
+            margin: 10px 0 0;
         }
 
-        .product-card .buy-button:hover {
-            background-color: #a35f75;
-        }
-
-        footer {
+        #loading, #empty-message {
             text-align: center;
-            padding: 1rem;
-            background-color: #e0e0e0;
+            grid-column: 1 / -1;
+            padding: 50px;
+            font-size: 1.2em;
             color: #777;
-            margin-top: 2rem;
         }
+        
+        /* Estilos do Selo */
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8em;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 10;
+        }
+        .status-pronta-entrega { 
+            background-color: #d4edda; 
+            color: #0c611f; 
+        }
+        .status-sob-encomenda { 
+            background-color: #fce8a9; 
+            color: #856404; 
+        }
+
+        /* --- ESTILOS PARA AS ESTRELAS ANIMADAS --- */
+        .star-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centraliza o contêiner */
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Permite clicar através dele */
+            z-index: 1; /* Fica abaixo do texto H1 */
+        }
+
+        .star {
+            position: absolute;
+            width: 30px; /* Tamanho da estrela */
+            height: 30px;
+            background: url('https://i.imgur.com/G4c5QyY.png') no-repeat center center / contain; /* Imagem de estrela brilhante */
+            opacity: 0;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+        }
+
+        /* Keyframes para a animação das estrelas */
+        @keyframes star-animation {
+            0% {
+                transform: translate(250px, 0px) scale(0.5) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                transform: translate(150px, -15px) scale(1) rotate(45deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50px, 10px) scale(1.2) rotate(90deg);
+                opacity: 1;
+            }
+            80% {
+                transform: translate(-250px, -20px) scale(0.5) rotate(135deg);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-300px, 0px) scale(0) rotate(180deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Variações para as 3 estrelas para um efeito mais natural */
+        .star:nth-child(1) {
+            animation: star-animation 5s infinite;
+        }
+        .star:nth-child(2) {
+            animation: star-animation 5s infinite -1.5s; /* Começa 1.5s depois */
+        }
+        .star:nth-child(3) {
+            animation: star-animation 5s infinite -3s; /* Começa 3s depois */
+        }
+
+        /* Ajuste para telas menores */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            header p {
+                font-size: 1em;
+            }
+            .star {
+                width: 20px; /* Estrelas menores em telas pequenas */
+                height: 20px;
+            }
+            @keyframes star-animation {
+                0% { transform: translate(150px, 0px) scale(0.5) rotate(0deg); opacity: 0; }
+                20% { transform: translate(80px, -10px) scale(1) rotate(45deg); opacity: 1; }
+                50% { transform: translate(-30px, 5px) scale(1.2) rotate(90deg); opacity: 1; }
+                80% { transform: translate(-150px, -10px) scale(0.5) rotate(135deg); opacity: 0; }
+                100% { transform: translate(-180px, 0px) scale(0) rotate(180deg); opacity: 0; }
+            }
+        }
+
     </style>
 </head>
 <body>
 
     <header>
+        <div class="star-container">
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+        </div>
         <h1>3 MARIAS MODA FEMININA</h1>
         <p>Lingeries e muito mais direto do Brasil!<br> Tudo à pronta-entrega.</p>
     </header>
 
     <main>
-        
-        <div id="filter-controls">
-            <button class="filter-button active" data-filter="pronta-entrega">✨ Pronta Entrega</button>
-            <button class="filter-button" data-filter="sob-encomenda">📦 Catálogo Completo (Sob Encomenda)</button>
+        <div id="controls">
+            <div>
+                <label for="source-filter">Filtrar por:</label>
+                <select id="source-filter" onchange="fetchProducts()">
+                    <option value="todos" selected>Mostrar Tudo (Catálogo Completo)</option>
+                    <option value="pronta-entrega">Pronta Entrega</option>
+                    <option value="sob-encomenda">Sob Encomenda</option>
+                </select>
             </div>
-
-        <h2><span id="collection-title">Pronta Entrega</span></h2>
-        
-        <div id="product-grid">
-            <p style="text-align: center;">Carregando produtos do Firebase...</p>
+            <a id="admin-link" href="admin.html">Painel Administrativo</a>
         </div>
+
+        <div id="loading">Carregando produtos...</div>
+        <div id="empty-message" style="display: none;">Nenhum produto encontrado com o filtro selecionado.</div>
+
+        <div id="products-grid">
+            </div>
     </main>
 
     <footer>
@@ -183,119 +287,92 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(); 
 
-        // Variável global para armazenar a lista completa de produtos
-        let allProducts = [];
-        const COLECAO_PRODUTOS = "products";
-        const productGrid = document.getElementById('product-grid');
-        const collectionTitle = document.getElementById('collection-title');
+        const productsGrid = document.getElementById('products-grid');
+        const loadingDiv = document.getElementById('loading');
+        const emptyMessageDiv = document.getElementById('empty-message');
+        
+        // NÚMERO CORRETO DA HARUMI 
+        const WHATSAPP_NUMBER = "818074558624";
 
-        // --- FUNÇÕES DE EXIBIÇÃO E FILTRO ---
 
-        // Função principal para buscar TODOS os produtos e salvar na variável global
-        async function loadAllProducts() {
+        // 4. LÓGICA DE BUSCA
+        async function fetchProducts() {
+            productsGrid.innerHTML = '';
+            loadingDiv.style.display = 'block';
+            emptyMessageDiv.style.display = 'none';
+
             try {
-                const snapshot = await db.collection(COLECAO_PRODUTOS).get();
-                allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const selectedSource = document.getElementById('source-filter').value;
+                let query = db.collection("products");
                 
-                // Exibe a categoria padrão ao carregar
-                filterAndDisplayProducts('pronta-entrega'); 
+                if (selectedSource === 'pronta-entrega') {
+                    query = query.where("source", "==", "pronta-entrega");
+                } else if (selectedSource === 'sob-encomenda') {
+                    query = query.where("source", "==", "sob-encomenda");
+                }
+                
+                const snapshot = await query.get();
+                const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                loadingDiv.style.display = 'none';
+
+                if (products.length === 0) {
+                    emptyMessageDiv.style.display = 'block';
+                    return;
+                }
+
+                products.forEach(product => {
+                    const name = product.name || 'Produto Sem Nome';
+                    const imageUrl = product.imageUrl || 'https://via.placeholder.com/300x200?text=IMAGEM';
+                    const price = product.price || '0';
+                    const source = product.source || 'pronta-entrega'; 
+                    
+                    const priceValue = parseFloat(price.toString().replace(',', '.')); 
+                    const precoFormatado = priceValue.toLocaleString('ja-JP', { 
+                        style: 'currency', 
+                        currency: 'JPY',
+                        maximumFractionDigits: 0
+                    });
+
+                    let statusText = '';
+                    let statusClass = '';
+
+                    if (source === 'pronta-entrega') {
+                        statusText = 'Pronta Entrega';
+                        statusClass = 'status-pronta-entrega';
+                    } else if (source === 'sob-encomenda') {
+                        statusText = 'Sob Encomenda';
+                        statusClass = 'status-sob-encomenda';
+                    } else {
+                        statusText = 'Pronta Entrega';
+                        statusClass = 'status-pronta-entrega';
+                    }
+
+                    const whatsappMessage = `Olá, Harumi! Vi o produto ${name} (${precoFormatado}) na loja. Tenho interesse.`;
+                    const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+
+
+                    const card = `
+                        <a href="detalhes.html?id=${product.id}" class="product-card">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                            <img src="${imageUrl}" alt="${name}">
+                            <div class="product-info">
+                                <h2>${name}</h2>
+                                <p class="price">${precoFormatado}</p>
+                            </div>
+                        </a>
+                    `;
+                    productsGrid.innerHTML += card;
+                });
 
             } catch (error) {
-                console.error('Erro ao buscar produtos do Firebase:', error);
-                productGrid.innerHTML = '<p style="text-align: center; color: red;">⚠️ Erro ao carregar a loja. Verifique o console.</p>';
+                console.error("Erro ao carregar produtos:", error);
+                loadingDiv.style.display = 'none';
+                productsGrid.innerHTML = `<p style="color: red; grid-column: 1 / -1;">Erro ao carregar dados. Verifique a conexão com o Firebase: ${error.message}</p>`;
             }
         }
-        
-        // Função que filtra e exibe os produtos
-        function filterAndDisplayProducts(filterSource) {
-            
-            productGrid.innerHTML = ''; // Limpa o grid
-            let filteredProducts;
-            let titleText = 'Nossa Coleção';
 
-            if (filterSource === 'all') {
-                filteredProducts = allProducts;
-            } else {
-                // Filtra pelo campo 'source' (pronta-entrega ou sob-encomenda)
-                filteredProducts = allProducts.filter(product => product.source === filterSource);
-            }
-            
-            // Define o título baseado no filtro
-            if (filterSource === 'pronta-entrega') {
-                titleText = 'Pronta Entrega (Envio Imediato)';
-            } else if (filterSource === 'sob-encomenda') {
-                titleText = 'Catálogo Completo (Sob Encomenda - 3-5 dias)';
-            }
-            collectionTitle.textContent = titleText;
-
-
-            if (filteredProducts.length === 0) {
-                productGrid.innerHTML = '<h2>Nenhum produto nesta categoria.</h2>';
-                return;
-            }
-
-            // Renderiza os produtos filtrados
-            filteredProducts.forEach(product => {
-                
-                // Leitura e formatação de dados
-                const imageUrl = product.imageUrl ? product.imageUrl : 'https://via.placeholder.com/300x300/ff69b4/ffffff?text=SEM IMAGEM';
-                const name = product.name || 'Produto Sem Nome';
-                const description = product.description || 'Descrição não disponível.';
-                const price = product.price || '0';
-                const source = product.source || 'pronta-entrega'; // Garante um valor padrão
-                
-                const precoFormatado = parseFloat(price.toString().replace(',', '.')).toLocaleString('ja-JP', { 
-                    style: 'currency', 
-                    currency: 'JPY',
-                    maximumFractionDigits: 0
-                });
-                
-                // Define classes e texto para o selo
-                const sourceText = source === 'pronta-entrega' ? 'PRONTA ENTREGA' : 'SOB ENCOMENDA';
-                const sourceClass = source === 'pronta-entrega' ? 'pronta-entrega' : 'sob-encomenda';
-                
-                
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                
-                card.innerHTML = `
-                    <img src="${imageUrl}" alt="Imagem de ${name}">
-                    <div style="padding: 1rem 1rem 0;">
-                        <span class="source-tag ${sourceClass}">${sourceText}</span>
-                    </div>
-                    <h3>${name}</h3>
-                    <p class="description">${description}</p>
-                    <p class="price">${precoFormatado}</p>
-                    <a href="detalhes.html?id=${product.id}&source=${source}" class="buy-button">Ver Detalhes</a>
-                `;
-                
-                productGrid.appendChild(card);
-            });
-        }
-
-        // --- EVENTOS DE CONTROLE ---
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. Carrega todos os produtos do Firebase
-            loadAllProducts(); 
-            
-            // 2. Adiciona o evento de clique nos botões de filtro
-            const filterButtons = document.querySelectorAll('.filter-button');
-            filterButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const filterValue = button.dataset.filter;
-                    
-                    // Remove a classe 'active' de todos os botões
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
-                    
-                    // Adiciona a classe 'active' ao botão clicado
-                    button.classList.add('active');
-                    
-                    // Chama a função de filtro
-                    filterAndDisplayProducts(filterValue);
-                });
-            });
-        });
+        document.addEventListener('DOMContentLoaded', fetchProducts);
     </script>
 </body>
 </html>
