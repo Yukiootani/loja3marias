@@ -233,16 +233,17 @@
             return storageRef.getDownloadURL();
         }
 
-        // Função que lista e exibe os produtos (ATUALIZADA)
+        // Função que lista e exibe os produtos (mantida)
         async function listProductsForManagement() {
             productsTableBody.innerHTML = ''; 
             loadingListDiv.style.display = 'block';
 
             try {
-                const snapshot = await db.collection(COLECAO_PRODUTOS).get();
+                // Ordenação para a tabela de admin: por data de criação
+                const snapshot = await db.collection(COLECAO_PRODUTOS).orderBy('createdAt', 'desc').get();
                 
                 if (snapshot.empty) {
-                    productsTableBody.innerHTML = '<tr><td colspan="6">Nenhum produto cadastrado.</td></tr>'; // Alterado de 5 para 6
+                    productsTableBody.innerHTML = '<tr><td colspan="6">Nenhum produto cadastrado.</td></tr>';
                     return;
                 }
 
@@ -255,9 +256,11 @@
                     });
                     
                     const source = product.source || 'N/A';
-                    const sourceText = source === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda';
+                    // Conversão para texto amigável (Pronta Entrega, Sob Encomenda)
+                    const sourceText = source === 'pronta-entrega' ? 'Pronta Entrega' : (source === 'sob-encomenda' ? 'Sob Encomenda' : 'N/A');
                     
-                    // NOVO: Exibição dos selos na tabela
+                    
+                    // Exibição dos selos na tabela
                     let selosText = '';
                     if (product.isNew) {
                         selosText += 'Novo / ';
@@ -265,7 +268,7 @@
                     if (product.isFeatured) {
                         selosText += 'Destaque';
                     }
-                    selosText = selosText.replace(/ \/ $/, '').trim() || 'Nenhum'; // Limpa o " / " final ou coloca "Nenhum"
+                    selosText = selosText.replace(/ \/ $/, '').trim() || 'Nenhum'; 
 
 
                     const row = productsTableBody.insertRow();
@@ -282,7 +285,7 @@
 
             } catch (error) {
                 console.error('Erro ao listar produtos:', error);
-                productsTableBody.innerHTML = '<tr><td colspan="6">Erro ao carregar lista. Verifique o console.</td></tr>'; // Alterado de 5 para 6
+                productsTableBody.innerHTML = '<tr><td colspan="6">Erro ao carregar lista. Verifique o console.</td></tr>';
             } finally {
                 loadingListDiv.style.display = 'none';
             }
@@ -332,7 +335,7 @@
             }
         });
 
-        // 3. LÓGICA DE SALVAMENTO DE PRODUTO (ATUALIZADA)
+        // 3. LÓGICA DE SALVAMENTO DE PRODUTO (CORRIGIDA)
         formProduto.addEventListener('submit', async (e) => {
             e.preventDefault(); 
             
@@ -344,9 +347,12 @@
             const nome = document.getElementById('nome').value;
             const descricao = document.getElementById('descricao').value;
             const preco = document.getElementById('preco').value;
-            const source = document.getElementById('source').value; 
             
-            // NOVO: Captura os valores dos checkboxes
+            // CORREÇÃO CRUCIAL: Captura o valor exato (pronta-entrega ou sob-encomenda) do <select>
+            const source = document.getElementById('source').value;
+            
+            // Não é necessário .toLowerCase().replace(/\s/g, '-') porque os <option value=""> já estão corretos.
+            
             const isNew = document.getElementById('isNew').checked;
             const isFeatured = document.getElementById('isFeatured').checked;
             
@@ -394,9 +400,9 @@
                     name: nome,
                     description: descricao,
                     price: preco,
-                    source: source, 
-                    isNew: isNew,       // NOVO CAMPO
-                    isFeatured: isFeatured, // NOVO CAMPO
+                    source: source,       // Valor padronizado ('pronta-entrega' ou 'sob-encomenda')
+                    isNew: isNew,
+                    isFeatured: isFeatured,
                     imageUrl: imageUrl, 
                     videoUrl: videoUrl, 
                     galeria: galeriaArray, 
