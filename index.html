@@ -133,29 +133,30 @@
             font-weight: bold; 
         }
         
-        /* --- ESTILO NOVO E MELHORADO PARA O BOTÃO "VER DETALHES" --- */
+        /* --- ESTILO MELHORADO PARA O BOTÃO "VER DETALHES" --- */
         .buy-button { 
             background-color: var(--primary-color); 
             color: white;
             padding: 10px 15px;
-            font-size: 1.1em; /* Fonte maior */
+            font-size: 1.1em; 
             font-weight: bold;
-            border-radius: 6px; /* Borda levemente arredondada */
-            border: 1px solid #a35f75; /* Borda sutil */
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Sombra 3D sutil */
+            border-radius: 6px; 
+            border: 1px solid #a35f75; 
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); 
             display: block;
             margin-top: 15px;
             transition: background-color 0.3s ease, transform 0.1s;
         }
         
         .buy-button:hover { 
-            background-color: #a35f75; /* Cor mais escura no hover */
-            transform: translateY(-1px); /* Efeito de elevação */
+            background-color: #a35f75; 
+            transform: translateY(-1px); 
             box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
         }
         /* ----------------------------------------------------------- */
 
-        /* Selos no Cartão */
+        /* --- REMOÇÃO DOS ESTILOS DOS SELOS --- */
+        /*
         .badge {
             position: absolute;
             top: 10px;
@@ -168,6 +169,8 @@
         }
         .badge.new { background-color: #ff6347; left: 10px; }
         .badge.featured { background-color: #28a745; right: 10px; }
+        */
+        /* --- FIM DA REMOÇÃO DOS ESTILOS DOS SELOS --- */
         
         /* Estilo para atalho Admin */
         #admin-trigger {
@@ -254,7 +257,7 @@
         });
         // --- FIM DO CÓDIGO DO ATALHO ADMIN ---
 
-        // --- CÓDIGO DE CARREGAMENTO DE PRODUTOS (Mantido) ---
+        // --- CÓDIGO DE CARREGAMENTO DE PRODUTOS (Removida a lógica dos selos) ---
         const productGrid = document.getElementById('product-grid');
         const filterButtons = document.querySelectorAll('.filter-button');
         const loadingStatus = document.getElementById('loading-status');
@@ -294,16 +297,17 @@
                     const card = document.createElement('div');
                     card.className = 'product-card';
                     
-                    let selosHTML = '';
-                    if (product.isNew) {
-                        selosHTML += `<span class="badge new">✨ NOVIDADE</span>`;
-                    }
-                    if (product.isFeatured) {
-                        selosHTML += `<span class="badge featured">✅ DESTAQUE</span>`;
-                    }
+                    // --- REMOÇÃO DO CÓDIGO HTML DOS SELOS ---
+                    // let selosHTML = '';
+                    // if (product.isNew) {
+                    //     selosHTML += `<span class="badge new">✨ NOVIDADE</span>`;
+                    // }
+                    // if (product.isFeatured) {
+                    //     selosHTML += `<span class="badge featured">✅ DESTAQUE</span>`;
+                    // }
+                    // --- FIM DA REMOÇÃO DO CÓDIGO HTML DOS SELOS ---
                     
                     card.innerHTML = `
-                        ${selosHTML}
                         <a href="${detailLink}"><img src="${product.imageUrl}" alt="${product.name}"></a>
                         <div class="product-info">
                             <h3>${product.name}</h3>
