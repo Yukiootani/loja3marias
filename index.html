@@ -19,10 +19,10 @@
             z-index: 1; 
         }
 
-        /* Destaque Pronta Entrega (FONTE DIMINUÍDA NOVAMENTE) */
+        /* Destaque Pronta Entrega */
         .highlight-text {
             font-weight: bold;
-            font-size: 1em; /* Diminuído para 1em para garantir que caiba */
+            font-size: 1em; /* Fonte ajustada para caber em uma linha */
             display: block;
             margin-bottom: 5px;
             white-space: nowrap; 
@@ -174,60 +174,6 @@
             user-select: none; 
             -webkit-tap-highlight-color: transparent;
         }
-
-        /* --- ESTILOS PARA A ANIMAÇÃO DAS ESTRELAS (MUITO OTIMIZADO) --- */
-        .star-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            /* Removido fadeInOutStars aqui para controle individual */
-        }
-
-        .star {
-            position: absolute;
-            color: white;
-            font-size: 2.5em; /* Estrelas um pouco maiores para serem mais notáveis */
-            text-shadow: 0 0 12px #f0e68c, 0 0 25px #ffd700; /* Brilho ainda mais intenso */
-            opacity: 0; /* Começa invisível */
-            transform: translateZ(0);
-            animation: starMovement 12s ease-out forwards; /* Duração aumentada para 12 segundos */
-        }
-
-        /* Keyframes para as estrelas - Movimento mais pronunciado e lento */
-        @keyframes starMovement {
-            0% {
-                opacity: 0;
-                transform: translate(-20%, 50%) scale(0.2) rotate(0deg); /* Começa bem fora da tela à esquerda */
-            }
-            15% {
-                opacity: 0.9;
-                transform: translate(10%, 20%) scale(0.9) rotate(45deg);
-            }
-            30% {
-                opacity: 1;
-                transform: translate(50%, 0%) scale(1.1) rotate(90deg); /* Ponto alto, mais central */
-            }
-            45% {
-                opacity: 0.9;
-                transform: translate(80%, 30%) scale(1) rotate(135deg);
-            }
-            60% {
-                opacity: 0.8;
-                transform: translate(60%, 80%) scale(0.9) rotate(180deg);
-            }
-            75% {
-                opacity: 0.5;
-                transform: translate(20%, 90%) scale(0.7) rotate(225deg);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(120%, 50%) scale(0.1) rotate(270deg); /* Termina bem fora da tela à direita */
-            }
-        }
     </style>
 </head>
 <body>
@@ -235,8 +181,7 @@
         <div id="admin-trigger">
             <h1>3 MARIAS MODA FEMININA</h1>
             <p id="main-slogan"><span class="highlight-text">PRODUTOS À PRONTA-ENTREGA</span><br>Sinta-se linda e segura.<br>Do Brasil para você.</p>
-            <div id="star-animation-area" class="star-container"></div>
-        </div>
+            </div>
     </header>
     <main>
         <div id="controls">
@@ -278,7 +223,7 @@
     </script>
 
     <script>
-        // --- CÓDIGO DO ATALHO ADMIN ---
+        // --- CÓDIGO DO ATALHO ADMIN (Mantido) ---
         const ADMIN_URL = "admin.html";
         const ADMIN_TRIGGER = document.getElementById('admin-trigger');
         let clickCount = 0;
@@ -302,36 +247,12 @@
         });
         // --- FIM DO CÓDIGO DO ATALHO ADMIN ---
 
-        // --- CÓDIGO DA ANIMAÇÃO DE ESTRELAS ---
-        const sloganElement = document.getElementById('main-slogan');
-        const starAnimationArea = document.getElementById('star-animation-area');
-
-        function createStarsAnimation() {
-            starAnimationArea.innerHTML = ''; 
-            
-            const starCount = 3;
-            const animationDurationPerStar = 12000; // 12 segundos por estrela
-            const delayBetweenStars = 1000; // 1 segundo de atraso entre cada estrela
-
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('span');
-                star.className = 'star';
-                star.textContent = '★'; 
-                
-                // Cada estrela inicia sua animação com um atraso
-                star.style.animationDelay = `${i * delayBetweenStars}ms`; 
-                starAnimationArea.appendChild(star);
-            }
-            
-            // Re-chama a animação depois que todas as estrelas terminarem
-            // (tempo da última estrela + duração da animação dela)
-            setTimeout(() => {
-                createStarsAnimation(); 
-            }, (starCount - 1) * delayBetweenStars + animationDurationPerStar); 
-        }
-
-        window.addEventListener('load', createStarsAnimation);
-        // --- FIM DO CÓDIGO DA ANIMAÇÃO DE ESTRELAS ---
+        // --- CÓDIGO DA ANIMAÇÃO DE ESTRELAS (REMOVIDO) ---
+        // const sloganElement = document.getElementById('main-slogan');
+        // const starAnimationArea = document.getElementById('star-animation-area');
+        // function createStarsAnimation() { ... }
+        // window.addEventListener('load', createStarsAnimation);
+        // --- FIM DO CÓDIGO DA ANIMAÇÃO DE ESTRELAS (REMOVIDO) ---
 
 
         const productGrid = document.getElementById('product-grid');
