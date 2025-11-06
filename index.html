@@ -35,34 +35,83 @@
             padding: 0 15px;
         }
         
-        /* Controles de Filtro (Sem botão Admin visível) */
+        /* Controles de Filtro com Botões */
         #controls {
             display: flex;
-            justify-content: flex-start; /* Alinha à esquerda */
-            align-items: center;
+            flex-direction: column; 
+            gap: 15px; 
             margin-bottom: 20px;
             padding: 15px;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            align-items: center; 
         }
 
-        #controls label {
+        /* Estilo para os botões de filtro */
+        .filter-button {
+            background-color: #d8a0b0; 
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 2px solid #FFD700; /* Borda Dourada */
+            font-size: 1.1em;
             font-weight: bold;
-            margin-right: 10px;
-            white-space: nowrap;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
+            width: 100%; 
+            max-width: 350px; 
+            text-align: center;
+            box-sizing: border-box; 
+        }
+
+        .filter-button:hover {
+            background-color: #c08090; 
+            border-color: #DAA520; 
+            transform: translateY(-2px);
+        }
+
+        /* Estilo para o botão ativo (selecionado) */
+        .filter-button.active {
+            background-color: #b76e86; 
+            border-color: #DAA520; 
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); 
         }
         
-        #source-filter {
+        /* Botão Admin */
+        #admin-link {
+            background-color: #b76e86;
+            color: white;
+            text-decoration: none;
             padding: 8px 12px;
             border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 1em;
-            cursor: pointer;
-            flex-grow: 1; /* Permite que o select se expanda */
-            max-width: 250px;
+            border: none;
+            text-align: center;
+            margin-top: 15px; 
+            font-size: 0.9em;
+            max-width: 200px;
         }
-        
+        #admin-link:hover {
+            background-color: #8c4c61;
+        }
+
+        /* Mídia query para telas maiores: colocar botões lado a lado */
+        @media (min-width: 600px) {
+            #controls {
+                flex-direction: row; 
+                justify-content: center;
+            }
+            .filter-button {
+                width: auto; 
+                margin: 0 10px; 
+            }
+            #admin-link {
+                margin-top: 0; 
+                margin-left: 15px; 
+            }
+        }
+
+
         /* Área dos Produtos */
         #products-grid {
             display: grid;
@@ -70,6 +119,7 @@
             gap: 20px;
         }
 
+        /* O cartão agora é uma DIV (Container) */
         .product-card {
             background-color: white;
             border-radius: 8px;
@@ -79,11 +129,21 @@
             color: #333;
             transition: transform 0.2s;
             position: relative;
+            /* Permite que o link de dentro se comporte como bloco */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .product-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Link da Imagem e Info (Bloco superior do card) */
+        .product-link-block {
+            text-decoration: none;
+            color: inherit;
         }
 
         .product-card img {
@@ -94,6 +154,7 @@
 
         .product-info {
             padding: 15px;
+            flex-grow: 1; /* Garante que o info block ocupe o espaço extra */
         }
 
         .product-info h2 {
@@ -108,6 +169,24 @@
             font-weight: bold;
             margin: 10px 0 0;
         }
+        
+        /* NOVO ESTILO: Botão Ver Detalhes */
+        .details-button {
+            display: block;
+            background-color: #b76e86; /* Rosa */
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            padding: 12px;
+            margin: 15px; 
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .details-button:hover {
+            background-color: #8c4c61;
+        }
+
 
         #loading, #empty-message {
             text-align: center;
@@ -156,15 +235,18 @@
 
     <main>
         <div id="controls">
-            <div>
-                <label for="source-filter">Filtrar por:</label>
-                <select id="source-filter" onchange="fetchProducts()">
-                    <option value="todos" selected>Mostrar Tudo (Catálogo Completo)</option>
-                    <option value="pronta-entrega">Pronta Entrega</option>
-                    <option value="sob-encomenda">Sob Encomenda</option>
-                </select>
-            </div>
-            </div>
+            <button class="filter-button active" data-filter="todos">
+                Mostrar Tudo (Catálogo Completo)
+            </button>
+            <button class="filter-button" data-filter="pronta-entrega">
+                Toyohashi e Região (Pronta Entrega)
+            </button>
+            <button class="filter-button" data-filter="sob-encomenda">
+                Receba em 3-5 dias. Qualquer lugar do Japão (Sob Encomenda)
+            </button>
+            
+            <a id="admin-link" href="admin.html">Painel Admin</a> 
+        </div>
 
         <div id="loading">Carregando produtos...</div>
         <div id="empty-message" style="display: none;">Nenhum produto encontrado com o filtro selecionado.</div>
@@ -181,7 +263,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-        // 2. CONFIGURAÇÃO (Com as suas chaves reais)
         const firebaseConfig = {
             apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
             authDomain: "loja3marias-50204.firebaseapp.com",
@@ -192,31 +273,29 @@
             measurementId: "G-TK877V6P0S"
         };
 
-        // 3. Inicializar o Firebase e o Firestore
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(); 
 
         const productsGrid = document.getElementById('products-grid');
         const loadingDiv = document.getElementById('loading');
         const emptyMessageDiv = document.getElementById('empty-message');
+        const filterButtons = document.querySelectorAll('.filter-button');
         
         const WHATSAPP_NUMBER = "818074558624";
 
+        let currentFilter = 'todos'; 
 
-        // 4. LÓGICA DE BUSCA
+        // LÓGICA DE BUSCA
         async function fetchProducts() {
             productsGrid.innerHTML = '';
             loadingDiv.style.display = 'block';
             emptyMessageDiv.style.display = 'none';
 
             try {
-                const selectedSource = document.getElementById('source-filter').value;
                 let query = db.collection("products");
                 
-                if (selectedSource === 'pronta-entrega') {
-                    query = query.where("source", "==", "pronta-entrega");
-                } else if (selectedSource === 'sob-encomenda') {
-                    query = query.where("source", "==", "sob-encomenda");
+                if (currentFilter !== 'todos') {
+                    query = query.where("source", "==", currentFilter);
                 }
                 
                 const snapshot = await query.get();
@@ -256,19 +335,21 @@
                         statusClass = 'status-pronta-entrega';
                     }
 
-                    const whatsappMessage = `Olá, Harumi! Vi o produto ${name} (${precoFormatado}) na loja. Tenho interesse.`;
-                    const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
-
-
+                    // ESTRUTURA DO CARD MODIFICADA PARA TER O BOTÃO SEPARADO
                     const card = `
-                        <a href="detalhes.html?id=${product.id}" class="product-card">
-                            <span class="status-badge ${statusClass}">${statusText}</span>
-                            <img src="${imageUrl}" alt="${name}">
-                            <div class="product-info">
-                                <h2>${name}</h2>
-                                <p class="price">${precoFormatado}</p>
-                            </div>
-                        </a>
+                        <div class="product-card">
+                            <a href="detalhes.html?id=${product.id}" class="product-link-block">
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                                <img src="${imageUrl}" alt="${name}">
+                                <div class="product-info">
+                                    <h2>${name}</h2>
+                                    <p class="price">${precoFormatado}</p>
+                                </div>
+                            </a>
+                            <a href="detalhes.html?id=${product.id}" class="details-button">
+                                Ver Detalhes
+                            </a>
+                        </div>
                     `;
                     productsGrid.innerHTML += card;
                 });
@@ -279,6 +360,17 @@
                 productsGrid.innerHTML = `<p style="color: red; grid-column: 1 / -1;">Erro ao carregar dados. Verifique a conexão com o Firebase: ${error.message}</p>`;
             }
         }
+
+        // Adiciona evento de clique aos botões de filtro
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                currentFilter = button.dataset.filter;
+                fetchProducts();
+            });
+        });
 
         document.addEventListener('DOMContentLoaded', fetchProducts);
     </script>
