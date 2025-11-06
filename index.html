@@ -35,7 +35,7 @@
             padding: 0 15px;
         }
         
-        /* Controles de Filtro com Botões */
+        /* Controles de Filtro com Botões (Apenas os essenciais) */
         #controls {
             display: flex;
             flex-direction: column; 
@@ -46,6 +46,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             align-items: center; 
+            /* Centraliza os botões de filtro e remove o botão Admin */
         }
 
         /* Estilo para os botões de filtro */
@@ -77,40 +78,6 @@
             border-color: #DAA520; 
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); 
         }
-        
-        /* Botão Admin */
-        #admin-link {
-            background-color: #b76e86;
-            color: white;
-            text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            border: none;
-            text-align: center;
-            margin-top: 15px; 
-            font-size: 0.9em;
-            max-width: 200px;
-        }
-        #admin-link:hover {
-            background-color: #8c4c61;
-        }
-
-        /* Mídia query para telas maiores: colocar botões lado a lado */
-        @media (min-width: 600px) {
-            #controls {
-                flex-direction: row; 
-                justify-content: center;
-            }
-            .filter-button {
-                width: auto; 
-                margin: 0 10px; 
-            }
-            #admin-link {
-                margin-top: 0; 
-                margin-left: 15px; 
-            }
-        }
-
 
         /* Área dos Produtos */
         #products-grid {
@@ -119,7 +86,6 @@
             gap: 20px;
         }
 
-        /* O cartão agora é uma DIV (Container) */
         .product-card {
             background-color: white;
             border-radius: 8px;
@@ -129,7 +95,6 @@
             color: #333;
             transition: transform 0.2s;
             position: relative;
-            /* Permite que o link de dentro se comporte como bloco */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -138,12 +103,6 @@
         .product-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Link da Imagem e Info (Bloco superior do card) */
-        .product-link-block {
-            text-decoration: none;
-            color: inherit;
         }
 
         .product-card img {
@@ -154,7 +113,7 @@
 
         .product-info {
             padding: 15px;
-            flex-grow: 1; /* Garante que o info block ocupe o espaço extra */
+            flex-grow: 1;
         }
 
         .product-info h2 {
@@ -170,10 +129,10 @@
             margin: 10px 0 0;
         }
         
-        /* NOVO ESTILO: Botão Ver Detalhes */
+        /* Botão Ver Detalhes */
         .details-button {
             display: block;
-            background-color: #b76e86; /* Rosa */
+            background-color: #b76e86; 
             color: white;
             text-decoration: none;
             text-align: center;
@@ -188,15 +147,7 @@
         }
 
 
-        #loading, #empty-message {
-            text-align: center;
-            grid-column: 1 / -1;
-            padding: 50px;
-            font-size: 1.2em;
-            color: #777;
-        }
-        
-        /* Estilos do Selo */
+        /* Estilos do Selo e Mensagens */
         .status-badge {
             position: absolute;
             top: 10px;
@@ -235,19 +186,15 @@
 
     <main>
         <div id="controls">
-            <button class="filter-button active" data-filter="todos">
-                Mostrar Tudo (Catálogo Completo)
-            </button>
-            <button class="filter-button" data-filter="pronta-entrega">
+            <button class="filter-button active" data-filter="pronta-entrega">
                 Toyohashi e Região (Pronta Entrega)
             </button>
             <button class="filter-button" data-filter="sob-encomenda">
                 Receba em 3-5 dias. Qualquer lugar do Japão (Sob Encomenda)
             </button>
             
-            <a id="admin-link" href="admin.html">Painel Admin</a> 
-        </div>
-
+            </div>
+        
         <div id="loading">Carregando produtos...</div>
         <div id="empty-message" style="display: none;">Nenhum produto encontrado com o filtro selecionado.</div>
 
@@ -257,6 +204,7 @@
 
     <footer>
         <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
+        <p style="font-size: 0.8em; margin-top: 5px;">Acesso Restrito: <a href="admin.html" style="color: #b76e86;">Painel Admin</a></p>
     </footer>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -283,7 +231,7 @@
         
         const WHATSAPP_NUMBER = "818074558624";
 
-        let currentFilter = 'todos'; 
+        let currentFilter = 'pronta-entrega'; // 🚨 NOVO PADRÃO: Começa exibindo Pronta Entrega
 
         // LÓGICA DE BUSCA
         async function fetchProducts() {
@@ -294,6 +242,7 @@
             try {
                 let query = db.collection("products");
                 
+                // Aplica o filtro baseado no botão ativo
                 if (currentFilter !== 'todos') {
                     query = query.where("source", "==", currentFilter);
                 }
@@ -335,7 +284,7 @@
                         statusClass = 'status-pronta-entrega';
                     }
 
-                    // ESTRUTURA DO CARD MODIFICADA PARA TER O BOTÃO SEPARADO
+
                     const card = `
                         <div class="product-card">
                             <a href="detalhes.html?id=${product.id}" class="product-link-block">
@@ -372,7 +321,12 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', fetchProducts);
+        // Inicializa o filtro e o estado ativo
+        document.addEventListener('DOMContentLoaded', () => {
+            // Define 'pronta-entrega' como ativo por padrão na inicialização
+            document.querySelector('[data-filter="pronta-entrega"]').classList.add('active');
+            fetchProducts();
+        });
     </script>
 </body>
 </html>
