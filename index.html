@@ -11,29 +11,23 @@
             margin: 0;
             background-color: #fdf7f9;
             color: #333;
-            overflow-x: hidden; /* Evita scroll horizontal por elementos animados */
         }
 
         header {
             background-color: #d8a0b0;
             color: white;
-            padding: 1rem 0;
+            padding: 2rem 1rem; /* Aumentei o padding para dar espaço */
             text-align: center;
-            position: relative; /* Para posicionar as estrelas */
-            overflow: hidden; /* Assegura que as estrelas desapareçam sem scroll */
+            position: relative; 
         }
 
         header h1 {
             margin: 0;
-            font-size: 2.5em; /* Aumentado para dar mais destaque */
-            position: relative;
-            z-index: 2; /* Para que o texto fique acima das estrelas */
+            font-size: 2.5em; /* Tamanho do título principal */
         }
         
         header p {
-            font-size: 1.1em; /* Ajuste para o subtítulo */
-            position: relative;
-            z-index: 2;
+            font-size: 1.1em;
         }
 
         main {
@@ -93,7 +87,7 @@
             text-decoration: none;
             color: #333;
             transition: transform 0.2s;
-            position: relative; /* Para posicionar o selo */
+            position: relative; 
         }
 
         .product-card:hover {
@@ -152,94 +146,19 @@
             color: #856404; 
         }
 
-        /* --- ESTILOS PARA AS ESTRELAS ANIMADAS --- */
-        .star-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%); /* Centraliza o contêiner */
-            width: 100%;
-            height: 100%;
-            pointer-events: none; /* Permite clicar através dele */
-            z-index: 1; /* Fica abaixo do texto H1 */
+        /* Rodapé */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #e0e0e0;
+            color: #777;
+            margin-top: 2rem;
         }
-
-        .star {
-            position: absolute;
-            width: 30px; /* Tamanho da estrela */
-            height: 30px;
-            background: url('https://i.imgur.com/G4c5QyY.png') no-repeat center center / contain; /* Imagem de estrela brilhante */
-            opacity: 0;
-            animation-iteration-count: infinite;
-            animation-timing-function: ease-in-out;
-        }
-
-        /* Keyframes para a animação das estrelas */
-        @keyframes star-animation {
-            0% {
-                transform: translate(250px, 0px) scale(0.5) rotate(0deg);
-                opacity: 0;
-            }
-            20% {
-                transform: translate(150px, -15px) scale(1) rotate(45deg);
-                opacity: 1;
-            }
-            50% {
-                transform: translate(-50px, 10px) scale(1.2) rotate(90deg);
-                opacity: 1;
-            }
-            80% {
-                transform: translate(-250px, -20px) scale(0.5) rotate(135deg);
-                opacity: 0;
-            }
-            100% {
-                transform: translate(-300px, 0px) scale(0) rotate(180deg);
-                opacity: 0;
-            }
-        }
-        
-        /* Variações para as 3 estrelas para um efeito mais natural */
-        .star:nth-child(1) {
-            animation: star-animation 5s infinite;
-        }
-        .star:nth-child(2) {
-            animation: star-animation 5s infinite -1.5s; /* Começa 1.5s depois */
-        }
-        .star:nth-child(3) {
-            animation: star-animation 5s infinite -3s; /* Começa 3s depois */
-        }
-
-        /* Ajuste para telas menores */
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8em;
-            }
-            header p {
-                font-size: 1em;
-            }
-            .star {
-                width: 20px; /* Estrelas menores em telas pequenas */
-                height: 20px;
-            }
-            @keyframes star-animation {
-                0% { transform: translate(150px, 0px) scale(0.5) rotate(0deg); opacity: 0; }
-                20% { transform: translate(80px, -10px) scale(1) rotate(45deg); opacity: 1; }
-                50% { transform: translate(-30px, 5px) scale(1.2) rotate(90deg); opacity: 1; }
-                80% { transform: translate(-150px, -10px) scale(0.5) rotate(135deg); opacity: 0; }
-                100% { transform: translate(-180px, 0px) scale(0) rotate(180deg); opacity: 0; }
-            }
-        }
-
     </style>
 </head>
 <body>
 
     <header>
-        <div class="star-container">
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-        </div>
         <h1>3 MARIAS MODA FEMININA</h1>
         <p>Lingeries e muito mais direto do Brasil!<br> Tudo à pronta-entrega.</p>
     </header>
@@ -372,6 +291,7 @@
             }
         }
 
+        // 5. CHAMA A FUNÇÃO DE BUSCA AO CARREGAR A PÁGINA
         document.addEventListener('DOMContentLoaded', fetchProducts);
     </script>
 </body>
