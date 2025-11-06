@@ -19,15 +19,15 @@
             z-index: 1; 
         }
 
-        /* Destaque Pronta Entrega (FONTE DIMINUÍDA) */
+        /* Destaque Pronta Entrega (FONTE DIMINUÍDA NOVAMENTE) */
         .highlight-text {
             font-weight: bold;
-            font-size: 1.1em; /* Diminuído de 1.3em para 1.1em para caber em uma linha */
+            font-size: 1em; /* Diminuído para 1em para garantir que caiba */
             display: block;
             margin-bottom: 5px;
-            white-space: nowrap; /* Tenta manter em uma linha, se houver espaço */
-            overflow: hidden; /* Esconde se ainda assim não couber (improvável com a nova fonte) */
-            text-overflow: ellipsis; /* Adiciona "..." se cortar */
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
         }
         
         main { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
@@ -175,7 +175,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- ESTILOS PARA A ANIMAÇÃO DAS ESTRELAS (APRIMORADO NOVAMENTE) --- */
+        /* --- ESTILOS PARA A ANIMAÇÃO DAS ESTRELAS (MUITO OTIMIZADO) --- */
         .star-container {
             position: absolute;
             top: 0;
@@ -184,56 +184,48 @@
             height: 100%;
             pointer-events: none;
             overflow: hidden;
-            opacity: 0;
-            animation: fadeInOutStars 0.5s forwards;
+            /* Removido fadeInOutStars aqui para controle individual */
         }
 
         .star {
             position: absolute;
             color: white;
-            font-size: 2.2em; /* Estrelas um pouco maiores */
-            text-shadow: 0 0 10px #f0e68c, 0 0 20px #ffd700; /* Brilho mais intenso */
-            opacity: 0;
+            font-size: 2.5em; /* Estrelas um pouco maiores para serem mais notáveis */
+            text-shadow: 0 0 12px #f0e68c, 0 0 25px #ffd700; /* Brilho ainda mais intenso */
+            opacity: 0; /* Começa invisível */
             transform: translateZ(0);
-            animation: starMovement 10s ease-out forwards; /* Duração aumentada para 10 segundos */
+            animation: starMovement 12s ease-out forwards; /* Duração aumentada para 12 segundos */
         }
 
-        /* Keyframes para as estrelas */
-        @keyframes fadeInOutStars {
-            0% { opacity: 0; }
-            10% { opacity: 1; } 
-            90% { opacity: 1; }
-            100% { opacity: 0; } 
-        }
-
+        /* Keyframes para as estrelas - Movimento mais pronunciado e lento */
         @keyframes starMovement {
             0% {
                 opacity: 0;
-                transform: translate(-10%, -10%) scale(0.3) rotate(0deg); /* Começa de fora */
+                transform: translate(-20%, 50%) scale(0.2) rotate(0deg); /* Começa bem fora da tela à esquerda */
             }
             15% {
                 opacity: 0.9;
-                transform: translate(20%, 30%) scale(1) rotate(60deg);
+                transform: translate(10%, 20%) scale(0.9) rotate(45deg);
             }
             30% {
                 opacity: 1;
-                transform: translate(70%, 10%) scale(1.2) rotate(120deg);
+                transform: translate(50%, 0%) scale(1.1) rotate(90deg); /* Ponto alto, mais central */
             }
             45% {
                 opacity: 0.9;
-                transform: translate(40%, 80%) scale(1.1) rotate(180deg);
+                transform: translate(80%, 30%) scale(1) rotate(135deg);
             }
             60% {
                 opacity: 0.8;
-                transform: translate(90%, 50%) scale(1) rotate(240deg);
+                transform: translate(60%, 80%) scale(0.9) rotate(180deg);
             }
-            80% {
+            75% {
                 opacity: 0.5;
-                transform: translate(10%, 60%) scale(0.8) rotate(320deg);
+                transform: translate(20%, 90%) scale(0.7) rotate(225deg);
             }
             100% {
                 opacity: 0;
-                transform: translate(110%, 10%) scale(0.1) rotate(360deg); /* Termina fora da tela */
+                transform: translate(120%, 50%) scale(0.1) rotate(270deg); /* Termina bem fora da tela à direita */
             }
         }
     </style>
@@ -316,25 +308,26 @@
 
         function createStarsAnimation() {
             starAnimationArea.innerHTML = ''; 
-            starAnimationArea.style.opacity = '1'; 
             
             const starCount = 3;
-            const animationDuration = 10000; // 10 segundos
-            
+            const animationDurationPerStar = 12000; // 12 segundos por estrela
+            const delayBetweenStars = 1000; // 1 segundo de atraso entre cada estrela
+
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('span');
                 star.className = 'star';
                 star.textContent = '★'; 
                 
-                // 0.8 segundo de atraso entre cada estrela para aparecer em momentos diferentes
-                star.style.animationDelay = `${i * 800}ms`; 
+                // Cada estrela inicia sua animação com um atraso
+                star.style.animationDelay = `${i * delayBetweenStars}ms`; 
                 starAnimationArea.appendChild(star);
             }
             
-            // Espera o tempo total da animação + o atraso da última estrela
+            // Re-chama a animação depois que todas as estrelas terminarem
+            // (tempo da última estrela + duração da animação dela)
             setTimeout(() => {
-                starAnimationArea.style.opacity = '0';
-            }, animationDuration + (starCount * 800)); 
+                createStarsAnimation(); 
+            }, (starCount - 1) * delayBetweenStars + animationDurationPerStar); 
         }
 
         window.addEventListener('load', createStarsAnimation);
