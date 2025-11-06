@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3 Marias Loja</title>
+    
     <style>
         /* Estilos de Estrutura */
         body { font-family: Arial, sans-serif; margin: 0; background-color: #fdf7f9; color: #333; }
@@ -12,7 +13,7 @@
         header p { font-size: 1.1em; }
         main { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
 
-        /* Controles de Filtro (Visual que você enviou) */
+        /* Controles de Filtro (Baseado no seu visual) */
         #controls {
             display: flex;
             flex-direction: column;
@@ -27,23 +28,20 @@
 
         /* Estilo para os botões */
         .filter-button {
-            background-color: #d8a0b0;
+            background-color: #b76e86; /* Rosa mais forte */
             color: white;
             padding: 12px 20px;
             border-radius: 8px;
-            border: 2px solid #FFD700; /* Borda Dourada */
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
+            transition: background-color 0.3s, transform 0.2s;
             width: 100%;
             max-width: 350px;
             text-align: center;
             box-sizing: border-box;
-            /* Estilos do filtro no print */
-            background-color: #b76e86; /* Rosa mais forte */
-            border: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .filter-button:hover {
@@ -79,12 +77,12 @@
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
 
-        /* CORREÇÃO DE IMAGEM APLICADA AQUI */
+        /* CORREÇÃO DE IMAGEM */
         .product-card img {
             width: 100%;
-            height: 350px; /* Aumentamos ligeiramente a altura para melhorar a proporção */
-            object-fit: cover; /* ESSENCIAL: Garante que a imagem preencha o espaço sem distorcer (cortando o excesso se necessário) */
-            object-position: center; /* Centraliza a parte visível da imagem */
+            height: 350px; /* Altura fixa para evitar o esticamento horizontal */
+            object-fit: cover; /* Garante que a imagem preencha sem distorcer */
+            object-position: center; 
         }
 
         .product-info {
@@ -96,21 +94,14 @@
         
         .product-info h3 {
             font-size: 1.25em;
-            color: #b76e86; /* Cor do Título (adaptado do print) */
+            color: #b76e86;
             margin: 0 0 0.5rem 0;
         }
         
-        .product-info .description {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 1rem;
-            flex-grow: 1;
-        }
-        
         .product-info .price {
-            font-size: 1.5em; /* Aumentado para destaque */
+            font-size: 1.5em;
             font-weight: bold;
-            color: #333; /* Cor do Preço (adaptado do print) */
+            color: #333;
             margin-bottom: 1rem;
         }
 
@@ -129,6 +120,21 @@
         .buy-button:hover {
             background-color: #a35f75;
         }
+
+        /* Selos no Cartão */
+        .badge {
+            position: absolute;
+            top: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            z-index: 1;
+        }
+        .badge.new { background-color: #ff6347; left: 10px; }
+        .badge.featured { background-color: #28a745; right: 10px; }
+
 
         footer { text-align: center; padding: 1rem; background-color: #e0e0e0; color: #777; margin-top: 2rem; }
         
@@ -152,71 +158,114 @@
     </header>
     <main>
         <div id="controls">
-            <button class="filter-button active" data-filter="Pronta Entrega">Toyohashi e Região (Pronta Entrega)</button>
-            <button class="filter-button" data-filter="Sob Encomenda">Receba em 3-5 dias. Qualquer lugar do Japão (Sob Encomenda)</button>
+            <button class="filter-button active" data-filter="pronta-entrega">Toyohashi e Região (Pronta Entrega)</button>
+            <button class="filter-button" data-filter="sob-encomenda">Receba em 3-5 dias. Qualquer lugar do Japão (Sob Encomenda)</button>
         </div>
         
         <div id="product-grid">
             </div>
+        
+        <p id="loading-status" style="text-align: center; margin-top: 40px; font-weight: bold;">Carregando produtos...</p>
     </main>
     <footer>
         <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
     </footer>
-    
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> 
+
+    <script>
+        // 1. CONFIGURAÇÃO (Copiada do seu detalhes.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
+            authDomain: "loja3marias-50204.firebaseapp.com",
+            projectId: "loja3marias-50204",
+            storageBucket: "loja3marias-50204.firebasestorage.app",
+            messagingSenderId: "405330133487",
+            appId: "1:405330133487:web:606de41211df52245f761a",
+            measurementId: "G-TK877V6P0S"
+        };
+        
+        // 🚨 NÚMERO FINAL DA HARUMI (Formato internacional sem o '+')
+        const WHATSAPP_NUMBER = "818074558624"; 
+
+        // 2. Inicialização
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const COLECAO_PRODUTOS = "products";
+    </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const productGrid = document.getElementById('product-grid');
             const filterButtons = document.querySelectorAll('.filter-button');
-            let currentFilter = 'Pronta Entrega'; // Filtro inicial
+            const loadingStatus = document.getElementById('loading-status');
+            
+            // O filtro inicial deve corresponder ao 'data-filter' do botão ativo
+            let currentFilter = 'pronta-entrega'; 
 
             async function fetchProducts() {
+                productGrid.innerHTML = '';
+                loadingStatus.textContent = 'Carregando produtos...';
+                loadingStatus.style.color = '#777';
+
                 try {
-                    const response = await fetch('/_data/produtos.json');
+                    // Consulta o Firestore, filtrando pela "source" E ordenando (Pode exigir índice!)
+                    const snapshot = await db.collection(COLECAO_PRODUTOS)
+                        .where('source', '==', currentFilter) // Filtra pelo campo 'source'
+                        .orderBy('createdAt', 'desc') // Ordena pelos mais novos primeiro
+                        .get();
                     
-                    if (!response.ok) {
-                        productGrid.innerHTML = '<p style="text-align: center; color: red;">Erro: Não foi possível carregar os produtos. Verifique o painel /admin.</p>';
-                        return;
-                    }
-                    
-                    const products = await response.json();
-                    productGrid.innerHTML = ''; 
+                    loadingStatus.style.display = 'none';
 
-                    if (!products || products.length === 0) {
-                        productGrid.innerHTML = '<p style="text-align: center;">Nenhum produto cadastrado ainda. Adicione o primeiro no painel /admin!</p>';
-                        return;
-                    }
-                    
-                    const filteredProducts = products.filter(product => {
-                        // O filtro funciona comparando a 'category' salva no Admin com o 'data-filter' do botão
-                        return product.category === currentFilter;
-                    });
-                    
-                    if (filteredProducts.length === 0) {
-                        productGrid.innerHTML = `<p style="text-align: center;">Nenhum produto em ${currentFilter} no momento.</p>`;
+                    if (snapshot.empty) {
+                        productGrid.innerHTML = `<p style="text-align: center; margin-top: 40px;">Nenhum produto em ${currentFilter === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda'} no momento.</p>`;
                         return;
                     }
 
-                    filteredProducts.forEach(product => {
+                    snapshot.forEach(doc => {
+                        const product = doc.data();
+                        
+                        // Formata o preço para ¥
+                        const precoFormatado = parseFloat(product.price || 0).toLocaleString('ja-JP', { 
+                            style: 'currency', 
+                            currency: 'JPY',
+                            maximumFractionDigits: 0
+                        });
+                        
+                        // Link para a página de detalhes: Passa o ID do documento do Firestore na URL
+                        const detailLink = `detalhes.html?id=${doc.id}`;
+                        
+                        // --- Montagem do Cartão ---
                         const card = document.createElement('div');
                         card.className = 'product-card';
                         
-                        // Garante que o link "Ver Detalhes" leve ao WhatsApp
-                        const detailLink = `https://wa.me/SEUNUMERO?text=Olá! Tenho interesse no produto: ${product.name} (Preço: ${product.price})`;
+                        // NOVO: Renderiza os selos (Novidade, Destaque)
+                        let selosHTML = '';
+                        if (product.isNew) {
+                            selosHTML += `<span class="badge new">✨ NOVIDADE</span>`;
+                        }
+                        if (product.isFeatured) {
+                            selosHTML += `<span class="badge featured">✅ DESTAQUE</span>`;
+                        }
                         
                         card.innerHTML = `
+                            ${selosHTML}
                             <img src="${product.imageUrl}" alt="${product.name}">
                             <div class="product-info">
                                 <h3>${product.name}</h3>
-                                <p class="price">¥${product.price}</p>
-                                <a href="${detailLink}" target="_blank" class="buy-button">Ver Detalhes</a>
+                                <p class="price">${precoFormatado}</p>
+                                <a href="${detailLink}" class="buy-button">Ver Detalhes</a>
                             </div>
                         `;
                         productGrid.appendChild(card);
                     });
 
                 } catch (error) {
-                    console.error('Erro ao buscar produtos:', error);
-                    productGrid.innerHTML = '<p style="text-align: center; color: red;">Erro grave de carregamento. Tente novamente mais tarde.</p>';
+                    console.error('Erro ao buscar produtos no Firestore:', error);
+                    // Mensagem de erro clara para o problema mais comum: O ÍNDICE
+                    loadingStatus.textContent = 'Erro! Não foi possível carregar os produtos. Você precisa criar o Índice no Console do Firebase (source + createdAt).';
+                    loadingStatus.style.color = 'red';
                 }
             }
 
@@ -226,7 +275,7 @@
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
                     currentFilter = button.dataset.filter;
-                    fetchProducts();
+                    fetchProducts(); // Recarrega com o novo filtro
                 });
             });
 
