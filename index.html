@@ -6,10 +6,9 @@
     <title>3 Marias Loja</title>
     
     <style>
-        /* Variáveis de Cor para Minimalismo e Dourado */
+        /* Variáveis de Cor */
         :root {
-            --primary-color: #b76e86; /* Rosa Principal */
-            --highlight-color: #DAA520; /* Dourado Sutil */
+            --primary-color: #b76e86; /* Rosa Principal (para botões/títulos) */
             --text-color: #333;
             --bg-color: #fdf9f9;
             --border-color: #eee;
@@ -20,97 +19,100 @@
         
         /* HEADER: Título Fixo e Limpo */
         header { 
-            background-color: white; 
-            color: var(--primary-color); 
+            background-color: var(--primary-color); /* Voltamos ao fundo rosa */
+            color: white; 
             text-align: center; 
             padding: 1rem 0; 
-            border-bottom: 1px solid var(--border-color); 
             position: relative; 
         }
         header h1 { 
             margin: 0; 
             font-size: 1.8em; 
-            color: var(--primary-color);
+            color: white;
         }
 
-        /* Banner Principal - Foco no Design Limpo */
+        /* Banner Principal (Carrossel Estático) */
         #main-banner {
             width: 100%;
-            height: 300px; /* Altura ajustada */
+            height: 350px; 
             /* URL TEMPORÁRIA: SUBSTITUA POR UMA IMAGEM DA SUA LOJA */
             background-image: url('https://via.placeholder.com/1000x400/d8a0b0/ffffff?text=SEU+BANNER+PRINCIPAL+AQUI'); 
             background-size: cover;
             background-position: center;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             color: white;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 25px; /* Espaçamento abaixo do banner */
-        }
-        
-        /* Texto de Impacto no Banner */
-        .highlight-text-main {
-            font-weight: bold;
-            font-size: 1.1em; 
-            display: block;
-            margin-bottom: 5px;
-            color: var(--highlight-color); /* Aplica a cor dourada aqui */
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-            letter-spacing: 1px;
-        }
-
-        #banner-slogan {
-            font-size: 1.1em;
+            font-size: 2em;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            line-height: 1.4;
-            margin-top: 5px;
         }
         
         main { 
-            max-width: 900px; /* Largura máxima otimizada */
+            max-width: 1200px; 
             margin: 0 auto; 
             padding: 0 15px; 
         }
 
-        /* Seção de Filtros */
-        #controls {
-            display: flex;
-            flex-direction: column;
+        /* Área de Ícones/Informações (NOVO BLOCO) */
+        #info-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
             gap: 10px;
-            padding: 15px;
-            background-color: white;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
+            padding: 15px 0;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
         }
-        
-        /* Estilo dos Títulos de Seção - Dourado e Minimalista */
+
+        .info-item {
+            background-color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .info-item .icon {
+            font-size: 1.5em;
+            color: var(--primary-color);
+            margin-right: 8px;
+        }
+
+        /* Estilo dos Títulos de Seção */
         .section-title {
             color: var(--primary-color);
             font-size: 1.3em;
             padding-bottom: 10px;
-            border-bottom: 2px solid var(--highlight-color); /* Linha Dourada */
+            border-bottom: 2px solid var(--border-color);
             margin-bottom: 20px;
-            text-align: center;
+            text-align: left; /* Alinhamento à esquerda para um visual mais limpo */
             font-weight: bold;
         }
 
-        /* Botões de Filtro - Novo Estilo Minimalista */
+        /* Seção de Filtros e Produtos */
+        #controls {
+            display: flex;
+            gap: 10px;
+            padding: 0;
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            margin-bottom: 20px;
+        }
+        
+        /* Botões de Filtro - Duas colunas */
         .filter-button {
             background-color: white; 
             color: var(--text-color);
-            border: 1px solid var(--primary-color);
+            border: 1px solid #ddd;
             box-shadow: none;
             font-size: 1em;
             font-weight: normal;
             padding: 12px;
-            border-radius: 4px;
+            border-radius: 0; /* Sem arredondamento */
             cursor: pointer;
-            text-align: center;
+            width: 50%; /* Ocupa metade da largura */
             transition: all 0.2s;
         }
 
@@ -120,15 +122,15 @@
             border-color: var(--primary-color);
             font-weight: bold;
         }
-        
-        /* Área dos Produtos - Grid Responsivo */
+
+        /* Produtos */
         #product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 20px;
+            grid-template-columns: 1fr 1fr; /* Duas colunas para os produtos em todos os tamanhos */
+            gap: 15px;
         }
         
-        /* Estilos de Cartão */
+        /* Estilos de Cartão - MUITO IMPORTANTE: Centralizar conteúdo */
         .product-card {
             background-color: white;
             border-radius: 8px;
@@ -139,14 +141,33 @@
             color: var(--text-color);
             transition: transform 0.2s;
         }
-        .product-card img { height: 300px; object-fit: cover; }
         
-        .product-info { padding: 1rem; text-align: center; }
-        .product-info h3 { font-size: 1.1em; color: var(--primary-color); }
-        .product-info .price { font-size: 1.3em; color: var(--text-color); font-weight: bold; }
-        .buy-button { background-color: var(--primary-color); }
-
-
+        .product-card img { 
+            width: 100%;
+            height: 250px; /* Altura ajustada para caber 2 por linha */
+            object-fit: cover; 
+        }
+        
+        .product-info { 
+            padding: 1rem; 
+            text-align: center; /* CENTRALIZAÇÃO APLICADA AQUI */
+        }
+        .product-info h3 { 
+            font-size: 1.1em; 
+            color: var(--primary-color); /* Cor Rosa Forte */
+            margin-bottom: 5px;
+        }
+        .product-info .price { 
+            font-size: 1.3em; 
+            color: var(--primary-color); /* Preço também com cor forte */
+            font-weight: bold; 
+        }
+        .buy-button { 
+            background-color: var(--primary-color); 
+            display: block;
+            margin-top: 10px;
+        }
+        
         /* Estilo para atalho Admin */
         #admin-trigger {
             cursor: pointer; 
@@ -163,17 +184,45 @@
     </header>
 
     <div id="main-banner">
-        <p class="highlight-text-main">PRODUTOS À PRONTA-ENTREGA</p>
-        <p id="banner-slogan">Sinta-se linda e segura. Do Brasil para você.</p>
+        <p id="banner-text">PRODUTOS À PRONTA-ENTREGA</p>
     </div>
 
     <main>
         
-        <h2 class="section-title">FILTRAR POR DISPONIBILIDADE</h2>
+        <div id="info-bar">
+            <div class="info-item">
+                <span class="icon">✨</span>
+                <div>
+                    <strong>SOB ENCOMENDA</strong><br>
+                    Receba em 3-5 dias
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="icon">🇧🇷</span>
+                <div>
+                    <strong>PRODUTOS DO BRASIL</strong><br>
+                    Moda íntima de alta qualidade
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="icon">📦</span>
+                <div>
+                    <strong>TOYOHASHI E REGIÃO</strong><br>
+                    Pronta entrega local
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="icon">🚚</span>
+                <div>
+                    <strong>ENTREGA GLOBAL JP</strong><br>
+                    Enviamos para todo o Japão
+                </div>
+            </div>
+        </div>
 
         <div id="controls">
-            <button class="filter-button active" data-filter="pronta-entrega">Toyohashi e Região (Pronta Entrega)</button>
-            <button class="filter-button" data-filter="sob-encomenda">Receba em 3-5 dias. Qualquer lugar do Japão (Sob Encomenda)</button>
+            <button class="filter-button active" data-filter="pronta-entrega">FILTRAR: PRONTA ENTREGA</button>
+            <button class="filter-button" data-filter="sob-encomenda">FILTRAR: SOB ENCOMENDA</button>
         </div>
 
         <h2 class="section-title">Nossa Coleção</h2>
@@ -213,7 +262,7 @@
     </script>
 
     <script>
-        // --- CÓDIGO DO ATALHO ADMIN ---
+        // --- CÓDIGO DO ATALHO ADMIN (Mantido) ---
         const ADMIN_URL = "admin.html";
         const ADMIN_TRIGGER = document.getElementById('admin-trigger');
         let clickCount = 0;
