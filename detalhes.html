@@ -2,451 +2,415 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Admin - Gerenciamento da Loja</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Produto | 3 Marias</title>
     
     <style>
+        /* Variáveis de Cor OTIMIZADAS PARA O VISUAL LABELLY */
+        :root {
+            --primary-color: #b76e86; /* Rosa/Bordô Principal (para acentos) */
+            --accent-color: #DAA520; /* DOURADO FOSCO (Para toque chic) */
+            --whatsapp-green: #28a745; /* Verde do WhatsApp Suave */
+            --text-color: #333; /* Texto Principal (Preto) */
+            --light-text: #666; /* Texto Secundário (Cinza Médio) */
+            --bg-color: #fcfcfc; /* Fundo Branco Limpo */
+            --border-color: #e0e0e0; /* Cinza sutil */
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        /* HEADER: Visual Limpo */
+        header {
+            background-color: white; 
+            color: var(--text-color); 
+            padding: 1rem 0;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color); /* Linha divisória fina */
+        }
+        header a {
+            color: var(--text-color); 
+            text-decoration: none; 
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+
+        /* Container de Detalhes - Clean */
+        #product-details {
             display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 0; /* Sem bordas arredondadas */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* 1. Área das Imagens/Vídeo */
+        .media-area {
+            flex: 1 1 45%; 
+            min-width: 300px;
+        }
+
+        #main-media-display {
+            width: 100%;
+            height: 400px;
+            display: flex; 
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border-radius: 0; 
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
         }
-        .container {
-            width: 95%; 
-            max-width: 800px; 
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            padding: 2rem 1rem; 
-            margin: 1rem 0; 
-            box-sizing: border-box; 
-        }
-        h1 { text-align: center; color: #b76e86; margin-top: 0; margin-bottom: 1.5rem; }
-        h2 { color: #b76e86; text-align: center; margin-top: 0; margin-bottom: 1rem; }
-        h3 { color: #b76e86; text-align: center; margin-bottom: 1rem; }
-        label { font-weight: bold; margin-bottom: 0.5rem; }
         
-        input[type="text"], input[type="password"], textarea, input[type="file"], select, input[type="number"] { /* Adicionado input[type="number"] */
+        #main-media-display img, #main-media-display video {
             width: 100%;
-            padding: 0.8rem;
-            margin-bottom: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box; 
-            resize: vertical;
+            height: 100%;
+            object-fit: cover;
         }
-        
-        /* Estilo para os checkboxes */
-        .checkbox-group {
+
+        #thumbnails {
             display: flex;
-            gap: 20px;
-            margin-bottom: 1rem;
-            padding: 10px;
-            border: 1px solid #eee;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px; 
+        }
+
+        .thumb-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 2px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: border 0.3s;
+        }
+        .thumb-container.active {
+            border: 2px solid var(--primary-color);
+        }
+        .thumb-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+        
+        /* ÍCONE DE VÍDEO (Overlay) - Ajustado para visual mais sutil */
+        .video-overlay::before {
+            content: '▶';
+            padding: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            line-height: 1;
+            color: var(--primary-color);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+
+        /* 2. Área das Informações */
+        .info-area {
+            flex: 1 1 45%;
+            padding-top: 10px;
+        }
+
+        .info-area h1 {
+            color: var(--text-color); /* Título Preto */
+            margin-top: 0;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        .info-area .price {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-color); /* Preço Rosa (Acento) */
+            margin: 15px 0;
+        }
+
+        .info-area p {
+            line-height: 1.6;
+            color: var(--light-text);
+        }
+
+        /* Selo de Status - Cores Suaves e Minimalistas */
+        .status-badge {
+            font-size: 0.9em;
+            padding: 8px 15px;
             border-radius: 4px;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
         }
-        .checkbox-group label {
-            font-weight: normal;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .status-pronta-entrega { 
+            background-color: #e6f9e6; /* Verde muito suave */
+            color: var(--whatsapp-green); 
+            border-color: #d0edd4;
         }
-        
-        button { padding: 0.9rem; border: none; border-radius: 4px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; width: 100%;}
-        #btnSalvar, #btnLogin { background-color: #b76e86; color: white; margin-bottom: 0.5rem; }
-        #btnLogout { background-color: #777; color: white; margin-top: 1.5rem; }
-        #status, #loginStatus { text-align: center; font-weight: bold; margin-top: 1rem; padding: 0.5rem; border-radius: 4px; min-height: 1.5rem; }
-        .status.success { color: #28a745; background-color: #e9f7ec; }
-        .status.error { color: #dc3545; background-color: #fdeeee; }
-        .status.loading { color: #007bff; background-color: #e6f2ff; }
-        .logo-admin { display: block; margin: 0 auto 20px auto; max-width: 150px; height: auto; }
-        #login-section { display: none; }
-        
-        /* Estilos da tabela de gerenciamento */
-        #product-management-list { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em;}
-        #product-management-list th, #product-management-list td { border: 1px solid #eee; padding: 8px; text-align: left; vertical-align: middle; }
-        #product-management-list th { background-color: #f4f4f4; color: #555; font-size: 0.9em; }
-        #product-management-list img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
-        .delete-btn { background-color: #dc3545; color: white; padding: 5px 8px; font-weight: normal; font-size: 0.8em; width: auto; }
-        
-        /* Quebra de linha nas células pequenas para mobile */
-        @media (max-width: 768px) {
-            #product-management-list th, #product-management-list td {
-                padding: 5px;
-            }
+        .status-sob-encomenda { 
+            background-color: #f7f7e6; /* Amarelo muito suave */
+            color: #856404; 
+            border-color: #eaeaa0;
+        }
+
+        /* Botão de Compra - Ajustado para harmonizar com a Home */
+        .buy-button {
+            display: block;
+            background-color: var(--whatsapp-green); /* Verde principal do WhatsApp */
+            color: white;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 4px;
+            margin-top: 30px;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); /* Sombra suave do verde */
+        }
+        .buy-button:hover {
+            background-color: #1e7e34; /* Verde mais escuro no hover */
+        }
+
+
+        /* Mensagens de Status */
+        #loading, #error {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: var(--light-text);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <img src="https://i.imgur.com/LG2KiJh.png" alt="Logo 3 Marias Moda Feminina" class="logo-admin">
+    <header>
+        <a href="index.html" style="color: var(--text-color);">&larr; Voltar para a Loja</a>
+    </header>
 
-        <h1>Administração da Loja</h1>
+    <main>
+        <div id="loading">Carregando detalhes do produto...</div>
+        <div id="error" style="display: none;"></div>
 
-        <section id="login-section">
-            <h2>Acesso Restrito</h2>
-            <form id="loginForm">
-                <label for="login-email">Email:</label>
-                <input type="text" id="login-email" placeholder="Seu email de admin" required>
-                
-                <label for="login-password">Senha:</label>
-                <input type="password" id="login-password" placeholder="Sua senha" required>
-                
-                <button type="submit" id="btnLogin">Entrar</button>
-            </form>
-            <div id="loginStatus" class="status"></div>
-        </section>
-
-        <section id="product-section" style="display: none;">
-            
-            <h2 id="welcomeMessage"></h2> 
-
-            <h3>1. Adicionar Novo Produto</h3>
-            <form id="formProduto">
-                <label for="nome">Nome do Produto:</label>
-                <input type="text" id="nome" placeholder="Ex: Conjunto Renda Premium" required>
-                
-                <label for="descricao">Descrição:</label>
-                <textarea id="descricao" placeholder="Ex: Conjunto luxuoso..." required></textarea>
-                
-                <label for="preco">Preço (¥):</label>
-                <input type="text" id="preco" placeholder="Ex: 4900 (apenas o número)" required>
-                
-                <label for="estoque">Quantidade em Estoque:</label>
-                <input type="number" id="estoque" placeholder="Ex: 5" required min="0"> 
-                
-                <label for="source">Disponibilidade / Fonte:</label>
-                <select id="source" required>
-                    <option value="pronta-entrega">Pronta Entrega (Estoque Harumi)</option>
-                    <option value="sob-encomenda">Sob Encomenda (Estoque Fornecedor)</option>
-                </select>
-                
-                <p style="font-weight: bold; margin-top: 1rem;">Selos de Destaque:</p>
-                <div class="checkbox-group">
-                    <label for="isNew">
-                        <input type="checkbox" id="isNew"> Produto Novo
-                    </label>
-                    <label for="isFeatured">
-                        <input type="checkbox" id="isFeatured"> Destaque / Promoção
-                    </label>
-                </div>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 1rem 0;">
-
-                <label for="fotoPrincipal">Foto Principal (Destaque):</label>
-                <input type="file" id="fotoPrincipal" accept="image/*" required>
-                
-                <label for="videoFile">Upload do Vídeo Curto (Opcional):</label>
-                <input type="file" id="videoFile" accept="video/mp4,video/quicktime,video/webm">
-                <p style="font-size: 0.8rem; color: #777;">Selecione um arquivo de vídeo (MP4, MOV, etc.)</p>
-
-                <label for="galeriaUpload">Fotos Adicionais (Galeria):</label>
-                <input type="file" id="galeriaUpload" accept="image/*" multiple>
-                <p style="font-size: 0.8rem; color: #777;">Você pode selecionar várias fotos de uma vez para a galeria.</p>
-                
-                <button type="submit" id="btnSalvar">Salvar Produto</button>
-            </form>
-            
-            <div id="status" class="status"></div>
-
-            <hr style="border: 0; border-top: 2px solid #b76e86; margin: 30px 0;">
-
-            <h3>2. Gerenciar Produtos Existentes</h3>
-            <div id="loading-list" class="status loading">Carregando lista de produtos...</div>
-            
-            <table id="product-management-list">
-                <thead>
-                    <tr>
-                        <th style="width: 60px;">Foto</th>
-                        <th>Nome</th>
-                        <th style="width: 80px;">Estoque</th> <th style="width: 180px;">Disponibilidade</th>
-                        <th style="width: 100px;">Selos</th> 
-                        <th style="width: 80px;">Preço (¥)</th>
-                        <th style="width: 100px;">Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="products-table-body">
-                    </tbody>
-            </table>
-
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 1.5rem 0;">
-            
-            <button id="btnLogout">Sair (Logout)</button>
-        </section>
-    </div>
+        <div id="product-details" style="display: none;">
+            </div>
+    </main>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script> 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-      // 1. CONFIGURAÇÃO (Suas Chaves Reais)
-      const firebaseConfig = {
-        apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
-        authDomain: "loja3marias-50204.firebaseapp.com",
-        projectId: "loja3marias-50204",
-        storageBucket: "loja3marias-50204.firebasestorage.app",
-        messagingSenderId: "405330133487",
-        appId: "1:405330133487:web:606de41211df52245f761a",
-        measurementId: "G-TK877V6P0S"
-      };
+        // 2. CONFIGURAÇÃO (Suas Chaves Reais)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
+            authDomain: "loja3marias-50204.firebaseapp.com",
+            projectId: "loja3marias-50204",
+            storageBucket: "loja3marias-50204.firebasestorage.app",
+            messagingSenderId: "405330133487",
+            appId: "1:405330133487:web:606de41211df52245f761a",
+            measurementId: "G-TK877V6P0S"
+        };
 
-      // 2. Inicialização
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-      const storage = firebase.storage();
-      const auth = firebase.auth(); 
-      const COLECAO_PRODUTOS = "products";
+        // 3. Inicializar o Firebase e o Firestore
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(); 
 
-      console.log("Admin: Firebase conectado.");
-    </script>
+        const detailsContainer = document.getElementById('product-details');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        
+        // 🚨 NÚMERO FINAL DA HARUMI (Formato internacional sem o '+')
+        const WHATSAPP_NUMBER = "818074558624"; 
 
-    <script>
-        // Elementos do HTML
-        const loginSection = document.getElementById('login-section');
-        const productSection = document.getElementById('product-section');
-        const loginForm = document.getElementById('loginForm');
-        const loginStatusDiv = document.getElementById('loginStatus');
-        const formProduto = document.getElementById('formProduto');
-        const statusDiv = document.getElementById('status');
-        const btnSalvar = document.getElementById('btnSalvar');
-        const btnLogout = document.getElementById('btnLogout');
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        const productsTableBody = document.getElementById('products-table-body');
-        const loadingListDiv = document.getElementById('loading-list');
 
-        function showStatus(div, message, type) {
-            div.textContent = message;
-            div.className = 'status ' + type; 
-        }
+        // 4. LÓGICA DE CARREGAMENTO
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
 
-        // --- FUNÇÕES PRINCIPAIS ---
+            if (!productId) {
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = "Erro: ID do produto não encontrado na URL. <a href='index.html'>Voltar para a loja.</a>";
+                return;
+            }
 
-        // Função de Upload (mantida)
-        async function uploadFileAndGetUrl(file, folder = 'produtos') {
-            const fileName = `${Date.now()}-${file.name}`; 
-            const storageRef = storage.ref(`${folder}/${fileName}`); 
-            await storageRef.put(file);
-            return storageRef.getDownloadURL();
-        }
+            fetchProductDetails(productId);
+        });
 
-        // Função que lista e exibe os produtos (ATUALIZADA para mostrar ESTOQUE)
-        async function listProductsForManagement() {
-            productsTableBody.innerHTML = ''; 
-            loadingListDiv.style.display = 'block';
-
+        async function fetchProductDetails(id) {
             try {
-                // Ordenação para a tabela de admin: por data de criação
-                const snapshot = await db.collection(COLECAO_PRODUTOS).orderBy('createdAt', 'desc').get();
-                
-                if (snapshot.empty) {
-                    productsTableBody.innerHTML = '<tr><td colspan="7">Nenhum produto cadastrado.</td></tr>'; // Alterado de 6 para 7 colunas
+                const doc = await db.collection("products").doc(id).get(); 
+
+                if (!doc.exists) {
+                    loadingDiv.style.display = 'none';
+                    errorDiv.style.display = 'block';
+                    errorDiv.innerHTML = "Erro: Produto não encontrado no banco de dados. <a href='index.html'>Voltar para a loja.</a>";
                     return;
                 }
 
-                snapshot.forEach(doc => {
-                    const product = doc.data();
-                    const precoFormatado = parseFloat(product.price || 0).toLocaleString('ja-JP', { 
-                        style: 'currency', 
-                        currency: 'JPY',
-                        maximumFractionDigits: 0
-                    });
+                const product = doc.data();
+                
+                // 5. PROCESSAMENTO DE DADOS E MÍDIA
+                const name = product.name || 'Produto Sem Nome';
+                const description = product.description || 'Descrição não disponível.';
+                const price = product.price || '0';
+                const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=IMAGEM+PRINCIPAL';
+                const videoUrl = product.videoUrl; 
+                const source = product.source || 'pronta-entrega'; 
+
+                let galleryUrls = product.galeria || [];
+                
+                let allMediaUrls = [];
+
+                if (videoUrl) {
+                    allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl });
+                }
+                
+                if (!allMediaUrls.some(m => m.url === imageUrl)) {
+                     allMediaUrls.push({ type: 'image', url: imageUrl, thumb: imageUrl });
+                }
+
+                galleryUrls.forEach(url => {
+                    allMediaUrls.push({ type: 'image', url: url, thumb: url });
+                });
+
+                allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i);
+
+
+                // 6. FORMATAÇÃO DO PREÇO e LÓGICA DO WHATSAPP
+                const priceValue = parseFloat(price.toString().replace(',', '.')); 
+                const precoFormatado = priceValue.toLocaleString('ja-JP', { 
+                    style: 'currency', 
+                    currency: 'JPY',
+                    maximumFractionDigits: 0
+                });
+                
+                let statusText;
+                let whatsappMessage;
+                let statusClass;
+
+                if (source === 'pronta-entrega') {
+                    statusText = '✨ Pronta Entrega (Envio/Retirada Imediata)';
+                    statusClass = 'status-pronta-entrega';
+                    whatsappMessage = `Olá, Harumi! Gostaria de comprar o produto ${name} (${precoFormatado}) que está na Pronta Entrega. Qual o procedimento para pagamento e envio/retirada?`;
+                } else {
+                    statusText = '📦 Sob Encomenda (Disponível em 3-5 dias)';
+                    statusClass = 'status-sob-encomenda';
+                    whatsappMessage = `Olá! Gostaria de encomendar o produto ${name} (${precoFormatado}) do Catálogo Completo. Entendi que o prazo é de 3-5 dias. Quais são as opções de recebimento?`;
+                }
+                
+                // 🚨 LINK FINAL: Usa o número correto com a mensagem personalizada
+                const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+                
+                // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL e MINIATURAS (Mantida)
+                let mainMediaHTML = '';
+                let galleryHTML = '';
+                
+                allMediaUrls.forEach((media, index) => {
+                    const isActive = index === 0;
                     
-                    const source = product.source || 'N/A';
-                    const sourceText = source === 'pronta-entrega' ? 'Pronta Entrega' : (source === 'sob-encomenda' ? 'Sob Encomenda' : 'N/A');
+                    const isVideoThumb = media.type === 'video';
+                    const thumbClasses = isVideoThumb ? 'video-thumb' : '';
                     
-                    // Exibição dos selos na tabela
-                    let selosText = '';
-                    if (product.isNew) { selosText += 'Novo / '; }
-                    if (product.isFeatured) { selosText += 'Destaque'; }
-                    selosText = selosText.replace(/ \/ $/, '').trim() || 'Nenhum'; 
-
-                    // Estiliza a cor do estoque se estiver baixo (opcional)
-                    const estoque = product.estoque !== undefined ? parseInt(product.estoque) : 0;
-                    const estoqueStyle = estoque < 3 ? 'color: red; font-weight: bold;' : '';
-
-
-                    const row = productsTableBody.insertRow();
-                    row.innerHTML = `
-                        <td><img src="${product.imageUrl || 'https://via.placeholder.com/50x50?text=SEM'}" alt="${product.name}"></td>
-                        <td>${product.name}</td>
-                        <td style="${estoqueStyle}">${estoque}</td> <td>${sourceText}</td>
-                        <td>${selosText}</td> 
-                        <td>${precoFormatado}</td>
-                        <td>
-                            <button class="delete-btn" data-id="${doc.id}">Excluir</button>
-                        </td>
+                    galleryHTML += `
+                        <div class="thumb-container ${isActive ? 'active' : ''} ${thumbClasses}" 
+                             data-type="${media.type}"
+                             data-full-src="${media.url}">
+                            <img src="${media.thumb}" alt="Mídia ${index + 1}">
+                            ${isVideoThumb ? '<div class="video-overlay"></div>' : ''}
+                        </div>
                     `;
-                });
 
-            } catch (error) {
-                console.error('Erro ao listar produtos:', error);
-                productsTableBody.innerHTML = '<tr><td colspan="7">Erro ao carregar lista. Verifique o console.</td></tr>'; // Alterado de 6 para 7 colunas
-            } finally {
-                loadingListDiv.style.display = 'none';
-            }
-        }
-        
-        // Função para excluir um produto (mantida)
-        async function deleteProduct(id) {
-            if (!confirm('Tem certeza que deseja EXCLUIR este produto? Essa ação é IRREVERSÍVEL.')) {
-                return;
-            }
-            showStatus(statusDiv, 'Excluindo produto...', 'loading');
-            try {
-                await db.collection(COLECAO_PRODUTOS).doc(id).delete();
-                
-                showStatus(statusDiv, 'Produto excluído com sucesso!', 'success');
-                listProductsForManagement(); 
-            } catch (error) {
-                console.error('Erro ao excluir:', error);
-                showStatus(statusDiv, `Falha ao excluir: ${error.message}`, 'error');
-            }
-        }
-
-        // --- EVENTOS ---
-
-        // 1. EVENTO DE CLIQUE DO BOTÃO EXCLUIR (mantido)
-        productsTableBody.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-btn')) {
-                const productId = e.target.dataset.id;
-                deleteProduct(productId);
-            }
-        });
-
-
-        // 2. LÓGICA DE LOGIN (mantida)
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-
-            showStatus(loginStatusDiv, 'Tentando entrar...', 'loading');
-
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-            } catch (error) {
-                console.error('Erro de Login:', error);
-                showStatus(loginStatusDiv, `Erro de Acesso: ${error.message}`, 'error');
-            }
-        });
-
-        // 3. LÓGICA DE SALVAMENTO DE PRODUTO (ATUALIZADA para salvar ESTOQUE)
-        formProduto.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-            
-            if (!auth.currentUser) {
-                showStatus(statusDiv, 'Erro: Você não está logado.', 'error');
-                return;
-            }
-
-            const nome = document.getElementById('nome').value;
-            const descricao = document.getElementById('descricao').value;
-            const preco = document.getElementById('preco').value;
-            const estoque = document.getElementById('estoque').value; // NOVO: Captura o estoque
-            const source = document.getElementById('source').value;
-            
-            const isNew = document.getElementById('isNew').checked;
-            const isFeatured = document.getElementById('isFeatured').checked;
-            
-            const fotoPrincipalFile = document.getElementById('fotoPrincipal').files[0];
-            const videoFile = document.getElementById('videoFile').files[0];
-            const galeriaFiles = document.getElementById('galeriaUpload').files;
-
-            if (!fotoPrincipalFile) {
-                showStatus(statusDiv, 'Por favor, escolha uma foto principal.', 'error');
-                return;
-            }
-
-            btnSalvar.disabled = true;
-            showStatus(statusDiv, 'Iniciando uploads...', 'loading'); 
-
-            let videoUrl = null;
-            let stepCounter = 1;
-            const totalSteps = 2 + (videoFile ? 1 : 0) + (galeriaFiles.length > 0 ? 1 : 0); 
-
-            try {
-                // A) UPLOAD DO VÍDEO CURTO
-                if (videoFile) {
-                    showStatus(statusDiv, `Passo ${stepCounter++}/${totalSteps} - Enviando vídeo...`, 'loading');
-                    videoUrl = await uploadFileAndGetUrl(videoFile, 'produtos/videos'); 
-                }
-
-                // B) UPLOAD DA FOTO PRINCIPAL
-                showStatus(statusDiv, `Passo ${stepCounter++}/${totalSteps} - Enviando foto principal...`, 'loading');
-                const imageUrl = await uploadFileAndGetUrl(fotoPrincipalFile, 'produtos');
-
-                // C) UPLOAD DAS FOTOS DA GALERIA
-                const uploadPromises = [];
-                if (galeriaFiles.length > 0) {
-                    showStatus(statusDiv, `Passo ${stepCounter++}/${totalSteps} - Enviando ${galeriaFiles.length} fotos da galeria...`, 'loading');
-                    for (const file of galeriaFiles) {
-                        uploadPromises.push(uploadFileAndGetUrl(file, 'produtos/galeria'));
+                    if (isActive) {
+                        if (media.type === 'video') {
+                             mainMediaHTML = `
+                                <video src="${media.url}" controls loop style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                                    Seu navegador não suporta o formato de vídeo.
+                                </video>
+                            `;
+                        } else {
+                            mainMediaHTML = `<img id="main-image" src="${media.url}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">`;
+                        }
                     }
-                }
-                const galeriaArray = await Promise.all(uploadPromises);
-
-                // D) SALVAR TUDO NO FIRESTORE
-                showStatus(statusDiv, 'Salvando dados do produto...', 'loading');
+                });
                 
-                await db.collection('products').add({
-                    name: nome,
-                    description: descricao,
-                    price: preco,
-                    estoque: parseInt(estoque), // NOVO: Salva o estoque como número
-                    source: source,
-                    isNew: isNew,
-                    isFeatured: isFeatured,
-                    imageUrl: imageUrl, 
-                    videoUrl: videoUrl, 
-                    galeria: galeriaArray, 
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+                // 8. MONTAGEM DO HTML COMPLETO
+                detailsContainer.innerHTML = `
+                    <div class="media-area">
+                        <div id="main-media-display">
+                            ${mainMediaHTML}
+                        </div>
+                        <div id="thumbnails">
+                            ${galleryHTML}
+                        </div>
+                    </div>
+                    <div class="info-area">
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                        <h1>${name}</h1>
+                        <p class="price">${precoFormatado}</p>
+                        <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3>
+                        <p style="color:var(--light-text); font-weight:400;">${description}</p>
+                        <a href="${whatsappLink}" target="_blank" class="buy-button">Comprar / Encomendar via WhatsApp</a>
+                    </div>
+                `;
+
+                // 9. FUNCIONALIDADE DA GALERIA (Mantida)
+                const mainMediaDisplay = document.getElementById('main-media-display');
+                const thumbContainers = document.querySelectorAll('.thumb-container');
+                
+                thumbContainers.forEach(container => {
+                    container.addEventListener('click', () => {
+                        const newSrc = container.dataset.full-src;
+                        const mediaType = container.dataset.type;
+
+                        mainMediaDisplay.innerHTML = ''; 
+                        
+                        if (mediaType === 'video') {
+                            mainMediaDisplay.innerHTML = `
+                                <video src="${newSrc}" controls loop style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                                    Seu navegador não suporta o formato de vídeo.
+                                </video>
+                            `;
+                        } else {
+                            mainMediaDisplay.innerHTML = `
+                                <img src="${newSrc}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+                            `;
+                        }
+                        
+                        thumbContainers.forEach(t => t.classList.remove('active'));
+                        container.classList.add('active');
+                    });
                 });
 
-                showStatus(statusDiv, 'Produto salvo com sucesso!', 'success');
-                formProduto.reset();
-                listProductsForManagement(); 
+                loadingDiv.style.display = 'none';
+                detailsContainer.style.display = 'flex';
+
 
             } catch (error) {
-                console.error('Erro no processo de salvamento:', error);
-                showStatus(statusDiv, `Erro: Falha no upload ou na permissão: ${error.message}`, 'error');
-
-            } finally {
-                btnSalvar.disabled = false;
+                console.error('Erro ao buscar produto:', error);
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = `Erro ao carregar os detalhes: ${error.message}. Verifique as regras do Firestore. <a href='index.html'>Voltar.</a>`;
             }
-        });
-
-        // 4. LÓGICA DE LOGOUT (mantida)
-        document.getElementById('btnLogout').addEventListener('click', async () => {
-            await auth.signOut();
-            window.location.reload(); 
-        });
-
-
-        // 5. VERIFICAÇÃO DE ESTADO DE AUTENTICAÇÃO (Chama a listagem ao logar - mantida)
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                // Usuário LOGADO
-                loginSection.style.display = 'none';
-                productSection.style.display = 'block';
-                welcomeMessage.textContent = 'Bem-vinda de volta, Harumi Ichimura!';
-                
-                listProductsForManagement(); 
-            } else {
-                // Usuário DESLOGADO
-                loginSection.style.display = 'block';
-                productSection.style.display = 'none';
-            }
-        });
-        
+        }
     </script>
-
 </body>
 </html>
