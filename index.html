@@ -8,31 +8,40 @@
     <style>
         /* Variáveis de Cor OTIMIZADAS PARA O VISUAL LABELLY */
         :root {
-            --primary-color: #333; /* Preto Chumbo/Texto Principal */
-            --accent-color: #999; /* Cinza Metalizado/Acentos (como o "IB" na foto) */
-            --bg-color: #fcfcfc; /* Fundo Branco Limpo */
-            --border-color: #ddd; /* Cinza sutil */
-            --filter-bg: #f9f9f9; /* Fundo dos botões de filtro (cinza claro) */
+            --primary-text: #333; /* Texto Principal (Quase Preto) */
+            --light-text: #666; /* Texto Secundário (Cinza Médio) */
+            --super-light-text: #999; /* Texto Super Leve (Cinza Claro) */
+            --bg-color: #ffffff; /* Fundo Branco Puro */
+            --border-color: #e0e0e0; /* Borda Cinza Muito Clara */
+            --filter-area-bg: #f5f5f5; /* Fundo da área de filtros */
+            --filter-button-active-border: #333; /* Borda do botão de filtro ativo */
         }
 
         /* Estilos de Estrutura BASE */
-        body { font-family: Arial, sans-serif; margin: 0; background-color: var(--bg-color); color: var(--primary-color); }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            margin: 0; 
+            background-color: var(--bg-color); 
+            color: var(--primary-text); 
+            -webkit-font-smoothing: antialiased; /* Suavização de fonte */
+        }
         
-        /* HEADER: Título Preto e Fundo Branco */
+        /* HEADER: Título Preto e Fundo Branco (como Labelly) */
         header { 
             background-color: white; 
-            color: var(--primary-color); 
             text-align: center; 
-            padding: 1.2rem 0; 
-            border-bottom: 1px solid var(--border-color); 
+            padding: 1.5rem 0 1rem 0; /* Mais padding em cima, menos embaixo */
+            border-bottom: none; /* Sem borda no header, como Labelly */
             position: relative; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Sombra super sutil */
         }
         header h1 { 
             margin: 0; 
-            font-size: 1.6em; 
-            color: var(--primary-color); 
+            font-size: 1.4em; /* Ligeiramente menor para elegância */
+            color: var(--primary-text); 
             letter-spacing: 2px; 
-            font-weight: 300; /* Fonte mais leve para elegância */
+            font-weight: 300; /* Fonte mais leve */
+            text-transform: uppercase; /* Maiúsculas, como o Labelly usa */
         }
         
         main { 
@@ -41,48 +50,49 @@
             padding: 0 15px; 
         }
 
-        /* Mensagem de Instrução */
+        /* Mensagem de Instrução (Mais sutil) */
         #filter-instruction {
             text-align: center;
-            font-size: 1em; 
-            font-weight: 400; /* Normal */
-            color: var(--primary-color); 
+            font-size: 0.95em; /* Ligeiramente menor */
+            font-weight: 400; 
+            color: var(--light-text); /* Cinza mais suave */
             margin-bottom: 25px; 
             padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color); /* Linha divisória suave */
         }
 
-        /* Seção de Filtros (Estilo como a barra "FILTRAR / ORDENAR") */
+        /* Seção de Filtros (Estilo do "FILTRAR / ORDENAR" da Labelly) */
         #controls {
             display: flex;
             gap: 0; 
-            padding: 0;
-            border: 1px solid var(--border-color); /* Borda fina */
+            border: 1px solid var(--border-color); /* Borda fina ao redor da caixa */
             border-radius: 4px;
             overflow: hidden;
             margin-bottom: 35px; 
-            background-color: var(--filter-bg); /* Fundo Cinza Claro */
+            background-color: var(--filter-area-bg); /* Fundo cinza claro */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02); /* Sombra ainda mais sutil */
         }
 
         /* Estilo dos Títulos de Seção */
         .section-title {
-            color: var(--primary-color); 
-            font-size: 1.4em;
+            color: var(--primary-text); 
+            font-size: 1.3em; /* Um pouco menor */
             padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color); /* Linha Fina Cinza */
+            border-bottom: 1px solid var(--border-color); /* Linha divisória suave */
             margin-bottom: 20px;
             text-align: left;
-            font-weight: bold;
-            letter-spacing: 1px;
+            font-weight: 600; /* Mais forte para títulos */
+            letter-spacing: 0.5px;
+            text-transform: uppercase; /* Maiúsculas */
         }
 
-        /* Botões de Filtro - Duas colunas Labelly Style */
+        /* Botões de Filtro - Réplica Labelly */
         .filter-button {
-            background-color: var(--filter-bg); 
-            color: var(--primary-color);
-            border-right: 1px solid var(--border-color); /* Separador sutil */
+            background-color: var(--filter-area-bg); /* Fundo da área de filtro */
+            color: var(--primary-text);
+            border-right: 1px solid var(--border-color); /* Separador vertical */
             box-shadow: none;
-            font-size: 1em;
+            font-size: 0.95em; /* Ligeiramente menor */
             font-weight: 500;
             padding: 12px;
             cursor: pointer;
@@ -92,13 +102,21 @@
         .filter-button:last-child { border-right: none; } 
 
         .filter-button.active {
-            background-color: white; /* Fundo Branco para o ativo */
-            color: var(--primary-color);
+            background-color: white; /* Fundo branco para o botão ativo */
+            color: var(--primary-text);
             font-weight: 600;
-            border: 1px solid var(--primary-color); /* Destaque forte na borda (opcional) */
-            z-index: 1; /* Para sobrepor a borda do inativo */
+            /* Border para destacar o ativo, como se estivesse "para fora" */
+            border-top: 2px solid var(--filter-button-active-border); 
+            border-bottom: 2px solid var(--filter-button-active-border);
+            border-left: 1px solid var(--filter-button-active-border);
+            border-right: 1px solid var(--filter-button-active-border);
+            margin: -1px; /* Ajusta para que a borda fique visível */
+            position: relative;
+            z-index: 1; /* Garante que a borda ativa se sobreponha */
         }
-        .filter-button.active:first-child { border-left: 1px solid var(--primary-color); }
+        .filter-button.active:first-child { border-left: 2px solid var(--filter-button-active-border); }
+        .filter-button.active:last-child { border-right: 2px solid var(--filter-button-active-border); }
+
 
         /* Produtos */
         #product-grid {
@@ -107,52 +125,62 @@
             gap: 25px; 
         }
         
-        /* Estilos de Cartão - Clean */
+        /* Estilos de Cartão - Clean e minimalista */
         .product-card {
             background-color: white;
-            border-radius: 0; /* Sem bordas arredondadas (Clean) */
-            border: none; /* Sem borda visível */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); 
+            border-radius: 0; 
+            border: 1px solid var(--border-color); /* Borda fina */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02); /* Sombra super, super sutil */
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         
-        .product-card img { height: 250px; object-fit: cover; }
+        .product-card img { 
+            width: 100%;
+            height: 250px; 
+            object-fit: cover; 
+            display: block; /* Remove espaço extra abaixo da imagem */
+        }
         
         .product-info { 
             padding: 1rem; 
             text-align: center; 
         }
         .product-info h3 { 
-            font-size: 1.1em; 
-            color: var(--primary-color); 
+            font-size: 1.05em; /* Mais sutil */
+            color: var(--primary-text); 
             margin-bottom: 5px;
-            font-weight: 500;
+            font-weight: 400; /* Leve */
+            text-transform: uppercase;
         }
         .product-info .price { 
-            font-size: 1.3em; 
-            color: var(--accent-color); /* PREÇO CINZA METALIZADO/SUTIL */
-            font-weight: 600; 
+            font-size: 1.2em; /* Um pouco menor */
+            color: var(--light-text); /* Cinza mais claro para preço */
+            font-weight: 500; 
         }
         
         /* Botão "Ver Detalhes" - Minimalista e Sutil */
         .buy-button { 
             background-color: white; 
-            color: var(--primary-color); 
+            color: var(--light-text); /* Texto Cinza Claro */
             padding: 8px 12px;
-            font-size: 1em;
-            font-weight: 500;
-            border-radius: 0; /* Sem bordas arredondadas */
-            border: 1px solid var(--accent-color); /* Borda FINA Cinza/Metalizada */
+            font-size: 0.95em;
+            font-weight: 400;
+            border-radius: 0; 
+            border: 1px solid var(--border-color); /* Borda Cinza Super Fina */
             box-shadow: none; 
             display: block;
             margin-top: 15px;
-            transition: background-color 0.3s ease, color 0.3s;
+            width: 80%; /* Mais estreito para elegância */
+            margin-left: auto;
+            margin-right: auto;
+            transition: background-color 0.3s ease, color 0.3s, border-color 0.3s;
         }
         
         .buy-button:hover { 
-            background-color: var(--primary-color); /* Fundo Preto no hover */
-            color: white;
+            background-color: var(--filter-area-bg); /* Fundo cinza claro no hover */
+            color: var(--primary-text);
+            border-color: var(--primary-text);
         }
         
         /* Estilo para atalho Admin */
@@ -212,7 +240,7 @@
     </script>
 
     <script>
-        // --- CÓDIGO DO ATALHO ADMIN (Mantido) ---
+        // --- CÓDIGO DO ATALHO ADMIN ---
         const ADMIN_URL = "admin.html";
         const ADMIN_TRIGGER = document.getElementById('admin-trigger');
         let clickCount = 0;
@@ -236,7 +264,7 @@
         });
         // --- FIM DO CÓDIGO DO ATALHO ADMIN ---
 
-        // --- CÓDIGO DE CARREGAMENTO DE PRODUTOS (Mantido) ---
+        // --- CÓDIGO DE CARREGAMENTO DE PRODUTOS ---
         const productGrid = document.getElementById('product-grid');
         const filterButtons = document.querySelectorAll('.filter-button');
         const loadingStatus = document.getElementById('loading-status');
