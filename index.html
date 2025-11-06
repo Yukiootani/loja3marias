@@ -6,7 +6,6 @@
     <title>3 MARIAS MODA FEMININA</title>
     
     <style>
-        /* [Seus Estilos CSS (Não alterados)] */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -36,7 +35,43 @@
             color: #b76e86;
             margin-bottom: 2rem;
         }
+        
+        /* Estilo da Seção de Filtros/Botões */
+        #filter-controls {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .filter-button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            border: 2px solid #b76e86;
+            background-color: transparent;
+            color: #b76e86;
+            cursor: pointer;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .filter-button.active, .filter-button:hover {
+            background-color: #b76e86;
+            color: white;
+        }
+        
+        /* Estilo do Selo de Disponibilidade */
+        .source-tag {
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        .pronta-entrega { background-color: #d4edda; color: #155724; } /* Verde Claro */
+        .sob-encomenda { background-color: #fff3cd; color: #856404; } /* Amarelo Claro */
 
+        /* Layout do Grid de Produtos */
         #product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -50,6 +85,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            position: relative; /* Para posicionar o selo */
         }
 
         .product-card img {
@@ -111,7 +147,14 @@
     </header>
 
     <main>
-        <h2>Nossa Coleção</h2>
+        
+        <div id="filter-controls">
+            <button class="filter-button active" data-filter="pronta-entrega">✨ Pronta Entrega</button>
+            <button class="filter-button" data-filter="sob-encomenda">📦 Catálogo Completo (Sob Encomenda)</button>
+            </div>
+
+        <h2><span id="collection-title">Pronta Entrega</span></h2>
+        
         <div id="product-grid">
             <p style="text-align: center;">Carregando produtos do Firebase...</p>
         </div>
@@ -140,65 +183,118 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(); 
 
-        // 4. LÓGICA DE BUSCA DE PRODUTOS DO FIREBASE
-        document.addEventListener('DOMContentLoaded', () => {
-            const productGrid = document.getElementById('product-grid');
-            const COLECAO_PRODUTOS = "products";
+        // Variável global para armazenar a lista completa de produtos
+        let allProducts = [];
+        const COLECAO_PRODUTOS = "products";
+        const productGrid = document.getElementById('product-grid');
+        const collectionTitle = document.getElementById('collection-title');
 
-            async function fetchProductsFromFirestore() {
-                productGrid.innerHTML = '<p style="text-align: center;">Carregando produtos do Firebase...</p>';
+        // --- FUNÇÕES DE EXIBIÇÃO E FILTRO ---
 
-                try {
-                    const snapshot = await db.collection(COLECAO_PRODUTOS).get(); 
-                    
-                    if (snapshot.empty) {
-                        productGrid.innerHTML = '<h2>Nenhum produto cadastrado.</h2>';
-                        return;
-                    }
+        // Função principal para buscar TODOS os produtos e salvar na variável global
+        async function loadAllProducts() {
+            try {
+                const snapshot = await db.collection(COLECAO_PRODUTOS).get();
+                allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Exibe a categoria padrão ao carregar
+                filterAndDisplayProducts('pronta-entrega'); 
 
-                    productGrid.innerHTML = '';
-                    
-                    snapshot.forEach(doc => {
-                        const product = doc.data();
-                        
-                        // Leitura do campo 'imageUrl' (com U maiúsculo)
-                        const imageUrl = product.imageUrl 
-                            ? product.imageUrl 
-                            : 'https://via.placeholder.com/300x300/ff69b4/ffffff?text=SEM IMAGEM';
-                        
-                        const name = product.name || 'Produto Sem Nome';
-                        const description = product.description || 'Descrição não disponível.';
-                        const price = product.price || '0';
-                        
-                        // FORMATAÇÃO PARA IENE (¥)
-                        const priceValue = parseFloat(price.toString().replace(',', '.')); 
-                        const precoFormatado = priceValue.toLocaleString('ja-JP', { 
-                            style: 'currency', 
-                            currency: 'JPY',
-                            maximumFractionDigits: 0
-                        });
+            } catch (error) {
+                console.error('Erro ao buscar produtos do Firebase:', error);
+                productGrid.innerHTML = '<p style="text-align: center; color: red;">⚠️ Erro ao carregar a loja. Verifique o console.</p>';
+            }
+        }
+        
+        // Função que filtra e exibe os produtos
+        function filterAndDisplayProducts(filterSource) {
+            
+            productGrid.innerHTML = ''; // Limpa o grid
+            let filteredProducts;
+            let titleText = 'Nossa Coleção';
 
-                        const card = document.createElement('div');
-                        card.className = 'product-card';
-                        
-                        card.innerHTML = `
-                            <img src="${imageUrl}" alt="Imagem de ${name}">
-                            <h3>${name}</h3>
-                            <p class="description">${description}</p>
-                            <p class="price">${precoFormatado}</p>
-                            <a href="detalhes.html?id=${doc.id}" class="buy-button">Ver Detalhes</a>
-                        `;
-                        
-                        productGrid.appendChild(card);
-                    });
+            if (filterSource === 'all') {
+                filteredProducts = allProducts;
+            } else {
+                // Filtra pelo campo 'source' (pronta-entrega ou sob-encomenda)
+                filteredProducts = allProducts.filter(product => product.source === filterSource);
+            }
+            
+            // Define o título baseado no filtro
+            if (filterSource === 'pronta-entrega') {
+                titleText = 'Pronta Entrega (Envio Imediato)';
+            } else if (filterSource === 'sob-encomenda') {
+                titleText = 'Catálogo Completo (Sob Encomenda - 3-5 dias)';
+            }
+            collectionTitle.textContent = titleText;
 
-                } catch (error) {
-                    console.error('Erro ao buscar produtos do Firebase:', error);
-                    productGrid.innerHTML = '<p style="text-align: center; color: red;">⚠️ Erro ao carregar os produtos. Verifique o console.</p>';
-                }
+
+            if (filteredProducts.length === 0) {
+                productGrid.innerHTML = '<h2>Nenhum produto nesta categoria.</h2>';
+                return;
             }
 
-            fetchProductsFromFirestore();
+            // Renderiza os produtos filtrados
+            filteredProducts.forEach(product => {
+                
+                // Leitura e formatação de dados
+                const imageUrl = product.imageUrl ? product.imageUrl : 'https://via.placeholder.com/300x300/ff69b4/ffffff?text=SEM IMAGEM';
+                const name = product.name || 'Produto Sem Nome';
+                const description = product.description || 'Descrição não disponível.';
+                const price = product.price || '0';
+                const source = product.source || 'pronta-entrega'; // Garante um valor padrão
+                
+                const precoFormatado = parseFloat(price.toString().replace(',', '.')).toLocaleString('ja-JP', { 
+                    style: 'currency', 
+                    currency: 'JPY',
+                    maximumFractionDigits: 0
+                });
+                
+                // Define classes e texto para o selo
+                const sourceText = source === 'pronta-entrega' ? 'PRONTA ENTREGA' : 'SOB ENCOMENDA';
+                const sourceClass = source === 'pronta-entrega' ? 'pronta-entrega' : 'sob-encomenda';
+                
+                
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="Imagem de ${name}">
+                    <div style="padding: 1rem 1rem 0;">
+                        <span class="source-tag ${sourceClass}">${sourceText}</span>
+                    </div>
+                    <h3>${name}</h3>
+                    <p class="description">${description}</p>
+                    <p class="price">${precoFormatado}</p>
+                    <a href="detalhes.html?id=${product.id}&source=${source}" class="buy-button">Ver Detalhes</a>
+                `;
+                
+                productGrid.appendChild(card);
+            });
+        }
+
+        // --- EVENTOS DE CONTROLE ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Carrega todos os produtos do Firebase
+            loadAllProducts(); 
+            
+            // 2. Adiciona o evento de clique nos botões de filtro
+            const filterButtons = document.querySelectorAll('.filter-button');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const filterValue = button.dataset.filter;
+                    
+                    // Remove a classe 'active' de todos os botões
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Adiciona a classe 'active' ao botão clicado
+                    button.classList.add('active');
+                    
+                    // Chama a função de filtro
+                    filterAndDisplayProducts(filterValue);
+                });
+            });
         });
     </script>
 </body>
