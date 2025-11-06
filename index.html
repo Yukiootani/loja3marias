@@ -10,7 +10,22 @@
         body { font-family: Arial, sans-serif; margin: 0; background-color: #fdf7f9; color: #333; }
         header { background-color: #d8a0b0; color: white; text-align: center; padding: 2rem 1rem; }
         header h1 { margin: 0; font-size: 2.5em; }
-        header p { font-size: 1.1em; }
+        
+        /* NOVO ESTILO: Fonte maior para o subtítulo */
+        header p { 
+            font-size: 1.25em; /* Aumento de 1.1em para 1.25em */
+            margin: 5px 0 0 0; 
+        }
+
+        /* NOVO ESTILO: Brilho Dourado para o texto "Tudo a pronta entrega" */
+        .golden-glow {
+            color: #ffd700; /* Cor Dourada */
+            text-shadow: 
+                0 0 5px #f0e68c, /* Brilho interno */
+                0 0 10px #daa520; /* Brilho externo */
+            font-weight: bold;
+        }
+
         main { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
 
         /* Controles de Filtro (Botões) */
@@ -152,8 +167,8 @@
         /* Estilo para garantir que o cabeçalho seja clicável */
         #admin-trigger {
             cursor: pointer; 
-            user-select: none; /* Evita seleção de texto durante cliques rápidos */
-            -webkit-tap-highlight-color: transparent; /* Remove o destaque de toque no celular */
+            user-select: none; 
+            -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
@@ -161,12 +176,12 @@
     <header>
         <div id="admin-trigger">
             <h1>3 MARIAS MODA FEMININA</h1>
-            <p>Lingeries e moda íntima do Brasil. Tudo a pronta entrega.</p>
+            <p>Lingeries e moda íntima do Brasil.<br><span class="golden-glow">Tudo a pronta entrega</span>.</p>
         </div>
     </header>
     <main>
         <div id="controls">
-            <button class="filter-button active" data-filter="pronta-entrega">Toyohashi e Região (Pronta Entrega)</button>
+            <button class="filter-button active" data-filter="pronta-entrega">Toyohashi e Região<br>(Pronta Entrega)</button>
             <button class="filter-button" data-filter="sob-encomenda">Receba em 3-5 dias. Qualquer lugar do Japão (Sob Encomenda)</button>
         </div>
         
@@ -204,7 +219,7 @@
     </script>
 
     <script>
-        // --- CÓDIGO DO ATALHO ADMIN (NOVO) ---
+        // --- CÓDIGO DO ATALHO ADMIN ---
         const ADMIN_URL = "admin"; // Seu painel está em /admin
         const ADMIN_TRIGGER = document.getElementById('admin-trigger');
         let clickCount = 0;
@@ -242,6 +257,7 @@
             productGrid.innerHTML = '';
             loadingStatus.textContent = 'Carregando produtos...';
             loadingStatus.style.color = '#777';
+            loadingStatus.style.display = 'block';
 
             try {
                 // Consulta o Firestore
@@ -299,6 +315,7 @@
                 console.error('Erro ao buscar produtos no Firestore:', error);
                 loadingStatus.textContent = 'Erro de carregamento. Recarregue a página.';
                 loadingStatus.style.color = 'red';
+                loadingStatus.style.display = 'block';
             }
         }
 
