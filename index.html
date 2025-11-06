@@ -8,24 +8,19 @@
     <style>
         /* Estilos de Estrutura */
         body { font-family: Arial, sans-serif; margin: 0; background-color: #fdf7f9; color: #333; }
-        header { background-color: #d8a0b0; color: white; text-align: center; padding: 2rem 1rem; }
+        header { background-color: #d8a0b0; color: white; text-align: center; padding: 2rem 1rem; position: relative; overflow: hidden; }
         header h1 { margin: 0; font-size: 2.5em; }
         
-        /* NOVO ESTILO: Fonte maior para o subtítulo */
+        /* Fonte maior para o subtítulo */
         header p { 
-            font-size: 1.25em; /* Aumento de 1.1em para 1.25em */
+            font-size: 1.25em; 
             margin: 5px 0 0 0; 
+            position: relative; /* Para posicionar as estrelas em relação a ele */
+            z-index: 1; /* Garante que o texto fique acima das estrelas */
         }
 
-        /* NOVO ESTILO: Brilho Dourado (mantido para destaque na segunda linha) */
-        .golden-glow {
-            color: #ffd700; /* Cor Dourada */
-            text-shadow: 
-                0 0 5px #f0e68c, /* Brilho interno */
-                0 0 10px #daa520; /* Brilho externo */
-            font-weight: bold;
-        }
-
+        /* Removendo o .golden-glow, o texto será normal agora */
+        
         main { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
 
         /* Controles de Filtro (Botões) */
@@ -95,8 +90,8 @@
         /* CORREÇÃO DE IMAGEM */
         .product-card img {
             width: 100%;
-            height: 350px; 
-            object-fit: cover; 
+            height: 350px;
+            object-fit: cover;
             object-position: center; 
         }
 
@@ -170,13 +165,72 @@
             user-select: none; 
             -webkit-tap-highlight-color: transparent;
         }
+
+        /* --- ESTILOS PARA A ANIMAÇÃO DAS ESTRELAS (NOVO) --- */
+        .star-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Garante que não interfira com cliques no texto */
+            overflow: hidden; /* Garante que as estrelas sumam ao sair da área */
+            opacity: 0; /* Inicialmente invisível */
+            animation: fadeInOutStars 0.5s forwards; /* Animação para aparecer e desaparecer o container */
+        }
+
+        .star {
+            position: absolute;
+            color: white; /* Cor da estrela */
+            font-size: 2em; /* Tamanho da estrela */
+            text-shadow: 0 0 8px #ffd700, 0 0 15px #f0e68c; /* Brilho */
+            opacity: 0; /* Começa invisível */
+            transform: translateZ(0); /* Força aceleração de hardware */
+            animation: starMovement 4s ease-out forwards; /* Animação de movimento */
+        }
+
+        /* Keyframes para as estrelas */
+        @keyframes fadeInOutStars {
+            0% { opacity: 0; }
+            10% { opacity: 1; } /* Aparece rapidamente */
+            90% { opacity: 1; }
+            100% { opacity: 0; } /* Desaparece lentamente */
+        }
+
+        @keyframes starMovement {
+            0% {
+                opacity: 0;
+                transform: translate(-100px, -50px) scale(0.5) rotate(0deg);
+            }
+            20% {
+                opacity: 0.8;
+                transform: translate(20px, 20px) scale(1) rotate(90deg);
+            }
+            40% {
+                opacity: 1;
+                transform: translate(calc(100% - 70px), -10px) scale(1.2) rotate(180deg);
+            }
+            60% {
+                opacity: 0.8;
+                transform: translate(calc(100% - 150px), 60px) scale(1.1) rotate(270deg);
+            }
+            80% {
+                opacity: 0.5;
+                transform: translate(30px, 90px) scale(0.9) rotate(360deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50px, -20px) scale(0.3) rotate(450deg);
+            }
+        }
     </style>
 </head>
 <body>
     <header>
         <div id="admin-trigger">
             <h1>3 MARIAS MODA FEMININA</h1>
-            <p>A moda íntima brasileira que te entende, no Japão.<br><span class="golden-glow">Sinta-se linda e segura. Do Brasil para você.</span></p>
+            <p id="main-slogan">Sua loja on-line, que te entende, no Japão.<br>Sinta-se linda e segura.<br>Do Brasil para você.</p>
+            <div id="star-animation-area" class="star-container"></div>
         </div>
     </header>
     <main>
@@ -220,7 +274,7 @@
 
     <script>
         // --- CÓDIGO DO ATALHO ADMIN ---
-        const ADMIN_URL = "admin.html"; // Ajustado para o seu arquivo admin.html
+        const ADMIN_URL = "admin.html";
         const ADMIN_TRIGGER = document.getElementById('admin-trigger');
         let clickCount = 0;
         let lastClickTime = 0;
@@ -242,6 +296,39 @@
             }
         });
         // --- FIM DO CÓDIGO DO ATALHO ADMIN ---
+
+        // --- CÓDIGO DA ANIMAÇÃO DE ESTRELAS (NOVO) ---
+        const sloganElement = document.getElementById('main-slogan');
+        const starAnimationArea = document.getElementById('star-animation-area');
+
+        // Função para criar e animar estrelas
+        function createStarsAnimation() {
+            starAnimationArea.innerHTML = ''; // Limpa estrelas anteriores
+            starAnimationArea.style.opacity = '1'; // Torna o container visível
+            
+            const starCount = 3;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('span');
+                star.className = 'star';
+                star.textContent = '★'; // Caractere de estrela
+                
+                // Atraso para cada estrela aparecer em sequência
+                star.style.animationDelay = `${i * 0.5}s`; 
+                starAnimationArea.appendChild(star);
+            }
+            
+            // Depois que a animação terminar, esconde o container
+            setTimeout(() => {
+                starAnimationArea.style.opacity = '0';
+            }, 4000 + (starCount * 500)); // Tempo da animação total + atrasos
+        }
+
+        // Chama a animação uma vez que a página carrega
+        window.addEventListener('load', createStarsAnimation);
+        // Ou você pode chamar em um intervalo, por exemplo, a cada 10 segundos
+        // setInterval(createStarsAnimation, 10000); 
+        // Descomente a linha acima se quiser que ela se repita automaticamente
+        // --- FIM DO CÓDIGO DA ANIMAÇÃO DE ESTRELAS ---
 
 
         const productGrid = document.getElementById('product-grid');
