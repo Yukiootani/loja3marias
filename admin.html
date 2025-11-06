@@ -29,7 +29,7 @@
         h2 { color: #b76e86; text-align: center; margin-top: 0; margin-bottom: 1rem; }
         h3 { color: #b76e86; text-align: center; margin-bottom: 1rem; }
         label { font-weight: bold; margin-bottom: 0.5rem; }
-        input[type="text"], input[type="password"], textarea, input[type="file"] {
+        input[type="text"], input[type="password"], textarea, input[type="file"], select { /* Adicionada tag select */
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 1rem;
@@ -54,6 +54,16 @@
         #product-management-list th { background-color: #f4f4f4; color: #555; font-size: 0.9em; }
         #product-management-list img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
         .delete-btn { background-color: #dc3545; color: white; padding: 5px 10px; font-weight: normal; font-size: 0.9em; width: auto; }
+        
+        /* NOVO: Estilo para o selo na lista de produtos */
+        .source-tag {
+            font-size: 0.75em;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .pronta-entrega { background-color: #d4edda; color: #155724; }
+        .sob-encomenda { background-color: #fff3cd; color: #856404; }
     </style>
 </head>
 <body>
@@ -93,6 +103,12 @@
                 <label for="preco">Preço (¥):</label>
                 <input type="text" id="preco" placeholder="Ex: 4900 (apenas o número)" required>
                 
+                <label for="source">Disponibilidade / Fonte:</label>
+                <select id="source" required>
+                    <option value="pronta-entrega">Pronta Entrega (Estoque Harumi)</option>
+                    <option value="sob-encomenda">Sob Encomenda (Estoque Fornecedor)</option>
+                </select>
+                
                 <hr style="border: 0; border-top: 1px solid #eee; margin: 1rem 0;">
 
                 <label for="fotoPrincipal">Foto Principal (Destaque):</label>
@@ -121,6 +137,7 @@
                     <tr>
                         <th style="width: 60px;">Foto</th>
                         <th>Nome</th>
+                        <th style="width: 180px;">Disponibilidade</th>
                         <th style="width: 80px;">Preço (¥)</th>
                         <th style="width: 100px;">Ação</th>
                     </tr>
@@ -191,7 +208,7 @@
             return storageRef.getDownloadURL();
         }
 
-        // Função que lista e exibe os produtos (mantida)
+        // Função que lista e exibe os produtos (ATUALIZADA)
         async function listProductsForManagement() {
             productsTableBody.innerHTML = ''; 
             loadingListDiv.style.display = 'block';
@@ -200,7 +217,7 @@
                 const snapshot = await db.collection(COLECAO_PRODUTOS).get();
                 
                 if (snapshot.empty) {
-                    productsTableBody.innerHTML = '<tr><td colspan="4">Nenhum produto cadastrado.</td></tr>';
+                    productsTableBody.innerHTML = '<tr><td colspan="5">Nenhum produto cadastrado.</td></tr>';
                     return;
                 }
 
@@ -211,11 +228,17 @@
                         currency: 'JPY',
                         maximumFractionDigits: 0
                     });
+                    
+                    const source = product.source || 'N/A'; // Pega o novo campo
+                    const sourceText = source === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda';
+                    const sourceClass = source === 'pronta-entrega' ? 'pronta-entrega' : 'sob-encomenda';
+
 
                     const row = productsTableBody.insertRow();
                     row.innerHTML = `
                         <td><img src="${product.imageUrl || 'https://via.placeholder.com/50x50?text=SEM'}" alt="${product.name}"></td>
                         <td>${product.name}</td>
+                        <td><span class="source-tag ${sourceClass}">${sourceText}</span></td>
                         <td>${precoFormatado}</td>
                         <td>
                             <button class="delete-btn" data-id="${doc.id}">Excluir</button>
@@ -225,7 +248,7 @@
 
             } catch (error) {
                 console.error('Erro ao listar produtos:', error);
-                productsTableBody.innerHTML = '<tr><td colspan="4">Erro ao carregar lista. Verifique o console.</td></tr>';
+                productsTableBody.innerHTML = '<tr><td colspan="5">Erro ao carregar lista. Verifique o console.</td></tr>';
             } finally {
                 loadingListDiv.style.display = 'none';
             }
@@ -275,7 +298,7 @@
             }
         });
 
-        // 3. LÓGICA DE SALVAMENTO DE PRODUTO
+        // 3. LÓGICA DE SALVAMENTO DE PRODUTO (ATUALIZADA)
         formProduto.addEventListener('submit', async (e) => {
             e.preventDefault(); 
             
@@ -287,8 +310,9 @@
             const nome = document.getElementById('nome').value;
             const descricao = document.getElementById('descricao').value;
             const preco = document.getElementById('preco').value;
+            const source = document.getElementById('source').value; // NOVO: Pega o valor da disponibilidade
             const fotoPrincipalFile = document.getElementById('fotoPrincipal').files[0];
-            const videoFile = document.getElementById('videoFile').files[0]; // NOVO: Pegando o arquivo de vídeo
+            const videoFile = document.getElementById('videoFile').files[0];
             const galeriaFiles = document.getElementById('galeriaUpload').files;
 
             if (!fotoPrincipalFile) {
@@ -301,13 +325,13 @@
 
             let videoUrl = null;
             let stepCounter = 1;
-            const totalSteps = 2 + (videoFile ? 1 : 0) + (galeriaFiles.length > 0 ? 1 : 0); // Cálculo aproximado para as mensagens
+            const totalSteps = 2 + (videoFile ? 1 : 0) + (galeriaFiles.length > 0 ? 1 : 0); 
 
             try {
-                // A) UPLOAD DO VÍDEO CURTO (Se existir)
+                // A) UPLOAD DO VÍDEO CURTO
                 if (videoFile) {
                     showStatus(statusDiv, `Passo ${stepCounter++}/${totalSteps} - Enviando vídeo...`, 'loading');
-                    videoUrl = await uploadFileAndGetUrl(videoFile, 'produtos/videos'); // Novo folder para vídeos
+                    videoUrl = await uploadFileAndGetUrl(videoFile, 'produtos/videos'); 
                 }
 
                 // B) UPLOAD DA FOTO PRINCIPAL
@@ -331,8 +355,9 @@
                     name: nome,
                     description: descricao,
                     price: preco,
+                    source: source, // 🚨 NOVO CAMPO SALVO AQUI!
                     imageUrl: imageUrl, 
-                    videoUrl: videoUrl, // Salva a URL do vídeo do Storage
+                    videoUrl: videoUrl, 
                     galeria: galeriaArray, 
                     createdAt: firebase.firestore.FieldValue.serverTimestamp() 
                 });
