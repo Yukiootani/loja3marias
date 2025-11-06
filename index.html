@@ -149,17 +149,24 @@
                 margin: 0 10px;
             }
         }
+        /* Estilo para garantir que o cabeçalho seja clicável */
+        #admin-trigger {
+            cursor: pointer; 
+            user-select: none; /* Evita seleção de texto durante cliques rápidos */
+            -webkit-tap-highlight-color: transparent; /* Remove o destaque de toque no celular */
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>3 MARIAS MODA FEMININA</h1>
-        <p>Lingeries e moda íntima do Brasil. Tudo a pronta entrega.</p>
+        <div id="admin-trigger">
+            <h1>3 MARIAS MODA FEMININA</h1>
+            <p>Lingeries e moda íntima do Brasil. Tudo a pronta entrega.</p>
+        </div>
     </header>
     <main>
         <div id="controls">
             <button class="filter-button active" data-filter="pronta-entrega">Toyohashi e Região (Pronta Entrega)</button>
-            
             <button class="filter-button" data-filter="sob-encomenda">Receba em 3-5 dias. Qualquer lugar do Japão (Sob Encomenda)</button>
         </div>
         
@@ -197,95 +204,116 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const productGrid = document.getElementById('product-grid');
-            const filterButtons = document.querySelectorAll('.filter-button');
-            const loadingStatus = document.getElementById('loading-status');
+        // --- CÓDIGO DO ATALHO ADMIN (NOVO) ---
+        const ADMIN_URL = "admin"; // Seu painel está em /admin
+        const ADMIN_TRIGGER = document.getElementById('admin-trigger');
+        let clickCount = 0;
+        let lastClickTime = 0;
+        
+        ADMIN_TRIGGER.addEventListener('click', () => {
+            const currentTime = new Date().getTime();
             
-            // O filtro inicial deve corresponder ao 'data-filter' do botão ativo
-            // Garantido que o padrão é 'pronta-entrega'
-            let currentFilter = 'pronta-entrega'; 
-
-            async function fetchProducts() {
-                productGrid.innerHTML = '';
-                loadingStatus.textContent = 'Carregando produtos...';
-                loadingStatus.style.color = '#777';
-
-                try {
-                    // Consulta o Firestore: FILTRA POR 'source' E ORDENA POR 'createdAt'
-                    const snapshot = await db.collection(COLECAO_PRODUTOS)
-                        // AQUI ESTÁ A CHAVE: currentFilter é o valor 'pronta-entrega' ou 'sob-encomenda'
-                        .where('source', '==', currentFilter) 
-                        .orderBy('createdAt', 'desc') 
-                        .get();
-                    
-                    loadingStatus.style.display = 'none';
-
-                    if (snapshot.empty) {
-                        productGrid.innerHTML = `<p style="text-align: center; margin-top: 40px;">Nenhum produto em ${currentFilter === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda'} no momento.</p>`;
-                        return;
-                    }
-
-                    snapshot.forEach(doc => {
-                        const product = doc.data();
-                        
-                        // Formata o preço para ¥
-                        const precoFormatado = parseFloat(product.price || 0).toLocaleString('ja-JP', { 
-                            style: 'currency', 
-                            currency: 'JPY',
-                            maximumFractionDigits: 0
-                        });
-                        
-                        // Link para a página de detalhes: Passa o ID do documento do Firestore na URL
-                        const detailLink = `detalhes.html?id=${doc.id}`;
-                        
-                        // --- Montagem do Cartão ---
-                        const card = document.createElement('div');
-                        card.className = 'product-card';
-                        
-                        // Renderiza os selos (Novidade, Destaque)
-                        let selosHTML = '';
-                        if (product.isNew) {
-                            selosHTML += `<span class="badge new">✨ NOVIDADE</span>`;
-                        }
-                        if (product.isFeatured) {
-                            selosHTML += `<span class="badge featured">✅ DESTAQUE</span>`;
-                        }
-                        
-                        card.innerHTML = `
-                            ${selosHTML}
-                            <img src="${product.imageUrl}" alt="${product.name}">
-                            <div class="product-info">
-                                <h3>${product.name}</h3>
-                                <p class="price">${precoFormatado}</p>
-                                <a href="${detailLink}" class="buy-button">Ver Detalhes</a>
-                            </div>
-                        `;
-                        productGrid.appendChild(card);
-                    });
-
-                } catch (error) {
-                    console.error('Erro ao buscar produtos no Firestore:', error);
-                    // Esta mensagem não deve mais aparecer, pois o índice foi criado!
-                    loadingStatus.textContent = 'Erro de carregamento. Recarregue a página.';
-                    loadingStatus.style.color = 'red';
-                }
+            // Se o último clique foi há mais de 500ms, reinicia a contagem
+            if (currentTime - lastClickTime > 500) { 
+                clickCount = 1;
+            } else {
+                clickCount++;
             }
 
-            // Lógica dos botões de filtro
-            filterButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    // currentFilter Pega o valor do data-filter (pronta-entrega ou sob-encomenda)
-                    currentFilter = button.dataset.filter;
-                    fetchProducts(); // Recarrega com o novo filtro
-                });
-            });
+            lastClickTime = currentTime;
 
-            // Carrega os produtos na primeira vez
-            fetchProducts();
+            // Se atingiu 3 cliques rápidos, redireciona
+            if (clickCount === 3) {
+                window.location.href = ADMIN_URL;
+                clickCount = 0; // Reseta
+            }
         });
+        // --- FIM DO CÓDIGO DO ATALHO ADMIN ---
+
+
+        const productGrid = document.getElementById('product-grid');
+        const filterButtons = document.querySelectorAll('.filter-button');
+        const loadingStatus = document.getElementById('loading-status');
+        
+        // O filtro inicial é 'pronta-entrega'
+        let currentFilter = 'pronta-entrega'; 
+
+        async function fetchProducts() {
+            productGrid.innerHTML = '';
+            loadingStatus.textContent = 'Carregando produtos...';
+            loadingStatus.style.color = '#777';
+
+            try {
+                // Consulta o Firestore
+                const snapshot = await db.collection(COLECAO_PRODUTOS)
+                    .where('source', '==', currentFilter) 
+                    .orderBy('createdAt', 'desc') 
+                    .get();
+                
+                loadingStatus.style.display = 'none';
+
+                if (snapshot.empty) {
+                    productGrid.innerHTML = `<p style="text-align: center; margin-top: 40px;">Nenhum produto em ${currentFilter === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda'} no momento.</p>`;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const product = doc.data();
+                    
+                    // Formata o preço para ¥
+                    const precoFormatado = parseFloat(product.price || 0).toLocaleString('ja-JP', { 
+                        style: 'currency', 
+                        currency: 'JPY',
+                        maximumFractionDigits: 0
+                    });
+                    
+                    // Link para a página de detalhes: Passa o ID do documento do Firestore na URL
+                    const detailLink = `detalhes.html?id=${doc.id}`;
+                    
+                    // --- Montagem do Cartão ---
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    
+                    // Renderiza os selos (Novidade, Destaque)
+                    let selosHTML = '';
+                    if (product.isNew) {
+                        selosHTML += `<span class="badge new">✨ NOVIDADE</span>`;
+                    }
+                    if (product.isFeatured) {
+                        selosHTML += `<span class="badge featured">✅ DESTAQUE</span>`;
+                    }
+                    
+                    card.innerHTML = `
+                        ${selosHTML}
+                        <img src="${product.imageUrl}" alt="${product.name}">
+                        <div class="product-info">
+                            <h3>${product.name}</h3>
+                            <p class="price">${precoFormatado}</p>
+                            <a href="${detailLink}" class="buy-button">Ver Detalhes</a>
+                        </div>
+                    `;
+                    productGrid.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Erro ao buscar produtos no Firestore:', error);
+                loadingStatus.textContent = 'Erro de carregamento. Recarregue a página.';
+                loadingStatus.style.color = 'red';
+            }
+        }
+
+        // Lógica dos botões de filtro
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentFilter = button.dataset.filter;
+                fetchProducts(); 
+            });
+        });
+
+        // Carrega os produtos na primeira vez
+        fetchProducts();
     </script>
 </body>
 </html>
