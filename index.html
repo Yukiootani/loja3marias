@@ -19,10 +19,11 @@
         
         /* HEADER: Título Fixo e Limpo */
         header { 
-            background-color: var(--primary-color); /* Voltamos ao fundo rosa */
+            background-color: var(--primary-color); 
             color: white; 
             text-align: center; 
             padding: 1rem 0; 
+            border-bottom: 1px solid #eee; 
             position: relative; 
         }
         header h1 { 
@@ -30,53 +31,33 @@
             font-size: 1.8em; 
             color: white;
         }
-
-        /* Banner Principal (Carrossel Estático) */
-        #main-banner {
-            width: 100%;
-            height: 350px; 
-            /* URL TEMPORÁRIA: SUBSTITUA POR UMA IMAGEM DA SUA LOJA */
-            background-image: url('https://via.placeholder.com/1000x400/d8a0b0/ffffff?text=SEU+BANNER+PRINCIPAL+AQUI'); 
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2em;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
         
         main { 
             max-width: 1200px; 
-            margin: 0 auto; 
+            margin: 20px auto; /* Espaçamento no topo */
             padding: 0 15px; 
         }
 
-        /* Área de Ícones/Informações (NOVO BLOCO) */
-        #info-bar {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
-            gap: 10px;
-            padding: 15px 0;
-            margin-bottom: 25px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .info-item {
-            background-color: white;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            line-height: 1.4;
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .info-item .icon {
-            font-size: 1.5em;
+        /* Mensagem de Instrução (NOVO) */
+        #filter-instruction {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
             color: var(--primary-color);
-            margin-right: 8px;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* Seção de Filtros */
+        #controls {
+            display: flex;
+            gap: 10px;
+            padding: 0;
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            margin-bottom: 25px;
         }
 
         /* Estilo dos Títulos de Seção */
@@ -86,21 +67,10 @@
             padding-bottom: 10px;
             border-bottom: 2px solid var(--border-color);
             margin-bottom: 20px;
-            text-align: left; /* Alinhamento à esquerda para um visual mais limpo */
+            text-align: left;
             font-weight: bold;
         }
 
-        /* Seção de Filtros e Produtos */
-        #controls {
-            display: flex;
-            gap: 10px;
-            padding: 0;
-            background-color: transparent;
-            border: none;
-            box-shadow: none;
-            margin-bottom: 20px;
-        }
-        
         /* Botões de Filtro - Duas colunas */
         .filter-button {
             background-color: white; 
@@ -110,7 +80,7 @@
             font-size: 1em;
             font-weight: normal;
             padding: 12px;
-            border-radius: 0; /* Sem arredondamento */
+            border-radius: 0;
             cursor: pointer;
             width: 50%; /* Ocupa metade da largura */
             transition: all 0.2s;
@@ -130,7 +100,7 @@
             gap: 15px;
         }
         
-        /* Estilos de Cartão - MUITO IMPORTANTE: Centralizar conteúdo */
+        /* Estilos de Cartão - CENTRALIZADO (como na foto) */
         .product-card {
             background-color: white;
             border-radius: 8px;
@@ -144,7 +114,7 @@
         
         .product-card img { 
             width: 100%;
-            height: 250px; /* Altura ajustada para caber 2 por linha */
+            height: 250px; 
             object-fit: cover; 
         }
         
@@ -154,12 +124,12 @@
         }
         .product-info h3 { 
             font-size: 1.1em; 
-            color: var(--primary-color); /* Cor Rosa Forte */
+            color: var(--primary-color); 
             margin-bottom: 5px;
         }
         .product-info .price { 
             font-size: 1.3em; 
-            color: var(--primary-color); /* Preço também com cor forte */
+            color: var(--primary-color); 
             font-weight: bold; 
         }
         .buy-button { 
@@ -183,42 +153,9 @@
         </div>
     </header>
 
-    <div id="main-banner">
-        <p id="banner-text">PRODUTOS À PRONTA-ENTREGA</p>
-    </div>
-
     <main>
         
-        <div id="info-bar">
-            <div class="info-item">
-                <span class="icon">✨</span>
-                <div>
-                    <strong>SOB ENCOMENDA</strong><br>
-                    Receba em 3-5 dias
-                </div>
-            </div>
-            <div class="info-item">
-                <span class="icon">🇧🇷</span>
-                <div>
-                    <strong>PRODUTOS DO BRASIL</strong><br>
-                    Moda íntima de alta qualidade
-                </div>
-            </div>
-            <div class="info-item">
-                <span class="icon">📦</span>
-                <div>
-                    <strong>TOYOHASHI E REGIÃO</strong><br>
-                    Pronta entrega local
-                </div>
-            </div>
-            <div class="info-item">
-                <span class="icon">🚚</span>
-                <div>
-                    <strong>ENTREGA GLOBAL JP</strong><br>
-                    Enviamos para todo o Japão
-                </div>
-            </div>
-        </div>
+        <p id="filter-instruction">Clique em um dos filtros</p>
 
         <div id="controls">
             <button class="filter-button active" data-filter="pronta-entrega">FILTRAR: PRONTA ENTREGA</button>
