@@ -34,11 +34,11 @@
         
         main { 
             max-width: 1200px; 
-            margin: 20px auto; /* Espaçamento no topo */
+            margin: 20px auto; 
             padding: 0 15px; 
         }
 
-        /* Mensagem de Instrução (NOVO) */
+        /* Mensagem de Instrução */
         #filter-instruction {
             text-align: center;
             font-size: 1.1em;
@@ -82,7 +82,7 @@
             padding: 12px;
             border-radius: 0;
             cursor: pointer;
-            width: 50%; /* Ocupa metade da largura */
+            width: 50%;
             transition: all 0.2s;
         }
 
@@ -96,11 +96,11 @@
         /* Produtos */
         #product-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Duas colunas para os produtos em todos os tamanhos */
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
         
-        /* Estilos de Cartão - CENTRALIZADO (como na foto) */
+        /* Estilos de Cartão - CENTRALIZADO */
         .product-card {
             background-color: white;
             border-radius: 8px;
@@ -120,7 +120,7 @@
         
         .product-info { 
             padding: 1rem; 
-            text-align: center; /* CENTRALIZAÇÃO APLICADA AQUI */
+            text-align: center; 
         }
         .product-info h3 { 
             font-size: 1.1em; 
@@ -132,11 +132,42 @@
             color: var(--primary-color); 
             font-weight: bold; 
         }
+        
+        /* --- ESTILO NOVO E MELHORADO PARA O BOTÃO "VER DETALHES" --- */
         .buy-button { 
             background-color: var(--primary-color); 
+            color: white;
+            padding: 10px 15px;
+            font-size: 1.1em; /* Fonte maior */
+            font-weight: bold;
+            border-radius: 6px; /* Borda levemente arredondada */
+            border: 1px solid #a35f75; /* Borda sutil */
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Sombra 3D sutil */
             display: block;
-            margin-top: 10px;
+            margin-top: 15px;
+            transition: background-color 0.3s ease, transform 0.1s;
         }
+        
+        .buy-button:hover { 
+            background-color: #a35f75; /* Cor mais escura no hover */
+            transform: translateY(-1px); /* Efeito de elevação */
+            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
+        }
+        /* ----------------------------------------------------------- */
+
+        /* Selos no Cartão */
+        .badge {
+            position: absolute;
+            top: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            z-index: 1;
+        }
+        .badge.new { background-color: #ff6347; left: 10px; }
+        .badge.featured { background-color: #28a745; right: 10px; }
         
         /* Estilo para atalho Admin */
         #admin-trigger {
