@@ -19,12 +19,15 @@
             z-index: 1; 
         }
 
-        /* Destaque Pronta Entrega */
+        /* Destaque Pronta Entrega (FONTE DIMINUÍDA) */
         .highlight-text {
             font-weight: bold;
-            font-size: 1.3em; 
+            font-size: 1.1em; /* Diminuído de 1.3em para 1.1em para caber em uma linha */
             display: block;
             margin-bottom: 5px;
+            white-space: nowrap; /* Tenta manter em uma linha, se houver espaço */
+            overflow: hidden; /* Esconde se ainda assim não couber (improvável com a nova fonte) */
+            text-overflow: ellipsis; /* Adiciona "..." se cortar */
         }
         
         main { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
@@ -172,7 +175,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- ESTILOS PARA A ANIMAÇÃO DAS ESTRELAS (APRIMORADO) --- */
+        /* --- ESTILOS PARA A ANIMAÇÃO DAS ESTRELAS (APRIMORADO NOVAMENTE) --- */
         .star-container {
             position: absolute;
             top: 0;
@@ -188,12 +191,11 @@
         .star {
             position: absolute;
             color: white;
-            font-size: 2em;
-            text-shadow: 0 0 8px #ffd700, 0 0 15px #f0e68c; 
+            font-size: 2.2em; /* Estrelas um pouco maiores */
+            text-shadow: 0 0 10px #f0e68c, 0 0 20px #ffd700; /* Brilho mais intenso */
             opacity: 0;
             transform: translateZ(0);
-            /* Duração aumentada para 7 segundos */
-            animation: starMovement 7s ease-out forwards; 
+            animation: starMovement 10s ease-out forwards; /* Duração aumentada para 10 segundos */
         }
 
         /* Keyframes para as estrelas */
@@ -205,34 +207,33 @@
         }
 
         @keyframes starMovement {
-            /* Posições ajustadas para um movimento mais lento e amplo */
             0% {
                 opacity: 0;
-                transform: translate(50%, 50%) scale(0.3) rotate(0deg); /* Começa no centro */
+                transform: translate(-10%, -10%) scale(0.3) rotate(0deg); /* Começa de fora */
             }
             15% {
                 opacity: 0.9;
-                transform: translate(10%, 10%) scale(1) rotate(60deg);
+                transform: translate(20%, 30%) scale(1) rotate(60deg);
             }
             30% {
                 opacity: 1;
-                transform: translate(80%, 30%) scale(1.2) rotate(120deg);
+                transform: translate(70%, 10%) scale(1.2) rotate(120deg);
             }
             45% {
                 opacity: 0.9;
-                transform: translate(20%, 80%) scale(1.1) rotate(180deg);
+                transform: translate(40%, 80%) scale(1.1) rotate(180deg);
             }
             60% {
                 opacity: 0.8;
-                transform: translate(90%, 60%) scale(1) rotate(240deg);
+                transform: translate(90%, 50%) scale(1) rotate(240deg);
             }
             80% {
                 opacity: 0.5;
-                transform: translate(10%, 30%) scale(0.8) rotate(320deg);
+                transform: translate(10%, 60%) scale(0.8) rotate(320deg);
             }
             100% {
                 opacity: 0;
-                transform: translate(50%, 50%) scale(0.1) rotate(360deg); /* Termina no centro, pequeno e some */
+                transform: translate(110%, 10%) scale(0.1) rotate(360deg); /* Termina fora da tela */
             }
         }
     </style>
@@ -318,22 +319,22 @@
             starAnimationArea.style.opacity = '1'; 
             
             const starCount = 3;
-            const animationDuration = 7000; // 7 segundos
+            const animationDuration = 10000; // 10 segundos
             
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('span');
                 star.className = 'star';
                 star.textContent = '★'; 
                 
-                // 0.5 segundo de atraso entre cada estrela
-                star.style.animationDelay = `${i * 500}ms`; 
+                // 0.8 segundo de atraso entre cada estrela para aparecer em momentos diferentes
+                star.style.animationDelay = `${i * 800}ms`; 
                 starAnimationArea.appendChild(star);
             }
             
             // Espera o tempo total da animação + o atraso da última estrela
             setTimeout(() => {
                 starAnimationArea.style.opacity = '0';
-            }, animationDuration + (starCount * 500)); 
+            }, animationDuration + (starCount * 800)); 
         }
 
         window.addEventListener('load', createStarsAnimation);
