@@ -15,6 +15,7 @@
             --light-text: #666; /* Texto Secundário (Cinza Médio) */
             --bg-color: #fcfcfc; /* Fundo Branco Limpo */
             --border-color: #e0e0e0; /* Cinza sutil */
+            --error-color: #dc3545; /* Cor de erro/esgotado */
         }
 
         body {
@@ -30,7 +31,7 @@
             color: var(--text-color); 
             padding: 1rem 0;
             text-align: center;
-            border-bottom: 1px solid var(--border-color); /* Linha divisória fina */
+            border-bottom: 1px solid var(--border-color);
         }
         header a {
             color: var(--text-color); 
@@ -52,7 +53,7 @@
             gap: 30px;
             background-color: white;
             padding: 20px;
-            border-radius: 0; /* Sem bordas arredondadas */
+            border-radius: 0;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--border-color);
         }
@@ -108,7 +109,7 @@
             border-radius: 2px;
         }
         
-        /* ÍCONE DE VÍDEO (Overlay) - Ajustado para visual mais sutil */
+        /* ÍCONE DE VÍDEO (Overlay) */
         .video-overlay::before {
             content: '▶';
             padding: 5px;
@@ -131,7 +132,7 @@
         }
 
         .info-area h1 {
-            color: var(--text-color); /* Título Preto */
+            color: var(--text-color);
             margin-top: 0;
             font-size: 2em;
             font-weight: 600;
@@ -140,7 +141,7 @@
         .info-area .price {
             font-size: 1.8em;
             font-weight: bold;
-            color: var(--primary-color); /* Preço Rosa (Acento) */
+            color: var(--primary-color);
             margin: 15px 0;
         }
 
@@ -148,6 +149,16 @@
             line-height: 1.6;
             color: var(--light-text);
         }
+
+        /* NOVO: STATUS DE ESTOQUE */
+        #stock-status {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+        .in-stock { color: var(--whatsapp-green); }
+        .out-of-stock { color: var(--error-color); }
+
 
         /* Selo de Status - Cores Suaves e Minimalistas */
         .status-badge {
@@ -160,20 +171,20 @@
             border: 1px solid transparent;
         }
         .status-pronta-entrega { 
-            background-color: #e6f9e6; /* Verde muito suave */
+            background-color: #e6f9e6; 
             color: var(--whatsapp-green); 
             border-color: #d0edd4;
         }
         .status-sob-encomenda { 
-            background-color: #f7f7e6; /* Amarelo muito suave */
+            background-color: #f7f7e6; 
             color: #856404; 
             border-color: #eaeaa0;
         }
 
-        /* Botão de Compra - Ajustado para harmonizar com a Home */
+        /* Botão de Compra - Ajustado para harmonizar */
         .buy-button {
             display: block;
-            background-color: var(--whatsapp-green); /* Verde principal do WhatsApp */
+            background-color: var(--whatsapp-green); 
             color: white;
             text-align: center;
             padding: 12px;
@@ -183,10 +194,17 @@
             border-radius: 4px;
             margin-top: 30px;
             transition: background-color 0.3s;
-            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); /* Sombra suave do verde */
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
         }
         .buy-button:hover {
-            background-color: #1e7e34; /* Verde mais escuro no hover */
+            background-color: #1e7e34;
+        }
+        /* ESTILO PARA BOTÃO ESGOTADO */
+        .sold-out-btn {
+            background-color: var(--error-color); 
+            color: white;
+            cursor: default;
+            pointer-events: none;
         }
 
 
@@ -267,6 +285,8 @@
                 }
 
                 const product = doc.data();
+                const estoque = parseInt(product.estoque || 0); // NOVO: Captura o estoque
+
                 
                 // 5. PROCESSAMENTO DE DADOS E MÍDIA
                 const name = product.name || 'Produto Sem Nome';
@@ -306,19 +326,32 @@
                 let statusText;
                 let whatsappMessage;
                 let statusClass;
+                let buttonText = 'Comprar / Encomendar via WhatsApp';
+                let buttonClass = 'buy-button';
+
 
                 if (source === 'pronta-entrega') {
-                    statusText = '✨ Pronta Entrega (Envio/Retirada Imediata)';
-                    statusClass = 'status-pronta-entrega';
-                    whatsappMessage = `Olá, Harumi! Gostaria de comprar o produto ${name} (${precoFormatado}) que está na Pronta Entrega. Qual o procedimento para pagamento e envio/retirada?`;
+                    if (estoque === 0) {
+                        // LÓGICA DE ESGOTADO PARA PRONTA ENTREGA
+                        statusText = '❌ ESGOTADO! Volte em breve.';
+                        statusClass = 'out-of-stock';
+                        buttonText = 'ESGOTADO';
+                        buttonClass = 'buy-button sold-out-btn';
+                        whatsappMessage = `Olá, Harumi! Infelizmente o produto ${name} (${precoFormatado}) está esgotado no momento. Poderia me avisar quando estiver disponível?`;
+                    } else {
+                        // PRONTA ENTREGA EM ESTOQUE
+                        statusText = `✅ Em Estoque! (${estoque} unidades)`;
+                        statusClass = 'in-stock';
+                        whatsappMessage = `Olá, Harumi! Gostaria de comprar o produto ${name} (${precoFormatado}) que está na Pronta Entrega. Qual o procedimento para pagamento e envio/retirada?`;
+                    }
                 } else {
+                    // SOB ENCOMENDA (Sempre disponível, mas com prazo)
                     statusText = '📦 Sob Encomenda (Disponível em 3-5 dias)';
                     statusClass = 'status-sob-encomenda';
                     whatsappMessage = `Olá! Gostaria de encomendar o produto ${name} (${precoFormatado}) do Catálogo Completo. Entendi que o prazo é de 3-5 dias. Quais são as opções de recebimento?`;
                 }
                 
-                // 🚨 LINK FINAL: Usa o número correto com a mensagem personalizada
-                const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+                const whatsappLink = (buttonClass === 'buy-button sold-out-btn') ? '#' : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
                 
                 // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL e MINIATURAS (Mantida)
                 let mainMediaHTML = '';
@@ -368,7 +401,7 @@
                         <p class="price">${precoFormatado}</p>
                         <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3>
                         <p style="color:var(--light-text); font-weight:400;">${description}</p>
-                        <a href="${whatsappLink}" target="_blank" class="buy-button">Comprar / Encomendar via WhatsApp</a>
+                        <a href="${whatsappLink}" target="_blank" class="${buttonClass}">${buttonText}</a>
                     </div>
                 `;
 
@@ -378,7 +411,7 @@
                 
                 thumbContainers.forEach(container => {
                     container.addEventListener('click', () => {
-                        const newSrc = container.dataset.full-src;
+                        const newSrc = container.dataset.fullSrc;
                         const mediaType = container.dataset.type;
 
                         mainMediaDisplay.innerHTML = ''; 
