@@ -17,7 +17,7 @@
             margin: 5px 0 0 0; 
         }
 
-        /* NOVO ESTILO: Brilho Dourado para o texto "Tudo a pronta entrega" */
+        /* NOVO ESTILO: Brilho Dourado (mantido para destaque na segunda linha) */
         .golden-glow {
             color: #ffd700; /* Cor Dourada */
             text-shadow: 
@@ -43,7 +43,7 @@
 
         /* Estilo para os botões */
         .filter-button {
-            background-color: #b76e86; /* Rosa mais forte */
+            background-color: #b76e86; 
             color: white;
             padding: 12px 20px;
             border-radius: 8px;
@@ -65,7 +65,7 @@
 
         /* Estilo para o botão ativo (selecionado) */
         .filter-button.active {
-            background-color: #d8a0b0; /* Cor que destaca o ativo */
+            background-color: #d8a0b0; 
         }
         
         /* Área dos Produtos */
@@ -95,8 +95,8 @@
         /* CORREÇÃO DE IMAGEM */
         .product-card img {
             width: 100%;
-            height: 350px; /* Altura fixa para evitar o esticamento horizontal */
-            object-fit: cover; /* Garante que a imagem preencha sem distorcer */
+            height: 350px; 
+            object-fit: cover; 
             object-position: center; 
         }
 
@@ -176,7 +176,7 @@
     <header>
         <div id="admin-trigger">
             <h1>3 MARIAS MODA FEMININA</h1>
-            <p>Lingeries e moda íntima do Brasil.<br><span class="golden-glow">Tudo a pronta entrega</span>.</p>
+            <p>A moda íntima brasileira que te entende, no Japão.<br><span class="golden-glow">Sinta-se linda e segura. Do Brasil para você.</span></p>
         </div>
     </header>
     <main>
@@ -220,7 +220,7 @@
 
     <script>
         // --- CÓDIGO DO ATALHO ADMIN ---
-        const ADMIN_URL = "admin"; // Seu painel está em /admin
+        const ADMIN_URL = "admin.html"; // Ajustado para o seu arquivo admin.html
         const ADMIN_TRIGGER = document.getElementById('admin-trigger');
         let clickCount = 0;
         let lastClickTime = 0;
@@ -228,7 +228,6 @@
         ADMIN_TRIGGER.addEventListener('click', () => {
             const currentTime = new Date().getTime();
             
-            // Se o último clique foi há mais de 500ms, reinicia a contagem
             if (currentTime - lastClickTime > 500) { 
                 clickCount = 1;
             } else {
@@ -237,10 +236,9 @@
 
             lastClickTime = currentTime;
 
-            // Se atingiu 3 cliques rápidos, redireciona
             if (clickCount === 3) {
                 window.location.href = ADMIN_URL;
-                clickCount = 0; // Reseta
+                clickCount = 0; 
             }
         });
         // --- FIM DO CÓDIGO DO ATALHO ADMIN ---
@@ -250,7 +248,6 @@
         const filterButtons = document.querySelectorAll('.filter-button');
         const loadingStatus = document.getElementById('loading-status');
         
-        // O filtro inicial é 'pronta-entrega'
         let currentFilter = 'pronta-entrega'; 
 
         async function fetchProducts() {
@@ -260,7 +257,6 @@
             loadingStatus.style.display = 'block';
 
             try {
-                // Consulta o Firestore
                 const snapshot = await db.collection(COLECAO_PRODUTOS)
                     .where('source', '==', currentFilter) 
                     .orderBy('createdAt', 'desc') 
@@ -276,21 +272,17 @@
                 snapshot.forEach(doc => {
                     const product = doc.data();
                     
-                    // Formata o preço para ¥
                     const precoFormatado = parseFloat(product.price || 0).toLocaleString('ja-JP', { 
                         style: 'currency', 
                         currency: 'JPY',
                         maximumFractionDigits: 0
                     });
                     
-                    // Link para a página de detalhes: Passa o ID do documento do Firestore na URL
                     const detailLink = `detalhes.html?id=${doc.id}`;
                     
-                    // --- Montagem do Cartão ---
                     const card = document.createElement('div');
                     card.className = 'product-card';
                     
-                    // Renderiza os selos (Novidade, Destaque)
                     let selosHTML = '';
                     if (product.isNew) {
                         selosHTML += `<span class="badge new">✨ NOVIDADE</span>`;
@@ -301,7 +293,7 @@
                     
                     card.innerHTML = `
                         ${selosHTML}
-                        <img src="${product.imageUrl}" alt="${product.name}">
+                        <a href="${detailLink}"><img src="${product.imageUrl}" alt="${product.name}"></a>
                         <div class="product-info">
                             <h3>${product.name}</h3>
                             <p class="price">${precoFormatado}</p>
