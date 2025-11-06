@@ -31,7 +31,7 @@
         h3 { color: #b76e86; text-align: center; margin-bottom: 1rem; }
         label { font-weight: bold; margin-bottom: 0.5rem; }
         
-        input[type="text"], input[type="password"], textarea, input[type="file"], select {
+        input[type="text"], input[type="password"], textarea, input[type="file"], select, input[type="number"] { /* Adicionado input[type="number"] */
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 1rem;
@@ -119,6 +119,9 @@
                 <label for="preco">Preço (¥):</label>
                 <input type="text" id="preco" placeholder="Ex: 4900 (apenas o número)" required>
                 
+                <label for="estoque">Quantidade em Estoque:</label>
+                <input type="number" id="estoque" placeholder="Ex: 5" required min="0"> 
+                
                 <label for="source">Disponibilidade / Fonte:</label>
                 <select id="source" required>
                     <option value="pronta-entrega">Pronta Entrega (Estoque Harumi)</option>
@@ -162,8 +165,9 @@
                     <tr>
                         <th style="width: 60px;">Foto</th>
                         <th>Nome</th>
-                        <th style="width: 180px;">Disponibilidade</th>
-                        <th style="width: 100px;">Selos</th> <th style="width: 80px;">Preço (¥)</th>
+                        <th style="width: 80px;">Estoque</th> <th style="width: 180px;">Disponibilidade</th>
+                        <th style="width: 100px;">Selos</th> 
+                        <th style="width: 80px;">Preço (¥)</th>
                         <th style="width: 100px;">Ação</th>
                     </tr>
                 </thead>
@@ -233,7 +237,7 @@
             return storageRef.getDownloadURL();
         }
 
-        // Função que lista e exibe os produtos (mantida)
+        // Função que lista e exibe os produtos (ATUALIZADA para mostrar ESTOQUE)
         async function listProductsForManagement() {
             productsTableBody.innerHTML = ''; 
             loadingListDiv.style.display = 'block';
@@ -243,7 +247,7 @@
                 const snapshot = await db.collection(COLECAO_PRODUTOS).orderBy('createdAt', 'desc').get();
                 
                 if (snapshot.empty) {
-                    productsTableBody.innerHTML = '<tr><td colspan="6">Nenhum produto cadastrado.</td></tr>';
+                    productsTableBody.innerHTML = '<tr><td colspan="7">Nenhum produto cadastrado.</td></tr>'; // Alterado de 6 para 7 colunas
                     return;
                 }
 
@@ -256,27 +260,26 @@
                     });
                     
                     const source = product.source || 'N/A';
-                    // Conversão para texto amigável (Pronta Entrega, Sob Encomenda)
                     const sourceText = source === 'pronta-entrega' ? 'Pronta Entrega' : (source === 'sob-encomenda' ? 'Sob Encomenda' : 'N/A');
-                    
                     
                     // Exibição dos selos na tabela
                     let selosText = '';
-                    if (product.isNew) {
-                        selosText += 'Novo / ';
-                    }
-                    if (product.isFeatured) {
-                        selosText += 'Destaque';
-                    }
+                    if (product.isNew) { selosText += 'Novo / '; }
+                    if (product.isFeatured) { selosText += 'Destaque'; }
                     selosText = selosText.replace(/ \/ $/, '').trim() || 'Nenhum'; 
+
+                    // Estiliza a cor do estoque se estiver baixo (opcional)
+                    const estoque = product.estoque !== undefined ? parseInt(product.estoque) : 0;
+                    const estoqueStyle = estoque < 3 ? 'color: red; font-weight: bold;' : '';
 
 
                     const row = productsTableBody.insertRow();
                     row.innerHTML = `
                         <td><img src="${product.imageUrl || 'https://via.placeholder.com/50x50?text=SEM'}" alt="${product.name}"></td>
                         <td>${product.name}</td>
-                        <td>${sourceText}</td>
-                        <td>${selosText}</td> <td>${precoFormatado}</td>
+                        <td style="${estoqueStyle}">${estoque}</td> <td>${sourceText}</td>
+                        <td>${selosText}</td> 
+                        <td>${precoFormatado}</td>
                         <td>
                             <button class="delete-btn" data-id="${doc.id}">Excluir</button>
                         </td>
@@ -285,7 +288,7 @@
 
             } catch (error) {
                 console.error('Erro ao listar produtos:', error);
-                productsTableBody.innerHTML = '<tr><td colspan="6">Erro ao carregar lista. Verifique o console.</td></tr>';
+                productsTableBody.innerHTML = '<tr><td colspan="7">Erro ao carregar lista. Verifique o console.</td></tr>'; // Alterado de 6 para 7 colunas
             } finally {
                 loadingListDiv.style.display = 'none';
             }
@@ -335,7 +338,7 @@
             }
         });
 
-        // 3. LÓGICA DE SALVAMENTO DE PRODUTO (CORRIGIDA)
+        // 3. LÓGICA DE SALVAMENTO DE PRODUTO (ATUALIZADA para salvar ESTOQUE)
         formProduto.addEventListener('submit', async (e) => {
             e.preventDefault(); 
             
@@ -347,11 +350,8 @@
             const nome = document.getElementById('nome').value;
             const descricao = document.getElementById('descricao').value;
             const preco = document.getElementById('preco').value;
-            
-            // CORREÇÃO CRUCIAL: Captura o valor exato (pronta-entrega ou sob-encomenda) do <select>
+            const estoque = document.getElementById('estoque').value; // NOVO: Captura o estoque
             const source = document.getElementById('source').value;
-            
-            // Não é necessário .toLowerCase().replace(/\s/g, '-') porque os <option value=""> já estão corretos.
             
             const isNew = document.getElementById('isNew').checked;
             const isFeatured = document.getElementById('isFeatured').checked;
@@ -400,7 +400,8 @@
                     name: nome,
                     description: descricao,
                     price: preco,
-                    source: source,       // Valor padronizado ('pronta-entrega' ou 'sob-encomenda')
+                    estoque: parseInt(estoque), // NOVO: Salva o estoque como número
+                    source: source,
                     isNew: isNew,
                     isFeatured: isFeatured,
                     imageUrl: imageUrl, 
