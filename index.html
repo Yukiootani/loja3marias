@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3 Marias Loja</title>
-    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,17 +15,13 @@
         header {
             background-color: #d8a0b0;
             color: white;
-            padding: 2rem 1rem;
+            padding: 1rem 0;
             text-align: center;
         }
 
-        header h1 {
+        h1 {
             margin: 0;
-            font-size: 2.5em; 
-        }
-        
-        header p {
-            font-size: 1.1em;
+            font-size: 1.5em;
         }
 
         main {
@@ -86,7 +81,7 @@
             text-decoration: none;
             color: #333;
             transition: transform 0.2s;
-            position: relative;
+            position: relative; /* Para posicionar o selo */
         }
 
         .product-card:hover {
@@ -125,7 +120,7 @@
             color: #777;
         }
         
-        /* Estilos do Selo */
+        /* Estilos do Selo (NOVO) */
         .status-badge {
             position: absolute;
             top: 10px;
@@ -144,22 +139,12 @@
             background-color: #fce8a9; 
             color: #856404; 
         }
-
-        /* Rodapé */
-        footer {
-            text-align: center;
-            padding: 1rem;
-            background-color: #e0e0e0;
-            color: #777;
-            margin-top: 2rem;
-        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>3 MARIAS MODA FEMININA</h1>
-        <p>Lingeries e muito mais direto do Brasil!<br> Tudo à pronta-entrega.</p>
+        <h1>3 Marias Loja</h1>
     </header>
 
     <main>
@@ -182,15 +167,11 @@
             </div>
     </main>
 
-    <footer>
-        <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
-    </footer>
-
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-        // 2. CONFIGURAÇÃO (Com as suas chaves reais)
+        // 2. CONFIGURAÇÃO (Suas Chaves Reais)
         const firebaseConfig = {
             apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
             authDomain: "loja3marias-50204.firebaseapp.com",
@@ -209,6 +190,7 @@
         const loadingDiv = document.getElementById('loading');
         const emptyMessageDiv = document.getElementById('empty-message');
         
+        // 🚨 NÚMERO CORRETO DA HARUMI (Formato internacional sem o '+')
         const WHATSAPP_NUMBER = "818074558624";
 
 
@@ -222,12 +204,18 @@
                 const selectedSource = document.getElementById('source-filter').value;
                 let query = db.collection("products");
                 
+                // 🚨 CORREÇÃO NA LÓGICA DO FILTRO: 
+                // Apenas aplica o where() se não for "todos". 
                 if (selectedSource === 'pronta-entrega') {
+                    // Nota: O método array-contains é usado apenas para a galeria.
+                    // Para o source, usamos ==. 
                     query = query.where("source", "==", "pronta-entrega");
                 } else if (selectedSource === 'sob-encomenda') {
                     query = query.where("source", "==", "sob-encomenda");
                 }
-                
+                // Se selectedSource === 'todos', a query não tem filtro, buscando tudo (incluindo produtos antigos sem o campo 'source').
+
+
                 const snapshot = await query.get();
                 const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -242,7 +230,7 @@
                     const name = product.name || 'Produto Sem Nome';
                     const imageUrl = product.imageUrl || 'https://via.placeholder.com/300x200?text=IMAGEM';
                     const price = product.price || '0';
-                    const source = product.source || 'pronta-entrega'; 
+                    const source = product.source || 'pronta-entrega'; // 🚨 FALLBACK: Produtos antigos sem campo 'source' são tratados como Pronta Entrega
                     
                     const priceValue = parseFloat(price.toString().replace(',', '.')); 
                     const precoFormatado = priceValue.toLocaleString('ja-JP', { 
@@ -260,11 +248,9 @@
                     } else if (source === 'sob-encomenda') {
                         statusText = 'Sob Encomenda';
                         statusClass = 'status-sob-encomenda';
-                    } else {
-                        statusText = 'Pronta Entrega';
-                        statusClass = 'status-pronta-entrega';
                     }
 
+                    // Monta o link do WhatsApp para o cartão (caso o cliente prefira clicar direto)
                     const whatsappMessage = `Olá, Harumi! Vi o produto ${name} (${precoFormatado}) na loja. Tenho interesse.`;
                     const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
 
@@ -289,6 +275,7 @@
             }
         }
 
+        // 5. CHAMA A FUNÇÃO DE BUSCA AO CARREGAR A PÁGINA
         document.addEventListener('DOMContentLoaded', fetchProducts);
     </script>
 </body>
