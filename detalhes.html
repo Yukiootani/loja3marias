@@ -60,9 +60,8 @@
             object-fit: cover;
         }
         #main-media-display video {
-            object-fit: contain; 
+            object-fit: contain;
         }
-
 
         #thumbnails {
             display: flex;
@@ -139,6 +138,45 @@
             line-height: 1.6;
         }
 
+        /* NOVO: Estilos do Selo de Status */
+        .status-badge {
+            font-size: 0.9em;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .status-pronta-entrega { 
+            background-color: #d4edda; 
+            color: #0c611f; 
+            border: 1px solid #c3e6cb;
+        }
+        .status-sob-encomenda { 
+            background-color: #fce8a9; 
+            color: #856404; 
+            border: 1px solid #f9e29a;
+        }
+
+        /* Botão de Compra */
+        .buy-button {
+            display: block;
+            background-color: #25d366; /* Cor do WhatsApp */
+            color: white;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        .buy-button:hover {
+            background-color: #128c7e;
+        }
+
+
         /* Mensagens de Status */
         #loading, #error {
             text-align: center;
@@ -184,6 +222,10 @@
         const detailsContainer = document.getElementById('product-details');
         const loadingDiv = document.getElementById('loading');
         const errorDiv = document.getElementById('error');
+        
+        // 🚨 NÚMERO FINAL DA HARUMI (Formato internacional sem o '+')
+        const WHATSAPP_NUMBER = "818074558624"; 
+
 
         // 4. LÓGICA DE CARREGAMENTO
         document.addEventListener('DOMContentLoaded', () => {
@@ -219,50 +261,62 @@
                 const price = product.price || '0';
                 const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=IMAGEM+PRINCIPAL';
                 const videoUrl = product.videoUrl; 
-                
+                const source = product.source || 'pronta-entrega'; 
+
                 let galleryUrls = product.galeria || [];
                 
                 let allMediaUrls = [];
 
-                // Coloca a MÍDIA PRINCIPAL (VÍDEO) como o primeiro item da lista de exibição
                 if (videoUrl) {
-                    allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl }); // Usa imageUrl como thumb do vídeo
+                    allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl });
                 }
                 
-                // Adiciona a foto principal (se ainda não estiver lá como thumb do vídeo)
                 if (!allMediaUrls.some(m => m.url === imageUrl)) {
                      allMediaUrls.push({ type: 'image', url: imageUrl, thumb: imageUrl });
                 }
 
-                // Adiciona as fotos da galeria
                 galleryUrls.forEach(url => {
                     allMediaUrls.push({ type: 'image', url: url, thumb: url });
                 });
 
-                // Remove duplicatas
                 allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i);
 
 
-                // 6. FORMATAÇÃO PARA IENE (¥)
+                // 6. FORMATAÇÃO DO PREÇO e LÓGICA DO WHATSAPP
                 const priceValue = parseFloat(price.toString().replace(',', '.')); 
                 const precoFormatado = priceValue.toLocaleString('ja-JP', { 
                     style: 'currency', 
                     currency: 'JPY',
                     maximumFractionDigits: 0
                 });
+                
+                let statusText;
+                let whatsappMessage;
+                let statusClass;
 
-                // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL e MINIATURAS
+                if (source === 'pronta-entrega') {
+                    statusText = '✨ Pronta Entrega (Envio/Retirada Imediata)';
+                    statusClass = 'status-pronta-entrega';
+                    whatsappMessage = `Olá, Harumi! Gostaria de comprar o produto ${name} (${precoFormatado}) que está na Pronta Entrega. Qual o procedimento para pagamento e envio/retirada?`;
+                } else {
+                    statusText = '📦 Sob Encomenda (Disponível em 3-5 dias)';
+                    statusClass = 'status-sob-encomenda';
+                    whatsappMessage = `Olá! Gostaria de encomendar o produto ${name} (${precoFormatado}) do Catálogo Completo. Entendi que o prazo é de 3-5 dias. Quais são as opções de recebimento?`;
+                }
+                
+                // 🚨 LINK FINAL: Usa o número correto com a mensagem personalizada
+                const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+                
+                // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL e MINIATURAS (Mantida)
                 let mainMediaHTML = '';
                 let galleryHTML = '';
                 
                 allMediaUrls.forEach((media, index) => {
                     const isActive = index === 0;
                     
-                    // Adiciona a classe e o overlay se for o thumbnail do vídeo
                     const isVideoThumb = media.type === 'video';
                     const thumbClasses = isVideoThumb ? 'video-thumb' : '';
                     
-                    // Cria as miniaturas (thumbs)
                     galleryHTML += `
                         <div class="thumb-container ${isActive ? 'active' : ''} ${thumbClasses}" 
                              data-type="${media.type}"
@@ -272,7 +326,6 @@
                         </div>
                     `;
 
-                    // Define a mídia inicial (primeiro item)
                     if (isActive) {
                         if (media.type === 'video') {
                              mainMediaHTML = `
@@ -297,25 +350,25 @@
                         </div>
                     </div>
                     <div class="info-area">
+                        <span class="status-badge ${statusClass}">${statusText}</span>
                         <h1 id="product-name">${name}</h1>
                         <p class="price">${precoFormatado}</p>
                         <h3>Descrição</h3>
                         <p>${description}</p>
-                        <a href="https://api.whatsapp.com/send?phone=SEU_NUMERO_WHATSAPP&text=Olá! Tenho interesse no produto ${name} (ID: ${id})." target="_blank" class="buy-button" style="margin-top: 20px;">Comprar via WhatsApp</a>
+                        <a href="${whatsappLink}" target="_blank" class="buy-button">Comprar / Encomendar via WhatsApp</a>
                     </div>
                 `;
 
-                // 9. FUNCIONALIDADE DA GALERIA (Troca de Mídia)
+                // 9. FUNCIONALIDADE DA GALERIA (Mantida)
                 const mainMediaDisplay = document.getElementById('main-media-display');
                 const thumbContainers = document.querySelectorAll('.thumb-container');
                 
                 thumbContainers.forEach(container => {
                     container.addEventListener('click', () => {
-                        // 🚨 CORREÇÃO: Usamos 'dataset.fullSrc' (camelCase) em vez de 'dataset.full-src' (com hífen)
-                        const newSrc = container.dataset.fullSrc; 
+                        const newSrc = container.dataset.fullSrc;
                         const mediaType = container.dataset.type;
 
-                        mainMediaDisplay.innerHTML = ''; // Limpa o display
+                        mainMediaDisplay.innerHTML = ''; 
                         
                         if (mediaType === 'video') {
                             mainMediaDisplay.innerHTML = `
@@ -329,7 +382,6 @@
                             `;
                         }
                         
-                        // Atualiza o estado ativo
                         thumbContainers.forEach(t => t.classList.remove('active'));
                         container.classList.add('active');
                     });
