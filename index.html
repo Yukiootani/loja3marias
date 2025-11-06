@@ -15,11 +15,17 @@
         header p { 
             font-size: 1.25em; 
             margin: 5px 0 0 0; 
-            position: relative; /* Para posicionar as estrelas em relação a ele */
-            z-index: 1; /* Garante que o texto fique acima das estrelas */
+            position: relative; 
+            z-index: 1; 
         }
 
-        /* Removendo o .golden-glow, o texto será normal agora */
+        /* Destaque Pronta Entrega */
+        .highlight-text {
+            font-weight: bold;
+            font-size: 1.3em; 
+            display: block;
+            margin-bottom: 5px;
+        }
         
         main { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
 
@@ -166,61 +172,67 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- ESTILOS PARA A ANIMAÇÃO DAS ESTRELAS (NOVO) --- */
+        /* --- ESTILOS PARA A ANIMAÇÃO DAS ESTRELAS (APRIMORADO) --- */
         .star-container {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* Garante que não interfira com cliques no texto */
-            overflow: hidden; /* Garante que as estrelas sumam ao sair da área */
-            opacity: 0; /* Inicialmente invisível */
-            animation: fadeInOutStars 0.5s forwards; /* Animação para aparecer e desaparecer o container */
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeInOutStars 0.5s forwards;
         }
 
         .star {
             position: absolute;
-            color: white; /* Cor da estrela */
-            font-size: 2em; /* Tamanho da estrela */
-            text-shadow: 0 0 8px #ffd700, 0 0 15px #f0e68c; /* Brilho */
-            opacity: 0; /* Começa invisível */
-            transform: translateZ(0); /* Força aceleração de hardware */
-            animation: starMovement 4s ease-out forwards; /* Animação de movimento */
+            color: white;
+            font-size: 2em;
+            text-shadow: 0 0 8px #ffd700, 0 0 15px #f0e68c; 
+            opacity: 0;
+            transform: translateZ(0);
+            /* Duração aumentada para 7 segundos */
+            animation: starMovement 7s ease-out forwards; 
         }
 
         /* Keyframes para as estrelas */
         @keyframes fadeInOutStars {
             0% { opacity: 0; }
-            10% { opacity: 1; } /* Aparece rapidamente */
+            10% { opacity: 1; } 
             90% { opacity: 1; }
-            100% { opacity: 0; } /* Desaparece lentamente */
+            100% { opacity: 0; } 
         }
 
         @keyframes starMovement {
+            /* Posições ajustadas para um movimento mais lento e amplo */
             0% {
                 opacity: 0;
-                transform: translate(-100px, -50px) scale(0.5) rotate(0deg);
+                transform: translate(50%, 50%) scale(0.3) rotate(0deg); /* Começa no centro */
             }
-            20% {
-                opacity: 0.8;
-                transform: translate(20px, 20px) scale(1) rotate(90deg);
+            15% {
+                opacity: 0.9;
+                transform: translate(10%, 10%) scale(1) rotate(60deg);
             }
-            40% {
+            30% {
                 opacity: 1;
-                transform: translate(calc(100% - 70px), -10px) scale(1.2) rotate(180deg);
+                transform: translate(80%, 30%) scale(1.2) rotate(120deg);
+            }
+            45% {
+                opacity: 0.9;
+                transform: translate(20%, 80%) scale(1.1) rotate(180deg);
             }
             60% {
                 opacity: 0.8;
-                transform: translate(calc(100% - 150px), 60px) scale(1.1) rotate(270deg);
+                transform: translate(90%, 60%) scale(1) rotate(240deg);
             }
             80% {
                 opacity: 0.5;
-                transform: translate(30px, 90px) scale(0.9) rotate(360deg);
+                transform: translate(10%, 30%) scale(0.8) rotate(320deg);
             }
             100% {
                 opacity: 0;
-                transform: translate(-50px, -20px) scale(0.3) rotate(450deg);
+                transform: translate(50%, 50%) scale(0.1) rotate(360deg); /* Termina no centro, pequeno e some */
             }
         }
     </style>
@@ -229,7 +241,7 @@
     <header>
         <div id="admin-trigger">
             <h1>3 MARIAS MODA FEMININA</h1>
-            <p id="main-slogan">Sua loja on-line, que te entende, no Japão.<br>Sinta-se linda e segura.<br>Do Brasil para você.</p>
+            <p id="main-slogan"><span class="highlight-text">PRODUTOS À PRONTA-ENTREGA</span><br>Sinta-se linda e segura.<br>Do Brasil para você.</p>
             <div id="star-animation-area" class="star-container"></div>
         </div>
     </header>
@@ -297,37 +309,34 @@
         });
         // --- FIM DO CÓDIGO DO ATALHO ADMIN ---
 
-        // --- CÓDIGO DA ANIMAÇÃO DE ESTRELAS (NOVO) ---
+        // --- CÓDIGO DA ANIMAÇÃO DE ESTRELAS ---
         const sloganElement = document.getElementById('main-slogan');
         const starAnimationArea = document.getElementById('star-animation-area');
 
-        // Função para criar e animar estrelas
         function createStarsAnimation() {
-            starAnimationArea.innerHTML = ''; // Limpa estrelas anteriores
-            starAnimationArea.style.opacity = '1'; // Torna o container visível
+            starAnimationArea.innerHTML = ''; 
+            starAnimationArea.style.opacity = '1'; 
             
             const starCount = 3;
+            const animationDuration = 7000; // 7 segundos
+            
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('span');
                 star.className = 'star';
-                star.textContent = '★'; // Caractere de estrela
+                star.textContent = '★'; 
                 
-                // Atraso para cada estrela aparecer em sequência
-                star.style.animationDelay = `${i * 0.5}s`; 
+                // 0.5 segundo de atraso entre cada estrela
+                star.style.animationDelay = `${i * 500}ms`; 
                 starAnimationArea.appendChild(star);
             }
             
-            // Depois que a animação terminar, esconde o container
+            // Espera o tempo total da animação + o atraso da última estrela
             setTimeout(() => {
                 starAnimationArea.style.opacity = '0';
-            }, 4000 + (starCount * 500)); // Tempo da animação total + atrasos
+            }, animationDuration + (starCount * 500)); 
         }
 
-        // Chama a animação uma vez que a página carrega
         window.addEventListener('load', createStarsAnimation);
-        // Ou você pode chamar em um intervalo, por exemplo, a cada 10 segundos
-        // setInterval(createStarsAnimation, 10000); 
-        // Descomente a linha acima se quiser que ela se repita automaticamente
         // --- FIM DO CÓDIGO DA ANIMAÇÃO DE ESTRELAS ---
 
 
