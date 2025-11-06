@@ -6,18 +6,37 @@
     <title>Detalhes do Produto | 3 Marias</title>
     
     <style>
+        /* Variáveis de Cor OTIMIZADAS PARA O VISUAL LABELLY */
+        :root {
+            --primary-color: #b76e86; /* Rosa/Bordô Principal (para acentos) */
+            --accent-color: #DAA520; /* DOURADO FOSCO (Para toque chic) */
+            --whatsapp-green: #28a745; /* Verde do WhatsApp Suave */
+            --text-color: #333; /* Texto Principal (Preto) */
+            --light-text: #666; /* Texto Secundário (Cinza Médio) */
+            --bg-color: #fcfcfc; /* Fundo Branco Limpo */
+            --border-color: #e0e0e0; /* Cinza sutil */
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background-color: #fdf7f9;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
 
+        /* HEADER: Visual Limpo */
         header {
-            background-color: #d8a0b0;
-            color: white;
+            background-color: white; 
+            color: var(--text-color); 
             padding: 1rem 0;
             text-align: center;
+            border-bottom: 1px solid var(--border-color); /* Linha divisória fina */
+        }
+        header a {
+            color: var(--primary-color); 
+            text-decoration: none; 
+            font-size: 1em;
+            font-weight: 500;
         }
 
         main {
@@ -26,14 +45,16 @@
             padding: 0 15px;
         }
 
+        /* Container de Detalhes - Clean */
         #product-details {
             display: flex;
             flex-wrap: wrap;
             gap: 30px;
             background-color: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 0; /* Sem bordas arredondadas */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
         }
         
         /* 1. Área das Imagens/Vídeo */
@@ -50,17 +71,15 @@
             align-items: center;
             overflow: hidden;
             margin-bottom: 15px;
-            border-radius: 6px;
-            background-color: #eee;
+            border-radius: 0; 
+            background-color: var(--filter-area-bg);
+            border: 1px solid var(--border-color);
         }
         
         #main-media-display img, #main-media-display video {
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-        #main-media-display video {
-            object-fit: contain;
         }
 
         #thumbnails {
@@ -74,106 +93,95 @@
             position: relative;
             width: 80px;
             height: 80px;
-            border-radius: 4px;
+            border-radius: 2px;
             cursor: pointer;
-            border: 2px solid transparent;
+            border: 1px solid var(--border-color);
             transition: border 0.3s;
         }
         .thumb-container.active {
-            border: 2px solid #b76e86;
+            border: 2px solid var(--primary-color);
         }
         .thumb-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 4px;
+            border-radius: 2px;
         }
         
-        /* ÍCONE DE VÍDEO (Overlay) */
-        .video-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 4px;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-        }
+        /* ÍCONE DE VÍDEO (Overlay) - Ajustado para visual mais sutil */
         .video-overlay::before {
             content: '▶';
             padding: 5px;
-            background-color: rgba(255, 255, 255, 0.5);
+            background-color: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             line-height: 1;
-            color: #b76e86;
+            color: var(--primary-color);
         }
 
 
         /* 2. Área das Informações */
         .info-area {
             flex: 1 1 45%;
-            padding-top: 20px;
+            padding-top: 10px;
         }
 
         .info-area h1 {
-            color: #b76e86;
+            color: var(--text-color); /* Título Preto */
             margin-top: 0;
             font-size: 2em;
+            font-weight: 600;
         }
 
         .info-area .price {
             font-size: 1.8em;
             font-weight: bold;
-            color: #333;
+            color: var(--primary-color); /* Preço Rosa (Acento) */
             margin: 15px 0;
         }
 
         .info-area p {
             line-height: 1.6;
+            color: var(--light-text);
         }
 
-        /* NOVO: Estilos do Selo de Status */
+        /* Selo de Status - Cores Suaves e Minimalistas */
         .status-badge {
             font-size: 0.9em;
             padding: 8px 15px;
-            border-radius: 5px;
-            font-weight: bold;
+            border-radius: 4px;
+            font-weight: 500;
             display: inline-block;
             margin-bottom: 20px;
+            border: 1px solid transparent;
         }
         .status-pronta-entrega { 
-            background-color: #d4edda; 
-            color: #0c611f; 
-            border: 1px solid #c3e6cb;
+            background-color: #e6f9e6; /* Verde muito suave */
+            color: var(--whatsapp-green); 
+            border-color: #d0edd4;
         }
         .status-sob-encomenda { 
-            background-color: #fce8a9; 
+            background-color: #f7f7e6; /* Amarelo muito suave */
             color: #856404; 
-            border: 1px solid #f9e29a;
+            border-color: #eaeaa0;
         }
 
-        /* Botão de Compra */
+        /* Botão de Compra - Ajustado para harmonizar com a Home */
         .buy-button {
             display: block;
-            background-color: #25d366; /* Cor do WhatsApp */
+            background-color: var(--whatsapp-green); /* Verde principal do WhatsApp */
             color: white;
             text-align: center;
             padding: 12px;
             text-decoration: none;
             font-size: 1.1em;
             font-weight: bold;
-            border-radius: 8px;
-            margin-top: 20px;
+            border-radius: 4px;
+            margin-top: 30px;
             transition: background-color 0.3s;
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); /* Sombra suave do verde */
         }
         .buy-button:hover {
-            background-color: #128c7e;
+            background-color: #1e7e34; /* Verde mais escuro no hover */
         }
 
 
@@ -182,14 +190,14 @@
             text-align: center;
             padding: 50px;
             font-size: 1.2em;
-            color: #777;
+            color: var(--light-text);
         }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="index.html" style="color: white; text-decoration: none; font-size: 1.2em;">&larr; Voltar para a Loja</a>
+        <a href="index.html" style="color: var(--text-color);">&larr; Voltar para a Loja</a>
     </header>
 
     <main>
@@ -351,10 +359,10 @@
                     </div>
                     <div class="info-area">
                         <span class="status-badge ${statusClass}">${statusText}</span>
-                        <h1 id="product-name">${name}</h1>
+                        <h1>${name}</h1>
                         <p class="price">${precoFormatado}</p>
-                        <h3>Descrição</h3>
-                        <p>${description}</p>
+                        <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3>
+                        <p style="color:var(--light-text); font-weight:400;">${description}</p>
                         <a href="${whatsappLink}" target="_blank" class="buy-button">Comprar / Encomendar via WhatsApp</a>
                     </div>
                 `;
