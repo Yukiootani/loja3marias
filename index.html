@@ -13,11 +13,13 @@
             color: #333;
         }
 
+        /* Adicionando cursor pointer no header para indicar que é clicável (sutilmente) */
         header {
             background-color: #d8a0b0;
             color: white;
             padding: 2rem 1rem;
             text-align: center;
+            cursor: pointer; /* Indica que o elemento é interativo */
         }
 
         header h1 {
@@ -35,7 +37,7 @@
             padding: 0 15px;
         }
         
-        /* Controles de Filtro com Botões (Apenas os essenciais) */
+        /* Controles de Filtro com Botões */
         #controls {
             display: flex;
             flex-direction: column; 
@@ -46,7 +48,6 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             align-items: center; 
-            /* Centraliza os botões de filtro e remove o botão Admin */
         }
 
         /* Estilo para os botões de filtro */
@@ -78,6 +79,19 @@
             border-color: #DAA520; 
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); 
         }
+
+        /* Mídia query para telas maiores: colocar botões lado a lado */
+        @media (min-width: 600px) {
+            #controls {
+                flex-direction: row; 
+                justify-content: center;
+            }
+            .filter-button {
+                width: auto; 
+                margin: 0 10px; 
+            }
+        }
+
 
         /* Área dos Produtos */
         #products-grid {
@@ -179,7 +193,7 @@
 </head>
 <body>
 
-    <header>
+    <header id="admin-secret-trigger">
         <h1>3 MARIAS MODA FEMININA</h1>
         <p>Lingeries e muito mais direto do Brasil!<br> Tudo à pronta-entrega.</p>
     </header>
@@ -192,8 +206,7 @@
             <button class="filter-button" data-filter="sob-encomenda">
                 Receba em 3-5 dias. Qualquer lugar do Japão (Sob Encomenda)
             </button>
-            
-            </div>
+        </div>
         
         <div id="loading">Carregando produtos...</div>
         <div id="empty-message" style="display: none;">Nenhum produto encontrado com o filtro selecionado.</div>
@@ -204,8 +217,7 @@
 
     <footer>
         <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
-        <p style="font-size: 0.8em; margin-top: 5px;">Acesso Restrito: <a href="admin.html" style="color: #b76e86;">Painel Admin</a></p>
-    </footer>
+        </footer>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -228,10 +240,36 @@
         const loadingDiv = document.getElementById('loading');
         const emptyMessageDiv = document.getElementById('empty-message');
         const filterButtons = document.querySelectorAll('.filter-button');
+        const adminSecretTrigger = document.getElementById('admin-secret-trigger'); // NOVO ELEMENTO
         
         const WHATSAPP_NUMBER = "818074558624";
 
-        let currentFilter = 'pronta-entrega'; // 🚨 NOVO PADRÃO: Começa exibindo Pronta Entrega
+        let currentFilter = 'pronta-entrega'; // Começa exibindo Pronta Entrega
+
+        // --- LÓGICA DO ACESSO ADMIN SECRETO (TRIPLE CLICK) ---
+        let clickCount = 0;
+        let lastClickTime = 0;
+        const TRIPLE_CLICK_INTERVAL = 500; // Tempo máximo entre cliques (0.5 segundo)
+
+        adminSecretTrigger.addEventListener('click', () => {
+            const now = new Date().getTime();
+
+            // Verifica se o tempo entre o clique atual e o anterior é válido
+            if (now - lastClickTime > TRIPLE_CLICK_INTERVAL) {
+                clickCount = 1; // Reseta a contagem se o tempo for muito longo
+            } else {
+                clickCount++;
+            }
+
+            lastClickTime = now;
+
+            if (clickCount === 3) {
+                clickCount = 0; // Zera para evitar ativação acidental contínua
+                // Não precisa de alert, apenas redireciona para ser mais rápido
+                window.location.href = 'admin.html'; 
+            }
+        });
+        // --------------------------------------------------------
 
         // LÓGICA DE BUSCA
         async function fetchProducts() {
