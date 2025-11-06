@@ -13,7 +13,7 @@
         header p { font-size: 1.1em; }
         main { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
 
-        /* Controles de Filtro (Baseado no seu visual) */
+        /* Controles de Filtro (Botões) */
         #controls {
             display: flex;
             flex-direction: column;
@@ -159,6 +159,7 @@
     <main>
         <div id="controls">
             <button class="filter-button active" data-filter="pronta-entrega">Toyohashi e Região (Pronta Entrega)</button>
+            
             <button class="filter-button" data-filter="sob-encomenda">Receba em 3-5 dias. Qualquer lugar do Japão (Sob Encomenda)</button>
         </div>
         
@@ -175,7 +176,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> 
 
     <script>
-        // 1. CONFIGURAÇÃO (Copiada do seu detalhes.html)
+        // 1. CONFIGURAÇÃO (Copiada do seu código, garantindo a conexão)
         const firebaseConfig = {
             apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
             authDomain: "loja3marias-50204.firebaseapp.com",
@@ -186,7 +187,7 @@
             measurementId: "G-TK877V6P0S"
         };
         
-        // 🚨 NÚMERO FINAL DA HARUMI (Formato internacional sem o '+')
+        // 🚨 NÚMERO FINAL DA HARUMI 
         const WHATSAPP_NUMBER = "818074558624"; 
 
         // 2. Inicialização
@@ -202,6 +203,7 @@
             const loadingStatus = document.getElementById('loading-status');
             
             // O filtro inicial deve corresponder ao 'data-filter' do botão ativo
+            // Garantido que o padrão é 'pronta-entrega'
             let currentFilter = 'pronta-entrega'; 
 
             async function fetchProducts() {
@@ -210,10 +212,11 @@
                 loadingStatus.style.color = '#777';
 
                 try {
-                    // Consulta o Firestore, filtrando pela "source" E ordenando (Pode exigir índice!)
+                    // Consulta o Firestore: FILTRA POR 'source' E ORDENA POR 'createdAt'
                     const snapshot = await db.collection(COLECAO_PRODUTOS)
-                        .where('source', '==', currentFilter) // Filtra pelo campo 'source'
-                        .orderBy('createdAt', 'desc') // Ordena pelos mais novos primeiro
+                        // AQUI ESTÁ A CHAVE: currentFilter é o valor 'pronta-entrega' ou 'sob-encomenda'
+                        .where('source', '==', currentFilter) 
+                        .orderBy('createdAt', 'desc') 
                         .get();
                     
                     loadingStatus.style.display = 'none';
@@ -240,7 +243,7 @@
                         const card = document.createElement('div');
                         card.className = 'product-card';
                         
-                        // NOVO: Renderiza os selos (Novidade, Destaque)
+                        // Renderiza os selos (Novidade, Destaque)
                         let selosHTML = '';
                         if (product.isNew) {
                             selosHTML += `<span class="badge new">✨ NOVIDADE</span>`;
@@ -263,8 +266,8 @@
 
                 } catch (error) {
                     console.error('Erro ao buscar produtos no Firestore:', error);
-                    // Mensagem de erro clara para o problema mais comum: O ÍNDICE
-                    loadingStatus.textContent = 'Erro! Não foi possível carregar os produtos. Você precisa criar o Índice no Console do Firebase (source + createdAt).';
+                    // Esta mensagem não deve mais aparecer, pois o índice foi criado!
+                    loadingStatus.textContent = 'Erro de carregamento. Recarregue a página.';
                     loadingStatus.style.color = 'red';
                 }
             }
@@ -274,6 +277,7 @@
                 button.addEventListener('click', () => {
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
+                    // currentFilter Pega o valor do data-filter (pronta-entrega ou sob-encomenda)
                     currentFilter = button.dataset.filter;
                     fetchProducts(); // Recarrega com o novo filtro
                 });
