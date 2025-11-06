@@ -6,7 +6,6 @@
     <title>3 Marias Loja</title>
     
     <style>
-        /* ... (Estilos CSS - MANTIDOS E SIMPLIFICADOS) ... */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -17,13 +16,17 @@
         header {
             background-color: #d8a0b0;
             color: white;
-            padding: 1rem 0;
+            padding: 2rem 1rem;
             text-align: center;
         }
 
-        h1 {
+        header h1 {
             margin: 0;
-            font-size: 1.5em;
+            font-size: 2.5em; 
+        }
+        
+        header p {
+            font-size: 1.1em;
         }
 
         main {
@@ -32,10 +35,10 @@
             padding: 0 15px;
         }
         
-        /* Controles de Filtro e Admin */
+        /* Controles de Filtro (Sem botão Admin visível) */
         #controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start; /* Alinha à esquerda */
             align-items: center;
             margin-bottom: 20px;
             padding: 15px;
@@ -47,27 +50,19 @@
         #controls label {
             font-weight: bold;
             margin-right: 10px;
+            white-space: nowrap;
         }
         
-        #source-filter, #admin-link {
+        #source-filter {
             padding: 8px 12px;
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 1em;
             cursor: pointer;
+            flex-grow: 1; /* Permite que o select se expanda */
+            max-width: 250px;
         }
         
-        #admin-link {
-            background-color: #b76e86;
-            color: white;
-            text-decoration: none;
-            border: none;
-            text-align: center;
-        }
-        #admin-link:hover {
-            background-color: #8c4c61;
-        }
-
         /* Área dos Produtos */
         #products-grid {
             display: grid;
@@ -83,7 +78,7 @@
             text-decoration: none;
             color: #333;
             transition: transform 0.2s;
-            position: relative; /* Para posicionar o selo */
+            position: relative;
         }
 
         .product-card:hover {
@@ -141,6 +136,15 @@
             background-color: #fce8a9; 
             color: #856404; 
         }
+
+        /* Rodapé */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #e0e0e0;
+            color: #777;
+            margin-top: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -160,8 +164,7 @@
                     <option value="sob-encomenda">Sob Encomenda</option>
                 </select>
             </div>
-            <a id="admin-link" href="admin.html">Painel Administrativo</a>
-        </div>
+            </div>
 
         <div id="loading">Carregando produtos...</div>
         <div id="empty-message" style="display: none;">Nenhum produto encontrado com o filtro selecionado.</div>
@@ -169,6 +172,10 @@
         <div id="products-grid">
             </div>
     </main>
+
+    <footer>
+        <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
+    </footer>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -193,7 +200,6 @@
         const loadingDiv = document.getElementById('loading');
         const emptyMessageDiv = document.getElementById('empty-message');
         
-        // NÚMERO CORRETO DA HARUMI 
         const WHATSAPP_NUMBER = "818074558624";
 
 
@@ -207,17 +213,12 @@
                 const selectedSource = document.getElementById('source-filter').value;
                 let query = db.collection("products");
                 
-                // 🚨 LÓGICA DO FILTRO: 
                 if (selectedSource === 'pronta-entrega') {
-                    // Filtra por Pronta Entrega
                     query = query.where("source", "==", "pronta-entrega");
                 } else if (selectedSource === 'sob-encomenda') {
-                    // Filtra por Sob Encomenda
                     query = query.where("source", "==", "sob-encomenda");
                 }
-                // Se selectedSource === 'todos', ele não aplica filtro, retornando TUDO (incluindo produtos antigos sem o campo 'source').
-
-
+                
                 const snapshot = await query.get();
                 const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -232,7 +233,7 @@
                     const name = product.name || 'Produto Sem Nome';
                     const imageUrl = product.imageUrl || 'https://via.placeholder.com/300x200?text=IMAGEM';
                     const price = product.price || '0';
-                    const source = product.source || 'pronta-entrega'; // 🚨 FALLBACK: Trata produtos sem o campo como Pronta Entrega para exibição
+                    const source = product.source || 'pronta-entrega'; 
                     
                     const priceValue = parseFloat(price.toString().replace(',', '.')); 
                     const precoFormatado = priceValue.toLocaleString('ja-JP', { 
@@ -251,12 +252,10 @@
                         statusText = 'Sob Encomenda';
                         statusClass = 'status-sob-encomenda';
                     } else {
-                        // Para produtos antigos que não tem o campo 'source' (se o filtro for 'todos')
                         statusText = 'Pronta Entrega';
                         statusClass = 'status-pronta-entrega';
                     }
 
-                    // Monta o link do WhatsApp para o cartão 
                     const whatsappMessage = `Olá, Harumi! Vi o produto ${name} (${precoFormatado}) na loja. Tenho interesse.`;
                     const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
 
@@ -281,7 +280,6 @@
             }
         }
 
-        // 5. CHAMA A FUNÇÃO DE BUSCA AO CARREGAR A PÁGINA
         document.addEventListener('DOMContentLoaded', fetchProducts);
     </script>
 </body>
