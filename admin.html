@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>Admin - Gerenciamento da Loja</title>
     
     <style>
@@ -17,19 +17,22 @@
             margin: 0;
         }
         .container {
-            width: 100%;
+            width: 95%; /* Ajusta para 95% da largura da tela */
             max-width: 800px; 
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            padding: 2rem;
-            margin: 1rem;
+            padding: 2rem 1rem; /* Mais padding nas laterais */
+            margin: 1rem 0; /* Remove margem lateral */
+            box-sizing: border-box; /* Garante que padding não estoure a largura */
         }
         h1 { text-align: center; color: #b76e86; margin-top: 0; margin-bottom: 1.5rem; }
         h2 { color: #b76e86; text-align: center; margin-top: 0; margin-bottom: 1rem; }
         h3 { color: #b76e86; text-align: center; margin-bottom: 1rem; }
         label { font-weight: bold; margin-bottom: 0.5rem; }
-        input[type="text"], input[type="password"], textarea, input[type="file"], select { /* Adicionada tag select */
+        
+        /* Ajuste para input, textarea e select */
+        input[type="text"], input[type="password"], textarea, input[type="file"], select {
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 1rem;
@@ -38,7 +41,8 @@
             box-sizing: border-box; 
             resize: vertical;
         }
-        button { padding: 0.9rem; border: none; border-radius: 4px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; }
+        
+        button { padding: 0.9rem; border: none; border-radius: 4px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; width: 100%;}
         #btnSalvar, #btnLogin { background-color: #b76e86; color: white; margin-bottom: 0.5rem; }
         #btnLogout { background-color: #777; color: white; margin-top: 1.5rem; }
         #status, #loginStatus { text-align: center; font-weight: bold; margin-top: 1rem; padding: 0.5rem; border-radius: 4px; min-height: 1.5rem; }
@@ -49,21 +53,18 @@
         #login-section { display: none; }
         
         /* Estilos da tabela de gerenciamento */
-        #product-management-list { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        #product-management-list th, #product-management-list td { border: 1px solid #eee; padding: 10px; text-align: left; vertical-align: middle; }
+        #product-management-list { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em;}
+        #product-management-list th, #product-management-list td { border: 1px solid #eee; padding: 8px; text-align: left; vertical-align: middle; }
         #product-management-list th { background-color: #f4f4f4; color: #555; font-size: 0.9em; }
-        #product-management-list img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
-        .delete-btn { background-color: #dc3545; color: white; padding: 5px 10px; font-weight: normal; font-size: 0.9em; width: auto; }
+        #product-management-list img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+        .delete-btn { background-color: #dc3545; color: white; padding: 5px 8px; font-weight: normal; font-size: 0.8em; width: auto; }
         
-        /* NOVO: Estilo para o selo na lista de produtos */
-        .source-tag {
-            font-size: 0.75em;
-            padding: 3px 6px;
-            border-radius: 3px;
-            font-weight: bold;
+        /* Quebra de linha nas células pequenas para mobile */
+        @media (max-width: 768px) {
+            #product-management-list th, #product-management-list td {
+                padding: 5px;
+            }
         }
-        .pronta-entrega { background-color: #d4edda; color: #155724; }
-        .sob-encomenda { background-color: #fff3cd; color: #856404; }
     </style>
 </head>
 <body>
@@ -208,7 +209,7 @@
             return storageRef.getDownloadURL();
         }
 
-        // Função que lista e exibe os produtos (ATUALIZADA)
+        // Função que lista e exibe os produtos (mantida)
         async function listProductsForManagement() {
             productsTableBody.innerHTML = ''; 
             loadingListDiv.style.display = 'block';
@@ -298,7 +299,7 @@
             }
         });
 
-        // 3. LÓGICA DE SALVAMENTO DE PRODUTO (ATUALIZADA)
+        // 3. LÓGICA DE SALVAMENTO DE PRODUTO
         formProduto.addEventListener('submit', async (e) => {
             e.preventDefault(); 
             
@@ -355,7 +356,7 @@
                     name: nome,
                     description: descricao,
                     price: preco,
-                    source: source, // 🚨 NOVO CAMPO SALVO AQUI!
+                    source: source, // Campo de Disponibilidade
                     imageUrl: imageUrl, 
                     videoUrl: videoUrl, 
                     galeria: galeriaArray, 
