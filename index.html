@@ -6,47 +6,48 @@
     <title>3 Marias Loja</title>
     
     <style>
-        /* Variáveis de Cor OTIMIZADAS */
+        /* Variáveis de Cor OTIMIZADAS PARA ELEGÂNCIA */
         :root {
-            --primary-color: #b76e86; /* Rosa Principal */
-            --accent-color: #DAA520; /* DOURADO SUTIL para acentos */
-            --text-color: #333;
-            --bg-color: #fdf9f9;
-            --border-color: #eee;
+            --primary-color: #b76e86; /* Rosa/Bordô Principal (para acentos) */
+            --accent-color: #DAA520; /* DOURADO FOSCO (Para toque chic) */
+            --text-color: #333; /* Texto Principal */
+            --light-text-color: #666; /* Texto Secundário (Chic) */
+            --bg-color: #fcfcfc; /* Quase Branco */
+            --border-color: #ddd; /* Cinza sutil */
         }
 
         /* Estilos de Estrutura BASE */
         body { font-family: Arial, sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); }
         
-        /* HEADER: Título Fixo e Limpo */
+        /* HEADER: Fundo Branco e Linha Dourada */
         header { 
-            background-color: white; /* Fundo branco/claro */
+            background-color: white; 
             color: var(--primary-color); 
             text-align: center; 
-            padding: 1.2rem 0; /* Mais espaçamento */
-            border-bottom: 2px solid var(--accent-color); /* Linha DOURADA sutil */
+            padding: 1.2rem 0; 
+            border-bottom: 1px solid var(--accent-color); /* Linha DOURADA sutil */
             position: relative; 
         }
         header h1 { 
             margin: 0; 
-            font-size: 1.6em; /* Um pouco menor para elegância */
-            color: var(--primary-color);
-            letter-spacing: 2px; /* Espaçamento entre letras (CHIC) */
+            font-size: 1.6em; 
+            color: var(--text-color); /* Título Preto para contraste elegante */
+            letter-spacing: 2px;
         }
         
         main { 
             max-width: 1200px; 
-            margin: 30px auto; /* Mais respiro */
+            margin: 30px auto; 
             padding: 0 15px; 
         }
 
         /* Mensagem de Instrução */
         #filter-instruction {
             text-align: center;
-            font-size: 1em; /* Fonte um pouco menor */
+            font-size: 1em; 
             font-weight: normal;
-            color: var(--text-color);
-            margin-bottom: 25px; /* Mais respiro */
+            color: var(--light-text-color); /* Cinza sutil */
+            margin-bottom: 25px; 
             padding: 10px 0;
             border-bottom: 1px solid var(--border-color);
         }
@@ -54,36 +55,35 @@
         /* Seção de Filtros */
         #controls {
             display: flex;
-            gap: 10px;
+            gap: 1px; /* Espaço mínimo entre botões */
             padding: 0;
-            background-color: transparent;
-            border: none;
-            box-shadow: none;
-            margin-bottom: 35px; /* Mais respiro */
+            border: 1px solid var(--border-color); /* Borda em torno de todos os botões */
+            border-radius: 4px;
+            overflow: hidden; /* Corta a borda interna */
+            margin-bottom: 35px; 
         }
 
         /* Estilo dos Títulos de Seção */
         .section-title {
-            color: var(--primary-color);
-            font-size: 1.4em; /* Ligeiramente maior para hierarquia */
+            color: var(--text-color); /* Título Preto */
+            font-size: 1.4em;
             padding-bottom: 10px;
             border-bottom: 1px solid var(--accent-color); /* Linha DOURADA */
             margin-bottom: 20px;
             text-align: left;
             font-weight: bold;
-            letter-spacing: 1px; /* Espaçamento entre letras */
+            letter-spacing: 1px;
         }
 
         /* Botões de Filtro - Duas colunas */
         .filter-button {
             background-color: white; 
             color: var(--text-color);
-            border: 1px solid var(--primary-color); /* Borda primária */
+            border: none; /* Borda removida porque o container já tem */
             box-shadow: none;
             font-size: 1em;
             font-weight: normal;
             padding: 12px;
-            border-radius: 4px; /* Bordas levemente arredondadas */
             cursor: pointer;
             width: 50%;
             transition: all 0.2s;
@@ -92,37 +92,27 @@
         .filter-button.active {
             background-color: var(--primary-color); 
             color: white;
-            border-color: var(--primary-color);
             font-weight: bold;
         }
 
         /* Produtos */
         #product-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px; /* Mais espaçamento entre produtos */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 25px; 
         }
         
-        /* Estilos de Cartão - CENTRALIZADO */
+        /* Estilos de Cartão - Elegantemente Flutuante */
         .product-card {
             background-color: white;
-            border-radius: 10px; /* Bordas mais arredondadas (CHIC) */
-            border: none; /* Remove a borda para um visual mais limpo */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra mais visível e elegante */
+            border-radius: 10px; 
+            border: 1px solid var(--border-color); /* Borda sutil */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra suave */
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         
-        .product-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .product-card img { 
-            width: 100%;
-            height: 250px; 
-            object-fit: cover; 
-        }
+        .product-card img { height: 250px; object-fit: cover; }
         
         .product-info { 
             padding: 1rem; 
@@ -130,41 +120,39 @@
         }
         .product-info h3 { 
             font-size: 1.1em; 
-            color: var(--text-color); /* Título Preto para contraste */
+            color: var(--text-color); 
             margin-bottom: 5px;
         }
         .product-info .price { 
             font-size: 1.3em; 
-            color: var(--accent-color); /* PREÇO DOURADO FOSCO */
+            color: var(--primary-color); /* Preço com a cor do acento (Rosa) */
             font-weight: bold; 
         }
         
-        /* Botão Melhorado */
+        /* --- ESTILO NOVO E MELHORADO PARA O BOTÃO "VER DETALHES" --- */
         .buy-button { 
-            background-color: var(--primary-color); 
-            color: white;
+            background-color: white; /* Fundo Branco (elegante) */
+            color: var(--primary-color); /* Texto Rosa */
             padding: 10px 15px;
             font-size: 1em;
             font-weight: bold;
             border-radius: 6px; 
-            border: none; 
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--accent-color); /* BORDA DOURADA */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
             display: block;
             margin-top: 15px;
             transition: background-color 0.3s ease, transform 0.1s;
         }
         
         .buy-button:hover { 
-            background-color: #a35f75; 
+            background-color: var(--primary-color); /* Fundo Rosa no hover */
+            color: white;
             transform: translateY(-1px);
         }
-        
+        /* ----------------------------------------------------------- */
+
         /* Estilo para atalho Admin */
-        #admin-trigger {
-            cursor: pointer; 
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent;
-        }
+        #admin-trigger { cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
 <body>
@@ -220,7 +208,7 @@
     </script>
 
     <script>
-        // --- CÓDIGO DO ATALHO ADMIN (Mantido) ---
+        // --- CÓDIGO DO ATALHO ADMIN ---
         const ADMIN_URL = "admin.html";
         const ADMIN_TRIGGER = document.getElementById('admin-trigger');
         let clickCount = 0;
@@ -244,7 +232,7 @@
         });
         // --- FIM DO CÓDIGO DO ATALHO ADMIN ---
 
-        // --- CÓDIGO DE CARREGAMENTO DE PRODUTOS (Mantido) ---
+        // --- CÓDIGO DE CARREGAMENTO DE PRODUTOS ---
         const productGrid = document.getElementById('product-grid');
         const filterButtons = document.querySelectorAll('.filter-button');
         const loadingStatus = document.getElementById('loading-status');
