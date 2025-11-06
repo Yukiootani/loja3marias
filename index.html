@@ -13,13 +13,12 @@
             color: #333;
         }
 
-        /* Adicionando cursor pointer no header para indicar que é clicável (sutilmente) */
         header {
             background-color: #d8a0b0;
             color: white;
             padding: 2rem 1rem;
             text-align: center;
-            cursor: pointer; /* Indica que o elemento é interativo */
+            cursor: pointer; 
         }
 
         header h1 {
@@ -56,7 +55,7 @@
             color: white;
             padding: 12px 20px;
             border-radius: 8px;
-            border: 2px solid #FFD700; /* Borda Dourada */
+            border: 2px solid #FFD700; 
             font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
@@ -160,18 +159,27 @@
             background-color: #8c4c61;
         }
 
-
-        /* Estilos do Selo e Mensagens */
-        .status-badge {
+        /* Contêiner dos Selos para posicionamento */
+        .badge-container {
             position: absolute;
             top: 10px;
             right: 10px;
+            display: flex; /* Permite colocar os selos lado a lado */
+            gap: 8px; /* Espaço entre os selos */
+            z-index: 10;
+        }
+
+        /* Estilos dos Selos */
+        .status-badge {
             font-size: 0.8em;
             padding: 5px 10px;
             border-radius: 5px;
             font-weight: bold;
-            z-index: 10;
+            white-space: nowrap; /* Não quebra a linha */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        
+        /* Estilos dos Selos de Disponibilidade */
         .status-pronta-entrega { 
             background-color: #d4edda; 
             color: #0c611f; 
@@ -179,6 +187,16 @@
         .status-sob-encomenda { 
             background-color: #fce8a9; 
             color: #856404; 
+        }
+
+        /* NOVO: Estilos dos Selos de Destaque */
+        .badge-new { 
+            background-color: #ff5722; /* Laranja/Vermelho para Novo */
+            color: white; 
+        }
+        .badge-featured { 
+            background-color: #FFD700; /* Dourado para Destaque */
+            color: #333; 
         }
 
         /* Rodapé */
@@ -240,23 +258,22 @@
         const loadingDiv = document.getElementById('loading');
         const emptyMessageDiv = document.getElementById('empty-message');
         const filterButtons = document.querySelectorAll('.filter-button');
-        const adminSecretTrigger = document.getElementById('admin-secret-trigger'); // NOVO ELEMENTO
+        const adminSecretTrigger = document.getElementById('admin-secret-trigger');
         
         const WHATSAPP_NUMBER = "818074558624";
 
-        let currentFilter = 'pronta-entrega'; // Começa exibindo Pronta Entrega
+        let currentFilter = 'pronta-entrega'; 
 
         // --- LÓGICA DO ACESSO ADMIN SECRETO (TRIPLE CLICK) ---
         let clickCount = 0;
         let lastClickTime = 0;
-        const TRIPLE_CLICK_INTERVAL = 500; // Tempo máximo entre cliques (0.5 segundo)
+        const TRIPLE_CLICK_INTERVAL = 500; 
 
         adminSecretTrigger.addEventListener('click', () => {
             const now = new Date().getTime();
 
-            // Verifica se o tempo entre o clique atual e o anterior é válido
             if (now - lastClickTime > TRIPLE_CLICK_INTERVAL) {
-                clickCount = 1; // Reseta a contagem se o tempo for muito longo
+                clickCount = 1; 
             } else {
                 clickCount++;
             }
@@ -264,14 +281,13 @@
             lastClickTime = now;
 
             if (clickCount === 3) {
-                clickCount = 0; // Zera para evitar ativação acidental contínua
-                // Não precisa de alert, apenas redireciona para ser mais rápido
+                clickCount = 0; 
                 window.location.href = 'admin.html'; 
             }
         });
         // --------------------------------------------------------
 
-        // LÓGICA DE BUSCA
+        // LÓGICA DE BUSCA (ATUALIZADA)
         async function fetchProducts() {
             productsGrid.innerHTML = '';
             loadingDiv.style.display = 'block';
@@ -280,10 +296,13 @@
             try {
                 let query = db.collection("products");
                 
-                // Aplica o filtro baseado no botão ativo
+                // Aplica o filtro
                 if (currentFilter !== 'todos') {
                     query = query.where("source", "==", currentFilter);
                 }
+                
+                // Ordem: Destaque primeiro, depois os mais novos
+                query = query.orderBy("isFeatured", "desc").orderBy("createdAt", "desc");
                 
                 const snapshot = await query.get();
                 const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -317,16 +336,32 @@
                     } else if (source === 'sob-encomenda') {
                         statusText = 'Sob Encomenda';
                         statusClass = 'status-sob-encomenda';
-                    } else {
-                        statusText = 'Pronta Entrega';
-                        statusClass = 'status-pronta-entrega';
                     }
+
+                    // NOVO: Geração dos Selos Extras
+                    let extraBadges = '';
+                    if (product.isFeatured) {
+                        extraBadges += `<span class="status-badge badge-featured">🔥 DESTAQUE</span>`;
+                    }
+                    // Adiciona o selo de novo APENAS se não for destaque para não poluir, ou você pode alterar a ordem
+                    if (product.isNew && !product.isFeatured) {
+                        extraBadges += `<span class="status-badge badge-new">✨ NOVIDADE</span>`;
+                    }
+                    
+                    // Juntando todos os selos
+                    const allBadges = `
+                        <div class="badge-container">
+                            ${extraBadges}
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                    `;
 
 
                     const card = `
                         <div class="product-card">
+                            ${allBadges} 
+                            
                             <a href="detalhes.html?id=${product.id}" class="product-link-block">
-                                <span class="status-badge ${statusClass}">${statusText}</span>
                                 <img src="${imageUrl}" alt="${name}">
                                 <div class="product-info">
                                     <h2>${name}</h2>
@@ -348,7 +383,7 @@
             }
         }
 
-        // Adiciona evento de clique aos botões de filtro
+        // Adiciona evento de clique aos botões de filtro (mantido)
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 filterButtons.forEach(btn => btn.classList.remove('active'));
@@ -359,9 +394,8 @@
             });
         });
 
-        // Inicializa o filtro e o estado ativo
+        // Inicializa o filtro e o estado ativo (mantido)
         document.addEventListener('DOMContentLoaded', () => {
-            // Define 'pronta-entrega' como ativo por padrão na inicialização
             document.querySelector('[data-filter="pronta-entrega"]').classList.add('active');
             fetchProducts();
         });
