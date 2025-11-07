@@ -8,13 +8,13 @@
     <style>
         /* Variáveis de Cor OTIMIZADAS PARA O VISUAL LABELLY */
         :root {
-            --primary-color: #b76e86; 
-            --accent-color: #DAA520; 
-            --whatsapp-green: #28a745; 
-            --text-color: #333; 
-            --light-text: #666; 
-            --bg-color: #fcfcfc; 
-            --border-color: #e0e0e0; 
+            --primary-color: #b76e86; /* Rosa/Bordô Principal (para acentos) */
+            --accent-color: #DAA520; /* DOURADO FOSCO (Para toque chic) */
+            --whatsapp-green: #28a745; /* Verde do WhatsApp Suave */
+            --text-color: #333; /* Texto Principal (Preto) */
+            --light-text: #666; /* Texto Secundário (Cinza Médio) */
+            --bg-color: #fcfcfc; /* Fundo Branco Limpo */
+            --border-color: #e0e0e0; /* Cinza sutil */
             --error-color: #dc3545; /* Cor de erro/esgotado */
         }
 
@@ -81,6 +81,9 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+        #main-media-display video {
+             object-fit: contain; /* Garante que o vídeo não seja cortado */
         }
 
         #thumbnails {
@@ -296,23 +299,30 @@
                 const videoUrl = product.videoUrl; 
                 const source = product.source || 'pronta-entrega'; 
 
-                let galleryUrls = product.galeria || [];
+                // CORREÇÃO APLICADA AQUI: O campo no Firebase é 'galeria'
+                let galleryUrls = product.galeria || []; 
                 
                 let allMediaUrls = [];
 
+                // Adiciona o vídeo (se existir)
                 if (videoUrl) {
                     allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl });
                 }
                 
+                // Adiciona a foto principal
                 if (!allMediaUrls.some(m => m.url === imageUrl)) {
                      allMediaUrls.push({ type: 'image', url: imageUrl, thumb: imageUrl });
                 }
 
+                // Adiciona as fotos da galeria
                 galleryUrls.forEach(url => {
                     allMediaUrls.push({ type: 'image', url: url, thumb: url });
                 });
 
+                // Remove duplicatas e garante que a foto principal é a primeira
                 allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i);
+                
+                // --- FIM DA LÓGICA DE MÍDIA ---
 
 
                 // 6. FORMATAÇÃO DO PREÇO e LÓGICA DO WHATSAPP
@@ -344,23 +354,21 @@
                         whatsappMessage = `Olá, Harumi! Gostaria de comprar o produto ${name} (${precoFormatado}) que está na Pronta Entrega. Qual o procedimento para pagamento e envio/retirada?`;
                     }
                 } else {
-                    // LÓGICA PARA SOB ENCOMENDA (Modificada para exibir estoque e prazo)
+                    // LÓGICA PARA SOB ENCOMENDA
                     statusText = `📦 Sob Encomenda (${estoque} unidades em estoque de fornecedor)`;
                     statusClass = 'status-sob-encomenda';
                     whatsappMessage = `Olá! Gostaria de encomendar o produto ${name} (${precoFormatado}) do Catálogo Completo. Entendi que o prazo é de 3-5 dias. Quais são as opções de recebimento?`;
                     
-                    // Adiciona o prazo abaixo da mensagem de status principal
                     lowStockWarning = `<p class="low-stock-warning">Prazo de entrega: 3-5 dias após o pedido.</p>`;
 
                     if (estoque === 0) {
-                        // NOVO AVISO se o ESTOQUE for ZERO, mesmo Sob Encomenda
                         lowStockWarning += `<p class="low-stock-warning" style="color:var(--error-color);">Atenção: Estoque do fornecedor zerado. O prazo pode ser estendido!</p>`;
                     }
                 }
                 
                 const whatsappLink = (buttonClass.includes('sold-out-btn')) ? '#' : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
                 
-                // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL e MINIATURAS (Mantida)
+                // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL e MINIATURAS
                 let mainMediaHTML = '';
                 let galleryHTML = '';
                 
@@ -370,6 +378,7 @@
                     const isVideoThumb = media.type === 'video';
                     const thumbClasses = isVideoThumb ? 'video-thumb' : '';
                     
+                    // Adicionando um ícone de vídeo nas miniaturas de vídeo
                     galleryHTML += `
                         <div class="thumb-container ${isActive ? 'active' : ''} ${thumbClasses}" 
                              data-type="${media.type}"
@@ -406,7 +415,8 @@
                         <span class="status-badge ${statusClass}">${statusText}</span>
                         <h1>${name}</h1>
                         <p class="price">${precoFormatado}</p>
-                        ${lowStockWarning} <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3>
+                        ${lowStockWarning} 
+                        <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3>
                         <p style="color:var(--light-text); font-weight:400;">${description}</p>
                         <a href="${whatsappLink}" target="_blank" class="${buttonClass}">${buttonText}</a>
                     </div>
@@ -424,13 +434,15 @@
                         mainMediaDisplay.innerHTML = ''; 
                         
                         if (mediaType === 'video') {
-                            mainMediaHTML = `
+                            // CORREÇÃO DE LÓGICA: Usei mainMediaHTML antes, agora uso a variável certa
+                            mainMediaDisplay.innerHTML = `
                                 <video src="${newSrc}" controls loop style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                                     Seu navegador não suporta o formato de vídeo.
                                 </video>
                             `;
                         } else {
-                            mainMediaHTML = `
+                             // CORREÇÃO DE LÓGICA: Uso a variável certa
+                            mainMediaDisplay.innerHTML = `
                                 <img src="${newSrc}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
                             `;
                         }
