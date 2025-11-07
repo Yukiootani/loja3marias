@@ -8,13 +8,13 @@
     <style>
         /* Variáveis de Cor OTIMIZADAS PARA O VISUAL LABELLY */
         :root {
-            --primary-color: #b76e86; /* Rosa/Bordô Principal (para acentos) */
-            --accent-color: #DAA520; /* DOURADO FOSCO (Para toque chic) */
-            --whatsapp-green: #28a745; /* Verde do WhatsApp Suave */
-            --text-color: #333; /* Texto Principal (Preto) */
-            --light-text: #666; /* Texto Secundário (Cinza Médio) */
-            --bg-color: #fcfcfc; /* Fundo Branco Limpo */
-            --border-color: #e0e0e0; /* Cinza sutil */
+            --primary-color: #b76e86; 
+            --accent-color: #DAA520; 
+            --whatsapp-green: #28a745; 
+            --text-color: #333; 
+            --light-text: #666; 
+            --bg-color: #fcfcfc; 
+            --border-color: #e0e0e0; 
             --error-color: #dc3545; /* Cor de erro/esgotado */
         }
 
@@ -31,7 +31,7 @@
             color: var(--text-color); 
             padding: 1rem 0;
             text-align: center;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color); 
         }
         header a {
             color: var(--text-color); 
@@ -53,7 +53,7 @@
             gap: 30px;
             background-color: white;
             padding: 20px;
-            border-radius: 0;
+            border-radius: 0; 
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--border-color);
         }
@@ -109,7 +109,7 @@
             border-radius: 2px;
         }
         
-        /* ÍCONE DE VÍDEO (Overlay) */
+        /* ÍCONE DE VÍDEO (Overlay) - Ajustado para visual mais sutil */
         .video-overlay::before {
             content: '▶';
             padding: 5px;
@@ -132,7 +132,7 @@
         }
 
         .info-area h1 {
-            color: var(--text-color);
+            color: var(--text-color); 
             margin-top: 0;
             font-size: 2em;
             font-weight: 600;
@@ -141,7 +141,7 @@
         .info-area .price {
             font-size: 1.8em;
             font-weight: bold;
-            color: var(--primary-color);
+            color: var(--primary-color); 
             margin: 15px 0;
         }
 
@@ -150,7 +150,7 @@
             color: var(--light-text);
         }
 
-        /* NOVO: STATUS DE ESTOQUE */
+        /* NOVO: STATUS DE ESTOQUE/AVISO */
         #stock-status {
             font-weight: bold;
             margin-bottom: 10px;
@@ -158,6 +158,7 @@
         }
         .in-stock { color: var(--whatsapp-green); }
         .out-of-stock { color: var(--error-color); }
+        .low-stock-warning { color: var(--error-color); font-size: 0.9em; font-weight: normal; margin-top: 5px; }
 
 
         /* Selo de Status - Cores Suaves e Minimalistas */
@@ -194,10 +195,10 @@
             border-radius: 4px;
             margin-top: 30px;
             transition: background-color 0.3s;
-            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); 
         }
         .buy-button:hover {
-            background-color: #1e7e34;
+            background-color: #1e7e34; 
         }
         /* ESTILO PARA BOTÃO ESGOTADO */
         .sold-out-btn {
@@ -285,8 +286,7 @@
                 }
 
                 const product = doc.data();
-                const estoque = parseInt(product.estoque || 0); // NOVO: Captura o estoque
-
+                const estoque = parseInt(product.estoque || 0);
                 
                 // 5. PROCESSAMENTO DE DADOS E MÍDIA
                 const name = product.name || 'Produto Sem Nome';
@@ -328,30 +328,37 @@
                 let statusClass;
                 let buttonText = 'Comprar / Encomendar via WhatsApp';
                 let buttonClass = 'buy-button';
+                let lowStockWarning = '';
 
 
                 if (source === 'pronta-entrega') {
                     if (estoque === 0) {
-                        // LÓGICA DE ESGOTADO PARA PRONTA ENTREGA
                         statusText = '❌ ESGOTADO! Volte em breve.';
                         statusClass = 'out-of-stock';
                         buttonText = 'ESGOTADO';
                         buttonClass = 'buy-button sold-out-btn';
                         whatsappMessage = `Olá, Harumi! Infelizmente o produto ${name} (${precoFormatado}) está esgotado no momento. Poderia me avisar quando estiver disponível?`;
                     } else {
-                        // PRONTA ENTREGA EM ESTOQUE
                         statusText = `✅ Em Estoque! (${estoque} unidades)`;
                         statusClass = 'in-stock';
                         whatsappMessage = `Olá, Harumi! Gostaria de comprar o produto ${name} (${precoFormatado}) que está na Pronta Entrega. Qual o procedimento para pagamento e envio/retirada?`;
                     }
                 } else {
-                    // SOB ENCOMENDA (Sempre disponível, mas com prazo)
-                    statusText = '📦 Sob Encomenda (Disponível em 3-5 dias)';
+                    // LÓGICA PARA SOB ENCOMENDA (Modificada para exibir estoque e prazo)
+                    statusText = `📦 Sob Encomenda (${estoque} unidades em estoque de fornecedor)`;
                     statusClass = 'status-sob-encomenda';
                     whatsappMessage = `Olá! Gostaria de encomendar o produto ${name} (${precoFormatado}) do Catálogo Completo. Entendi que o prazo é de 3-5 dias. Quais são as opções de recebimento?`;
+                    
+                    // Adiciona o prazo abaixo da mensagem de status principal
+                    lowStockWarning = `<p class="low-stock-warning">Prazo de entrega: 3-5 dias após o pedido.</p>`;
+
+                    if (estoque === 0) {
+                        // NOVO AVISO se o ESTOQUE for ZERO, mesmo Sob Encomenda
+                        lowStockWarning += `<p class="low-stock-warning" style="color:var(--error-color);">Atenção: Estoque do fornecedor zerado. O prazo pode ser estendido!</p>`;
+                    }
                 }
                 
-                const whatsappLink = (buttonClass === 'buy-button sold-out-btn') ? '#' : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+                const whatsappLink = (buttonClass.includes('sold-out-btn')) ? '#' : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
                 
                 // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL e MINIATURAS (Mantida)
                 let mainMediaHTML = '';
@@ -399,7 +406,7 @@
                         <span class="status-badge ${statusClass}">${statusText}</span>
                         <h1>${name}</h1>
                         <p class="price">${precoFormatado}</p>
-                        <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3>
+                        ${lowStockWarning} <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3>
                         <p style="color:var(--light-text); font-weight:400;">${description}</p>
                         <a href="${whatsappLink}" target="_blank" class="${buttonClass}">${buttonText}</a>
                     </div>
@@ -417,13 +424,13 @@
                         mainMediaDisplay.innerHTML = ''; 
                         
                         if (mediaType === 'video') {
-                            mainMediaDisplay.innerHTML = `
+                            mainMediaHTML = `
                                 <video src="${newSrc}" controls loop style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                                     Seu navegador não suporta o formato de vídeo.
                                 </video>
                             `;
                         } else {
-                            mainMediaDisplay.innerHTML = `
+                            mainMediaHTML = `
                                 <img src="${newSrc}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
                             `;
                         }
