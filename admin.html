@@ -31,7 +31,7 @@
         h3 { color: #b76e86; text-align: center; margin-bottom: 1rem; }
         label { font-weight: bold; margin-bottom: 0.5rem; }
         
-        input[type="text"], input[type="password"], textarea, input[type="file"], select, input[type="number"] { /* Adicionado input[type="number"] */
+        input[type="text"], input[type="password"], textarea, input[type="file"], select, input[type="number"] {
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 1rem;
@@ -74,10 +74,39 @@
         #product-management-list img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
         .delete-btn { background-color: #dc3545; color: white; padding: 5px 8px; font-weight: normal; font-size: 0.8em; width: auto; }
         
+        /* Estilos NOVOS para Edição de Estoque */
+        .stock-control {
+            display: flex; 
+            gap: 5px; 
+            align-items: center;
+        }
+        .stock-control .stock-input {
+            width: 50px; 
+            padding: 5px; 
+            margin: 0;
+            text-align: center;
+        }
+        .update-stock-btn {
+            padding: 5px; 
+            font-size: 0.7em; 
+            width: auto; 
+            background-color: #5cb85c; 
+            color: white;
+            white-space: nowrap; /* Garante que o texto 'Salvar' não quebre */
+            box-shadow: none;
+        }
+        
         /* Quebra de linha nas células pequenas para mobile */
         @media (max-width: 768px) {
             #product-management-list th, #product-management-list td {
                 padding: 5px;
+            }
+            .stock-control {
+                flex-direction: column; 
+                gap: 2px;
+            }
+            .stock-control .stock-input {
+                width: 90%;
             }
         }
     </style>
@@ -165,7 +194,7 @@
                     <tr>
                         <th style="width: 60px;">Foto</th>
                         <th>Nome</th>
-                        <th style="width: 80px;">Estoque</th> <th style="width: 180px;">Disponibilidade</th>
+                        <th style="width: 130px;">Estoque</th> <th style="width: 180px;">Disponibilidade</th>
                         <th style="width: 100px;">Selos</th> 
                         <th style="width: 80px;">Preço (¥)</th>
                         <th style="width: 100px;">Ação</th>
@@ -236,18 +265,37 @@
             await storageRef.put(file);
             return storageRef.getDownloadURL();
         }
+        
+        // NOVO: Função para atualizar apenas o estoque
+        async function updateStock(id, newStock) {
+            showStatus(statusDiv, 'Atualizando estoque...', 'loading');
+            try {
+                // O Firebase Firestore precisa de um número inteiro
+                const stockValue = parseInt(newStock); 
+                
+                await db.collection(COLECAO_PRODUTOS).doc(id).update({
+                    estoque: stockValue
+                });
+                
+                showStatus(statusDiv, `Estoque de produto atualizado para ${stockValue}!`, 'success');
+                listProductsForManagement(); // Recarrega a lista para mostrar o status atualizado
+            } catch (error) {
+                console.error('Erro ao atualizar estoque:', error);
+                showStatus(statusDiv, `Falha ao atualizar estoque: ${error.message}`, 'error');
+            }
+        }
 
-        // Função que lista e exibe os produtos (ATUALIZADA para mostrar ESTOQUE)
+
+        // Função que lista e exibe os produtos (ATUALIZADA para mostrar CAMPO DE EDIÇÃO)
         async function listProductsForManagement() {
             productsTableBody.innerHTML = ''; 
             loadingListDiv.style.display = 'block';
 
             try {
-                // Ordenação para a tabela de admin: por data de criação
                 const snapshot = await db.collection(COLECAO_PRODUTOS).orderBy('createdAt', 'desc').get();
                 
                 if (snapshot.empty) {
-                    productsTableBody.innerHTML = '<tr><td colspan="7">Nenhum produto cadastrado.</td></tr>'; // Alterado de 6 para 7 colunas
+                    productsTableBody.innerHTML = '<tr><td colspan="7">Nenhum produto cadastrado.</td></tr>'; 
                     return;
                 }
 
@@ -262,22 +310,26 @@
                     const source = product.source || 'N/A';
                     const sourceText = source === 'pronta-entrega' ? 'Pronta Entrega' : (source === 'sob-encomenda' ? 'Sob Encomenda' : 'N/A');
                     
-                    // Exibição dos selos na tabela
                     let selosText = '';
                     if (product.isNew) { selosText += 'Novo / '; }
                     if (product.isFeatured) { selosText += 'Destaque'; }
                     selosText = selosText.replace(/ \/ $/, '').trim() || 'Nenhum'; 
 
-                    // Estiliza a cor do estoque se estiver baixo (opcional)
                     const estoque = product.estoque !== undefined ? parseInt(product.estoque) : 0;
-                    const estoqueStyle = estoque < 3 ? 'color: red; font-weight: bold;' : '';
+                    // Estiliza apenas se for Pronta Entrega e o estoque estiver baixo
+                    const estoqueStyle = estoque < 3 && product.source === 'pronta-entrega' ? 'color: red; font-weight: bold;' : '';
 
 
                     const row = productsTableBody.insertRow();
                     row.innerHTML = `
                         <td><img src="${product.imageUrl || 'https://via.placeholder.com/50x50?text=SEM'}" alt="${product.name}"></td>
                         <td>${product.name}</td>
-                        <td style="${estoqueStyle}">${estoque}</td> <td>${sourceText}</td>
+                        <td style="${estoqueStyle}">
+                            <div class="stock-control">
+                                <input type="number" min="0" value="${estoque}" data-id="${doc.id}" class="stock-input">
+                                <button class="update-stock-btn" data-id="${doc.id}">Salvar</button>
+                            </div>
+                        </td> <td>${sourceText}</td>
                         <td>${selosText}</td> 
                         <td>${precoFormatado}</td>
                         <td>
@@ -288,7 +340,7 @@
 
             } catch (error) {
                 console.error('Erro ao listar produtos:', error);
-                productsTableBody.innerHTML = '<tr><td colspan="7">Erro ao carregar lista. Verifique o console.</td></tr>'; // Alterado de 6 para 7 colunas
+                productsTableBody.innerHTML = '<tr><td colspan="7">Erro ao carregar lista. Verifique o console.</td></tr>'; 
             } finally {
                 loadingListDiv.style.display = 'none';
             }
@@ -313,11 +365,25 @@
 
         // --- EVENTOS ---
 
-        // 1. EVENTO DE CLIQUE DO BOTÃO EXCLUIR (mantido)
+        // 1. EVENTO DE CLIQUE DO BOTÃO EXCLUIR e ATUALIZAR ESTOQUE (MODIFICADO)
         productsTableBody.addEventListener('click', (e) => {
             if (e.target.classList.contains('delete-btn')) {
                 const productId = e.target.dataset.id;
                 deleteProduct(productId);
+            } 
+            
+            // NOVO: Listener para o botão de salvar estoque
+            if (e.target.classList.contains('update-stock-btn')) {
+                const productId = e.target.dataset.id;
+                // Encontra a linha (<tr>) para procurar o input correto
+                const row = e.target.closest('tr');
+                // Busca o input com a classe stock-input e o ID do produto
+                const stockInput = row.querySelector(`.stock-input[data-id="${productId}"]`);
+                
+                if (stockInput) {
+                    const newStock = stockInput.value;
+                    updateStock(productId, newStock);
+                }
             }
         });
 
@@ -338,7 +404,7 @@
             }
         });
 
-        // 3. LÓGICA DE SALVAMENTO DE PRODUTO (ATUALIZADA para salvar ESTOQUE)
+        // 3. LÓGICA DE SALVAMENTO DE PRODUTO (mantida)
         formProduto.addEventListener('submit', async (e) => {
             e.preventDefault(); 
             
@@ -350,7 +416,7 @@
             const nome = document.getElementById('nome').value;
             const descricao = document.getElementById('descricao').value;
             const preco = document.getElementById('preco').value;
-            const estoque = document.getElementById('estoque').value; // NOVO: Captura o estoque
+            const estoque = document.getElementById('estoque').value; 
             const source = document.getElementById('source').value;
             
             const isNew = document.getElementById('isNew').checked;
@@ -400,7 +466,7 @@
                     name: nome,
                     description: descricao,
                     price: preco,
-                    estoque: parseInt(estoque), // NOVO: Salva o estoque como número
+                    estoque: parseInt(estoque), 
                     source: source,
                     isNew: isNew,
                     isFeatured: isFeatured,
@@ -430,7 +496,7 @@
         });
 
 
-        // 5. VERIFICAÇÃO DE ESTADO DE AUTENTICAÇÃO (Chama a listagem ao logar - mantida)
+        // 5. VERIFICAÇÃO DE ESTADO DE AUTENTICAÇÃO (mantida)
         auth.onAuthStateChanged((user) => {
             if (user) {
                 // Usuário LOGADO
