@@ -6,26 +6,21 @@
     <title>3 Marias Loja</title>
     
     <style>
-        /* Variáveis de Cor OTIMIZADAS PARA O VISUAL LABELLY */
         :root {
-            --primary-color: #b76e86; /* Rosa/Bordô Principal (para acentos) */
-            --accent-color: #DAA520; /* DOURADO FOSCO (Para toque chic) */
-            --text-color: #333; /* Texto Principal (Preto) */
-            --bg-color: #fcfcfc; /* Quase Branco */
-            --border-color: #e0e0e0; /* Cinza sutil */
-            --filter-area-bg: #f5f5f5; /* Fundo dos botões de filtro (cinza claro) */
+            --primary-color: #b76e86; 
+            --accent-color: #DAA520; 
+            --text-color: #333; 
+            --bg-color: #fcfcfc; 
+            --border-color: #e0e0e0; 
+            --filter-area-bg: #f5f5f5; 
         }
-
-        /* Estilos de Estrutura BASE */
         body { font-family: Arial, sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); }
-        
-        /* HEADER: Fundo Branco e Linha Dourada */
         header { 
             background-color: white; 
             color: var(--text-color); 
             text-align: center; 
             padding: 1.2rem 0; 
-            border-bottom: 2px solid var(--accent-color); /* Linha DOURADA sutil */
+            border-bottom: 2px solid var(--accent-color); 
             position: relative; 
         }
         header h1 { 
@@ -35,14 +30,11 @@
             letter-spacing: 2px; 
             font-weight: 300; 
         }
-        
         main { 
             max-width: 1200px; 
             margin: 30px auto; 
             padding: 0 15px; 
         }
-
-        /* Mensagem de Instrução */
         #filter-instruction {
             text-align: center;
             font-size: 1em; 
@@ -50,10 +42,8 @@
             color: var(--text-color);
             margin-bottom: 25px; 
             padding: 10px 0;
-            border-bottom: 1px solid var(--accent-color); /* Linha Dourada */
+            border-bottom: 1px solid var(--accent-color); 
         }
-
-        /* Seção de Filtros (Estilo como a barra "FILTRAR / ORDENAR") */
         #controls {
             display: flex;
             gap: 0; 
@@ -65,20 +55,16 @@
             background-color: var(--filter-area-bg); 
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
         }
-
-        /* Estilo dos Títulos de Seção */
         .section-title {
             color: var(--text-color); 
             font-size: 1.4em;
             padding-bottom: 10px;
-            border-bottom: 1px solid var(--accent-color); /* Linha DOURADA */
+            border-bottom: 1px solid var(--accent-color); 
             margin-bottom: 20px;
             text-align: left;
             font-weight: bold;
             letter-spacing: 1px;
         }
-
-        /* Botões de Filtro - Duas colunas CHICS */
         .filter-button {
             background-color: var(--filter-area-bg); 
             color: var(--text-color);
@@ -92,7 +78,6 @@
             transition: all 0.2s;
         }
         .filter-button:last-child { border-right: none; } 
-
         .filter-button.active {
             background-color: white; 
             color: var(--primary-color); 
@@ -107,15 +92,11 @@
         }
         .filter-button.active:first-child { border-left: 2px solid var(--primary-color); }
         .filter-button.active:last-child { border-right: 2px solid var(--primary-color); }
-
-        /* Produtos */
         #product-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Mobile: 2 Colunas */
+            grid-template-columns: 1fr 1fr; 
             gap: 25px; 
         }
-        
-        /* Estilos de Cartão */
         .product-card {
             background-color: white;
             border-radius: 6px;
@@ -124,41 +105,37 @@
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        
         .product-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
         }
-
-        /* NOVO: Contêiner de Imagem com Proporção (para imagens verticais) */
+        /* Contêiner de Imagem com Proporção (para imagens verticais) */
         .image-wrapper {
             position: relative;
             width: 100%;
-            padding-top: 133%; /* Proporção 3:4 (altura / largura * 100). Ajuste se suas imagens forem de outra proporção! */
+            padding-top: 133%; /* Proporção 3:4 */
             overflow: hidden;
-            background-color: #f0f0f0; /* Fundo cinza caso a imagem demore */
+            background-color: #f0f0f0; 
         }
-
         .image-wrapper img { 
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%; 
-            object-fit: contain; /* ESSENCIAL: Garante que a imagem inteira apareça, sem corte */
-            object-position: center top; /* Centraliza horizontalmente e alinha ao topo verticalmente */
-            background-color: white; /* Fundo branco dentro do wrapper */
+            object-fit: contain; 
+            object-position: center top; 
+            background-color: white; 
         }
-        
-        /* --- OTIMIZAÇÃO DESKTOP: 3 COLUNAS --- */
         @media (min-width: 992px) {
             #product-grid {
                 grid-template-columns: 1fr 1fr 1fr; 
                 gap: 30px; 
             }
+            .image-wrapper {
+                padding-top: 150%; /* Proporção 2:3 no Desktop (Mais Alta) */
+            }
         }
-        /* --- FIM DA OTIMIZAÇÃO DESKTOP --- */
-        
         .product-info { 
             padding: 1rem; 
             text-align: center; 
@@ -173,8 +150,6 @@
             color: var(--primary-color); 
             font-weight: bold; 
         }
-        
-        /* Botão "Ver Detalhes" */
         .buy-button { 
             background-color: white;
             color: var(--primary-color); 
@@ -188,13 +163,10 @@
             margin-top: 15px;
             transition: background-color 0.3s ease, color 0.3s;
         }
-        
         .buy-button:hover { 
             background-color: var(--primary-color); 
             color: white;
         }
-        
-        /* Estilo para atalho Admin */
         #admin-trigger { cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
@@ -206,21 +178,14 @@
     </header>
 
     <main>
-        
         <p id="filter-instruction">Clique em um dos filtros</p>
-
         <div id="controls">
             <button class="filter-button active" data-filter="pronta-entrega">FILTRAR: PRONTA ENTREGA</button>
             <button class="filter-button" data-filter="sob-encomenda">FILTRAR: SOB ENCOMENDA</button>
         </div>
-
         <h2 class="section-title">Nossa Coleção</h2>
-        
-        <div id="product-grid">
-            </div>
-        
+        <div id="product-grid"></div>
         <p id="loading-status" style="text-align: center; margin-top: 40px; font-weight: bold;">Carregando produtos...</p>
-        
     </main>
     <footer>
         <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
@@ -240,11 +205,7 @@
             appId: "1:405330133487:web:606de41211df52245f761a",
             measurementId: "G-TK877V6P0S"
         };
-        
-        // 🚨 NÚMERO FINAL DA HARUMI 
         const WHATSAPP_NUMBER = "818074558624"; 
-
-        // 2. Inicialização
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const COLECAO_PRODUTOS = "products";
@@ -254,24 +215,12 @@
         // --- CÓDIGO DO ATALHO ADMIN ---
         const ADMIN_URL = "admin.html";
         const ADMIN_TRIGGER = document.getElementById('admin-trigger');
-        let clickCount = 0;
-        let lastClickTime = 0;
-        
+        let clickCount = 0; let lastClickTime = 0;
         ADMIN_TRIGGER.addEventListener('click', () => {
             const currentTime = new Date().getTime();
-            
-            if (currentTime - lastClickTime > 500) { 
-                clickCount = 1;
-            } else {
-                clickCount++;
-            }
-
+            if (currentTime - lastClickTime > 500) { clickCount = 1; } else { clickCount++; }
             lastClickTime = currentTime;
-
-            if (clickCount === 3) {
-                window.location.href = ADMIN_URL;
-                clickCount = 0; 
-            }
+            if (clickCount === 3) { window.location.href = ADMIN_URL; clickCount = 0; }
         });
         // --- FIM DO CÓDIGO DO ATALHO ADMIN ---
 
@@ -279,7 +228,6 @@
         const productGrid = document.getElementById('product-grid');
         const filterButtons = document.querySelectorAll('.filter-button');
         const loadingStatus = document.getElementById('loading-status');
-        
         let currentFilter = 'pronta-entrega'; 
 
         async function fetchProducts() {
@@ -287,46 +235,30 @@
             loadingStatus.textContent = 'Carregando produtos...';
             loadingStatus.style.color = '#777';
             loadingStatus.style.display = 'block';
-
             try {
                 const snapshot = await db.collection(COLECAO_PRODUTOS)
                     .where('source', '==', currentFilter) 
                     .orderBy('createdAt', 'desc') 
                     .get();
-                
                 loadingStatus.style.display = 'none';
-
-                // Lógica de filtragem de estoque
                 let availableProducts = [];
-                
                 snapshot.forEach(doc => {
                     const product = doc.data();
                     const estoque = parseInt(product.estoque || 0);
-
                     if (estoque > 0 || product.source === 'sob-encomenda') {
                         availableProducts.push({ data: product, id: doc.id, estoque: estoque });
                     }
                 });
-
                 if (availableProducts.length === 0) {
                     productGrid.innerHTML = `<p style="text-align: center; margin-top: 40px;">Nenhum produto em ${currentFilter === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda'} disponível no momento.</p>`;
                     return;
                 }
-
                 availableProducts.forEach(item => {
                     const product = item.data;
-                    const precoFormatado = parseFloat(product.price || 0).toLocaleString('ja-JP', { 
-                        style: 'currency', 
-                        currency: 'JPY',
-                        maximumFractionDigits: 0
-                    });
-                    
-                    const detailLink = `detalhes.html?id=${item.id}`;
-                    
+                    const precoFormatado = parseFloat(product.price || 0).toLocaleString('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 });
+                    const detailLink = `detalhes.html?id=${item.id}`; // GARANTE O ID CORRETO
                     const card = document.createElement('div');
                     card.className = 'product-card';
-                    
-                    // Ajuste no HTML para usar o novo .image-wrapper
                     card.innerHTML = `
                         <a href="${detailLink}">
                             <div class="image-wrapper">
@@ -341,16 +273,12 @@
                     `;
                     productGrid.appendChild(card);
                 });
-
             } catch (error) {
                 console.error('Erro ao buscar produtos no Firestore:', error);
                 loadingStatus.textContent = 'Erro de carregamento. Recarregue a página.';
                 loadingStatus.style.color = 'red';
-                loadingStatus.style.display = 'block';
             }
         }
-
-        // Lógica dos botões de filtro
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 filterButtons.forEach(btn => btn.classList.remove('active'));
@@ -359,8 +287,6 @@
                 fetchProducts(); 
             });
         });
-
-        // Carrega os produtos na primeira vez
         fetchProducts();
     </script>
 </body>
