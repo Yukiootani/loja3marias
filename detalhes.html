@@ -6,7 +6,6 @@
     <title>Detalhes do Produto | 3 Marias</title>
     
     <style>
-        /* [Todo o seu CSS 'Labelly' (idêntico ao anterior) está aqui...] */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
@@ -168,9 +167,7 @@
     <main>
         <div id="loading">Carregando detalhes do produto...</div>
         <div id="error" style="display: none;"></div>
-
-        <div id="product-details" style="display: none;">
-            </div>
+        <div id="product-details" style="display: none;"></div>
     </main>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -194,21 +191,18 @@
         const detailsContainer = document.getElementById('product-details');
         const loadingDiv = document.getElementById('loading');
         const errorDiv = document.getElementById('error');
-        
         const WHATSAPP_NUMBER = "818074558624"; 
 
-        // 4. LÓGICA DE CARREGAMENTO (Limpas, sem Debug)
+        // LÓGICA DE CARREGAMENTO (Limpas, sem Debug)
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
-
             if (!productId) {
                 loadingDiv.style.display = 'none';
                 errorDiv.style.display = 'block';
                 errorDiv.innerHTML = "Erro: ID do produto não encontrado na URL. <a href='index.html'>Voltar para a loja.</a>";
                 return;
             }
-
             fetchProductDetails(productId);
         });
 
@@ -223,9 +217,6 @@
                     errorDiv.innerHTML = "Erro: Produto não encontrado no banco de dados. <a href='index.html'>Voltar para a loja.</a>";
                     return;
                 }
-                
-                // [O restante do seu código (Lógica de Mídia, Lógica do WhatsApp, etc.)]
-                // ... (todo o código da função fetchProductDetails que já funcionava) ...
                 
                 // (Início da lógica copiada)
                 const product = doc.data();
@@ -265,4 +256,33 @@
                     const isActive = index === 0; const isVideoThumb = media.type === 'video'; const thumbClasses = isVideoThumb ? 'video-thumb' : '';
                     galleryHTML += `<div class="thumb-container ${isActive ? 'active' : ''} ${thumbClasses}" data-type="${media.type}" data-full-src="${media.url}"><img src="${media.thumb}" alt="Mídia ${index + 1}">${isVideoThumb ? '<div class="video-overlay"></div>' : ''}</div>`;
                     if (isActive) {
-                        if (media.type === 'video') { mainMediaHTML = `<video src="${media.url}" controls loop style="width: 100%; height: 100%; object-fit: contain; background-color: white;
+                        if (media.type === 'video') { mainMediaHTML = `<video src="${media.url}" controls loop style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">Seu navegador não suporta o formato de vídeo.</video>`; }
+                        else { mainMediaHTML = `<img id="main-image" src="${media.url}" alt="${name}" style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">`; }
+                    }
+                });
+                detailsContainer.innerHTML = `<div class="media-area"><div id="main-media-display">${mainMediaHTML}</div><div id="thumbnails">${galleryHTML}</div></div><div class="info-area"><span class="status-badge ${statusClass}">${statusText}</span><h1>${name}</h1><p class="price">${precoFormatado}</p>${lowStockWarning}<h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3><p style="color:var(--light-text); font-weight:400;">${description}</p><a href="${whatsappLink}" target="_blank" class="${buttonClass}">${buttonText}</a></div>`;
+                const mainMediaDisplay = document.getElementById('main-media-display');
+                const thumbContainers = document.querySelectorAll('.thumb-container');
+                thumbContainers.forEach(container => {
+                    container.addEventListener('click', () => {
+                        const newSrc = container.dataset.fullSrc; const mediaType = container.dataset.type; mainMediaDisplay.innerHTML = ''; 
+                        if (mediaType === 'video') { mainMediaDisplay.innerHTML = `<video src="${newSrc}" controls loop style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">Seu navegador não suporta o formato de vídeo.</video>`; }
+                        else { mainMediaDisplay.innerHTML = `<img src="${newSrc}" alt="${name}" style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">`; }
+                        thumbContainers.forEach(t => t.classList.remove('active')); container.classList.add('active');
+                    });
+                });
+                // (Fim da lógica copiada)
+                
+                loadingDiv.style.display = 'none';
+                detailsContainer.style.display = 'flex';
+
+            } catch (error) {
+                // Se falhar, mostrará o erro
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = `Erro ao carregar os detalhes: ${error.message}. Verifique as Regras do Firestore ou o Console (F12). <a href='index.html'>Voltar.</a>`;
+            }
+        }
+    </script>
+</body>
+</html>
