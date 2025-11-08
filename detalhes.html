@@ -8,14 +8,14 @@
     <style>
         /* Variáveis de Cor OTIMIZADAS PARA O VISUAL LABELLY */
         :root {
-            --primary-color: #b76e86; /* Rosa/Bordô Principal (para acentos) */
-            --accent-color: #DAA520; /* DOURADO FOSCO (Para toque chic) */
-            --whatsapp-green: #28a745; /* Verde do WhatsApp Suave */
-            --text-color: #333; /* Texto Principal (Preto) */
-            --light-text: #666; /* Texto Secundário (Cinza Médio) */
-            --bg-color: #fcfcfc; /* Fundo Branco Limpo */
-            --border-color: #e0e0e0; /* Cinza sutil */
-            --error-color: #dc3545; /* Cor de erro/esgotado */
+            --primary-color: #b76e86; 
+            --accent-color: #DAA520; 
+            --whatsapp-green: #28a745; 
+            --text-color: #333; 
+            --light-text: #666; 
+            --bg-color: #fcfcfc; 
+            --border-color: #e0e0e0; 
+            --error-color: #dc3545;
         }
 
         body {
@@ -64,27 +64,28 @@
             min-width: 300px;
         }
 
+        /* NOVO: Contêiner de Proporção para a Mídia Principal */
         #main-media-display {
+            position: relative;
             width: 100%;
-            height: 400px;
-            display: flex; 
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            padding-top: 133%; /* Ajustado para a proporção vertical 3:4 */
             margin-bottom: 15px;
             border-radius: 0; 
             background-color: var(--bg-color);
             border: 1px solid var(--border-color);
+            overflow: hidden;
         }
         
         #main-media-display img, #main-media-display video {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain; /* ESSENCIAL: Garante que a imagem inteira apareça, sem corte */
+            background-color: white; /* Fundo branco dentro do display */
         }
-        #main-media-display video {
-             object-fit: contain; /* Garante que o vídeo não seja cortado */
-        }
+        /* Fim do Novo Contêiner */
 
         #thumbnails {
             display: flex;
@@ -112,7 +113,7 @@
             border-radius: 2px;
         }
         
-        /* ÍCONE DE VÍDEO (Overlay) - Ajustado para visual mais sutil */
+        /* ÍCONE DE VÍDEO (Overlay) */
         .video-overlay::before {
             content: '▶';
             padding: 5px;
@@ -154,13 +155,6 @@
         }
 
         /* NOVO: STATUS DE ESTOQUE/AVISO */
-        #stock-status {
-            font-weight: bold;
-            margin-bottom: 10px;
-            padding: 5px 0;
-        }
-        .in-stock { color: var(--whatsapp-green); }
-        .out-of-stock { color: var(--error-color); }
         .low-stock-warning { color: var(--error-color); font-size: 0.9em; font-weight: normal; margin-top: 5px; }
 
 
@@ -236,233 +230,3 @@
     </main>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
-    <script>
-        // 2. CONFIGURAÇÃO (Suas Chaves Reais)
-        const firebaseConfig = {
-            apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
-            authDomain: "loja3marias-50204.firebaseapp.com",
-            projectId: "loja3marias-50204",
-            storageBucket: "loja3marias-50204.firebasestorage.app",
-            messagingSenderId: "405330133487",
-            appId: "1:405330133487:web:606de41211df52245f761a",
-            measurementId: "G-TK877V6P0S"
-        };
-
-        // 3. Inicializar o Firebase e o Firestore
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(); 
-
-        const detailsContainer = document.getElementById('product-details');
-        const loadingDiv = document.getElementById('loading');
-        const errorDiv = document.getElementById('error');
-        
-        // 🚨 NÚMERO FINAL DA HARUMI (Formato internacional sem o '+')
-        const WHATSAPP_NUMBER = "818074558624"; 
-
-
-        // 4. LÓGICA DE CARREGAMENTO
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
-
-            if (!productId) {
-                loadingDiv.style.display = 'none';
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = "Erro: ID do produto não encontrado na URL. <a href='index.html'>Voltar para a loja.</a>";
-                return;
-            }
-
-            fetchProductDetails(productId);
-        });
-
-        async function fetchProductDetails(id) {
-            try {
-                const doc = await db.collection("products").doc(id).get(); 
-
-                if (!doc.exists) {
-                    loadingDiv.style.display = 'none';
-                    errorDiv.style.display = 'block';
-                    errorDiv.innerHTML = "Erro: Produto não encontrado no banco de dados. <a href='index.html'>Voltar para a loja.</a>";
-                    return;
-                }
-
-                const product = doc.data();
-                const estoque = parseInt(product.estoque || 0);
-                
-                // 5. PROCESSAMENTO DE DADOS E MÍDIA
-                const name = product.name || 'Produto Sem Nome';
-                const description = product.description || 'Descrição não disponível.';
-                const price = product.price || '0';
-                const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=IMAGEM+PRINCIPAL';
-                const videoUrl = product.videoUrl; 
-                const source = product.source || 'pronta-entrega'; 
-
-                // CORREÇÃO APLICADA AQUI: O campo no Firebase é 'galeria'
-                let galleryUrls = product.galeria || []; 
-                
-                let allMediaUrls = [];
-
-                // Adiciona o vídeo (se existir)
-                if (videoUrl) {
-                    allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl });
-                }
-                
-                // Adiciona a foto principal
-                if (!allMediaUrls.some(m => m.url === imageUrl)) {
-                     allMediaUrls.push({ type: 'image', url: imageUrl, thumb: imageUrl });
-                }
-
-                // Adiciona as fotos da galeria
-                galleryUrls.forEach(url => {
-                    allMediaUrls.push({ type: 'image', url: url, thumb: url });
-                });
-
-                // Remove duplicatas e garante que a foto principal é a primeira
-                allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i);
-                
-                // --- FIM DA LÓGICA DE MÍDIA ---
-
-
-                // 6. FORMATAÇÃO DO PREÇO e LÓGICA DO WHATSAPP
-                const priceValue = parseFloat(price.toString().replace(',', '.')); 
-                const precoFormatado = priceValue.toLocaleString('ja-JP', { 
-                    style: 'currency', 
-                    currency: 'JPY',
-                    maximumFractionDigits: 0
-                });
-                
-                let statusText;
-                let whatsappMessage;
-                let statusClass;
-                let buttonText = 'Comprar / Encomendar via WhatsApp';
-                let buttonClass = 'buy-button';
-                let lowStockWarning = '';
-
-
-                if (source === 'pronta-entrega') {
-                    if (estoque === 0) {
-                        statusText = '❌ ESGOTADO! Volte em breve.';
-                        statusClass = 'out-of-stock';
-                        buttonText = 'ESGOTADO';
-                        buttonClass = 'buy-button sold-out-btn';
-                        whatsappMessage = `Olá, Harumi! Infelizmente o produto ${name} (${precoFormatado}) está esgotado no momento. Poderia me avisar quando estiver disponível?`;
-                    } else {
-                        statusText = `✅ Em Estoque! (${estoque} unidades)`;
-                        statusClass = 'in-stock';
-                        whatsappMessage = `Olá, Harumi! Gostaria de comprar o produto ${name} (${precoFormatado}) que está na Pronta Entrega. Qual o procedimento para pagamento e envio/retirada?`;
-                    }
-                } else {
-                    // LÓGICA PARA SOB ENCOMENDA
-                    statusText = `📦 Sob Encomenda (${estoque} unidades em estoque de fornecedor)`;
-                    statusClass = 'status-sob-encomenda';
-                    whatsappMessage = `Olá! Gostaria de encomendar o produto ${name} (${precoFormatado}) do Catálogo Completo. Entendi que o prazo é de 3-5 dias. Quais são as opções de recebimento?`;
-                    
-                    lowStockWarning = `<p class="low-stock-warning">Prazo de entrega: 3-5 dias após o pedido.</p>`;
-
-                    if (estoque === 0) {
-                        lowStockWarning += `<p class="low-stock-warning" style="color:var(--error-color);">Atenção: Estoque do fornecedor zerado. O prazo pode ser estendido!</p>`;
-                    }
-                }
-                
-                const whatsappLink = (buttonClass.includes('sold-out-btn')) ? '#' : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
-                
-                // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL e MINIATURAS
-                let mainMediaHTML = '';
-                let galleryHTML = '';
-                
-                allMediaUrls.forEach((media, index) => {
-                    const isActive = index === 0;
-                    
-                    const isVideoThumb = media.type === 'video';
-                    const thumbClasses = isVideoThumb ? 'video-thumb' : '';
-                    
-                    // Adicionando um ícone de vídeo nas miniaturas de vídeo
-                    galleryHTML += `
-                        <div class="thumb-container ${isActive ? 'active' : ''} ${thumbClasses}" 
-                             data-type="${media.type}"
-                             data-full-src="${media.url}">
-                            <img src="${media.thumb}" alt="Mídia ${index + 1}">
-                            ${isVideoThumb ? '<div class="video-overlay"></div>' : ''}
-                        </div>
-                    `;
-
-                    if (isActive) {
-                        if (media.type === 'video') {
-                             mainMediaHTML = `
-                                <video src="${media.url}" controls loop style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
-                                    Seu navegador não suporta o formato de vídeo.
-                                </video>
-                            `;
-                        } else {
-                            mainMediaHTML = `<img id="main-image" src="${media.url}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">`;
-                        }
-                    }
-                });
-                
-                // 8. MONTAGEM DO HTML COMPLETO
-                detailsContainer.innerHTML = `
-                    <div class="media-area">
-                        <div id="main-media-display">
-                            ${mainMediaHTML}
-                        </div>
-                        <div id="thumbnails">
-                            ${galleryHTML}
-                        </div>
-                    </div>
-                    <div class="info-area">
-                        <span class="status-badge ${statusClass}">${statusText}</span>
-                        <h1>${name}</h1>
-                        <p class="price">${precoFormatado}</p>
-                        ${lowStockWarning} 
-                        <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3>
-                        <p style="color:var(--light-text); font-weight:400;">${description}</p>
-                        <a href="${whatsappLink}" target="_blank" class="${buttonClass}">${buttonText}</a>
-                    </div>
-                `;
-
-                // 9. FUNCIONALIDADE DA GALERIA (Mantida)
-                const mainMediaDisplay = document.getElementById('main-media-display');
-                const thumbContainers = document.querySelectorAll('.thumb-container');
-                
-                thumbContainers.forEach(container => {
-                    container.addEventListener('click', () => {
-                        const newSrc = container.dataset.fullSrc;
-                        const mediaType = container.dataset.type;
-
-                        mainMediaDisplay.innerHTML = ''; 
-                        
-                        if (mediaType === 'video') {
-                            // CORREÇÃO DE LÓGICA: Usei mainMediaHTML antes, agora uso a variável certa
-                            mainMediaDisplay.innerHTML = `
-                                <video src="${newSrc}" controls loop style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
-                                    Seu navegador não suporta o formato de vídeo.
-                                </video>
-                            `;
-                        } else {
-                             // CORREÇÃO DE LÓGICA: Uso a variável certa
-                            mainMediaDisplay.innerHTML = `
-                                <img src="${newSrc}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
-                            `;
-                        }
-                        
-                        thumbContainers.forEach(t => t.classList.remove('active'));
-                        container.classList.add('active');
-                    });
-                });
-
-                loadingDiv.style.display = 'none';
-                detailsContainer.style.display = 'flex';
-
-
-            } catch (error) {
-                console.error('Erro ao buscar produto:', error);
-                loadingDiv.style.display = 'none';
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = `Erro ao carregar os detalhes: ${error.message}. Verifique as regras do Firestore. <a href='index.html'>Voltar.</a>`;
-            }
-        }
-    </script>
-</body>
-</html>
