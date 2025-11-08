@@ -130,20 +130,31 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
         }
 
-        .product-card img { 
+        /* NOVO: Contêiner de Imagem com Proporção (para imagens verticais) */
+        .image-wrapper {
+            position: relative;
             width: 100%;
-            height: 250px; /* ALTURA MOBILE (250px) */
-            object-fit: cover; 
+            padding-top: 133%; /* Proporção 3:4 (altura / largura * 100). Ajuste se suas imagens forem de outra proporção! */
+            overflow: hidden;
+            background-color: #f0f0f0; /* Fundo cinza caso a imagem demore */
+        }
+
+        .image-wrapper img { 
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%; 
+            object-fit: contain; /* ESSENCIAL: Garante que a imagem inteira apareça, sem corte */
+            object-position: center top; /* Centraliza horizontalmente e alinha ao topo verticalmente */
+            background-color: white; /* Fundo branco dentro do wrapper */
         }
         
-        /* --- OTIMIZAÇÃO DESKTOP: 3 COLUNAS E ALTURA MAIOR --- */
+        /* --- OTIMIZAÇÃO DESKTOP: 3 COLUNAS --- */
         @media (min-width: 992px) {
             #product-grid {
                 grid-template-columns: 1fr 1fr 1fr; 
                 gap: 30px; 
-            }
-            .product-card img {
-                height: 350px; /* AUMENTA A ALTURA PARA CABER A IMAGEM VERTICAL */
             }
         }
         /* --- FIM DA OTIMIZAÇÃO DESKTOP --- */
@@ -315,8 +326,13 @@
                     const card = document.createElement('div');
                     card.className = 'product-card';
                     
+                    // Ajuste no HTML para usar o novo .image-wrapper
                     card.innerHTML = `
-                        <a href="${detailLink}"><img src="${product.imageUrl}" alt="${product.name}"></a>
+                        <a href="${detailLink}">
+                            <div class="image-wrapper">
+                                <img src="${product.imageUrl}" alt="${product.name}">
+                            </div>
+                        </a>
                         <div class="product-info">
                             <h3>${product.name}</h3>
                             <p class="price">${precoFormatado}</p>
