@@ -58,11 +58,11 @@
             display: flex;
             gap: 0; 
             padding: 0;
-            border: 1px solid var(--border-color); /* Borda fina */
+            border: 1px solid var(--border-color); 
             border-radius: 4px;
             overflow: hidden;
             margin-bottom: 35px; 
-            background-color: var(--filter-area-bg); /* Fundo Cinza Claro */
+            background-color: var(--filter-area-bg); 
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
         }
 
@@ -108,14 +108,24 @@
         .filter-button.active:first-child { border-left: 2px solid var(--primary-color); }
         .filter-button.active:last-child { border-right: 2px solid var(--primary-color); }
 
-        /* Produtos */
+        /* Produtos - MOBILE (2 COLUNAS) */
         #product-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr; /* Padrão Mobile: 2 Colunas */
             gap: 25px; 
         }
+
+        /* --- OTIMIZAÇÃO DESKTOP: 3 COLUNAS --- */
+        @media (min-width: 992px) {
+            #product-grid {
+                /* Em telas maiores, cria 3 colunas, tornando a grade mais densa */
+                grid-template-columns: 1fr 1fr 1fr; 
+                gap: 30px; /* Mais espaçamento entre produtos grandes */
+            }
+        }
+        /* --- FIM DA OTIMIZAÇÃO DESKTOP --- */
         
-        /* Estilos de Cartão - Elegantemente Flutuante */
+        /* Estilos de Cartão */
         .product-card {
             background-color: white;
             border-radius: 6px;
@@ -151,7 +161,7 @@
             font-weight: bold; 
         }
         
-        /* Botão "Ver Detalhes" - Minimalista */
+        /* Botão "Ver Detalhes" */
         .buy-button { 
             background-color: white;
             color: var(--primary-color); 
