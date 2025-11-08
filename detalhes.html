@@ -6,7 +6,7 @@
     <title>Detalhes do Produto | 3 Marias</title>
     
     <style>
-        /* Variáveis de Cor OTIMIZADAS PARA O VISUAL LABELLY */
+        /* [Todo o seu CSS 'Labelly' (idêntico ao anterior) está aqui...] */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
@@ -17,15 +17,12 @@
             --border-color: #e0e0e0; 
             --error-color: #dc3545;
         }
-
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
         }
-
-        /* HEADER: Visual Limpo */
         header {
             background-color: white; 
             color: var(--text-color); 
@@ -39,14 +36,11 @@
             font-size: 1em;
             font-weight: 500;
         }
-
         main {
             max-width: 1000px;
             margin: 30px auto;
             padding: 0 15px;
         }
-
-        /* Container de Detalhes - Clean */
         #product-details {
             display: flex;
             flex-wrap: wrap;
@@ -57,42 +51,35 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--border-color);
         }
-        
-        /* 1. Área das Imagens/Vídeo */
         .media-area {
             flex: 1 1 45%; 
             min-width: 300px;
         }
-
-        /* Contêiner de Proporção para a Mídia Principal */
         #main-media-display {
             position: relative;
             width: 100%;
-            padding-top: 150%; /* Proporção vertical 2:3 */
+            padding-top: 150%; 
             margin-bottom: 15px;
             border-radius: 0; 
             background-color: var(--bg-color);
             border: 1px solid var(--border-color);
             overflow: hidden;
         }
-        
         #main-media-display img, #main-media-display video {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Garante que a imagem inteira apareça, sem corte */
+            object-fit: contain; 
             background-color: white; 
         }
-
         #thumbnails {
             display: flex;
             gap: 10px;
             overflow-x: auto;
             padding-bottom: 10px; 
         }
-
         .thumb-container {
             position: relative;
             width: 80px;
@@ -102,17 +89,13 @@
             border: 1px solid var(--border-color);
             transition: border 0.3s;
         }
-        .thumb-container.active {
-            border: 2px solid var(--primary-color);
-        }
+        .thumb-container.active { border: 2px solid var(--primary-color); }
         .thumb-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             border-radius: 2px;
         }
-        
-        /* ÍCONE DE VÍDEO (Overlay) */
         .video-overlay::before {
             content: '▶';
             padding: 5px;
@@ -126,38 +109,14 @@
             transform: translate(-50%, -50%);
             z-index: 10;
         }
-
-
-        /* 2. Área das Informações */
         .info-area {
             flex: 1 1 45%;
             padding-top: 10px;
         }
-
-        .info-area h1 {
-            color: var(--text-color); 
-            margin-top: 0;
-            font-size: 2em;
-            font-weight: 600;
-        }
-
-        .info-area .price {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: var(--primary-color); 
-            margin: 15px 0;
-        }
-
-        .info-area p {
-            line-height: 1.6;
-            color: var(--light-text);
-        }
-
-        /* STATUS DE ESTOQUE/AVISO */
+        .info-area h1 { color: var(--text-color); margin-top: 0; font-size: 2em; font-weight: 600; }
+        .info-area .price { font-size: 1.8em; font-weight: bold; color: var(--primary-color); margin: 15px 0; }
+        .info-area p { line-height: 1.6; color: var(--light-text); }
         .low-stock-warning { color: var(--error-color); font-size: 0.9em; font-weight: normal; margin-top: 5px; }
-
-
-        /* Selo de Status - Cores Suaves e Minimalistas */
         .status-badge {
             font-size: 0.9em;
             padding: 8px 15px;
@@ -167,18 +126,10 @@
             margin-bottom: 20px;
             border: 1px solid transparent;
         }
-        .status-pronta-entrega { 
-            background-color: #e6f9e6; 
-            color: var(--whatsapp-green); 
-            border-color: #d0edd4;
-        }
-        .status-sob-encomenda { 
-            background-color: #f7f7e6; 
-            color: #856404; 
-            border-color: #eaeaa0;
-        }
-
-        /* Botão de Compra */
+        .status-pronta-entrega { background-color: #e6f9e6; color: var(--whatsapp-green); border-color: #d0edd4; }
+        .status-sob-encomenda { background-color: #f7f7e6; color: #856404; border-color: #eaeaa0; }
+        .in-stock { color: var(--whatsapp-green); }
+        .out-of-stock { color: var(--error-color); }
         .buy-button {
             display: block;
             background-color: var(--whatsapp-green); 
@@ -193,18 +144,13 @@
             transition: background-color 0.3s;
             box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); 
         }
-        .buy-button:hover {
-            background-color: #1e7e34; 
-        }
+        .buy-button:hover { background-color: #1e7e34; }
         .sold-out-btn {
             background-color: var(--error-color); 
             color: white;
             cursor: default;
             pointer-events: none;
         }
-
-
-        /* Mensagens de Status */
         #loading, #error {
             text-align: center;
             padding: 50px;
@@ -242,7 +188,6 @@
             measurementId: "G-TK877V6P0S"
         };
 
-        // 3. Inicializar o Firebase e o Firestore
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(); 
 
@@ -252,111 +197,8 @@
         
         const WHATSAPP_NUMBER = "818074558624"; 
 
-
-        // 4. LÓGICA DE CARREGAMENTO
+        // 4. LÓGICA DE CARREGAMENTO (COM MENSAGENS DE DEBUG)
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DEBUG: Página de Detalhes carregada.'); // MENSAGEM 1
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
-
-            if (!productId) {
-                loadingDiv.style.display = 'none';
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = "Erro: ID do produto não encontrado na URL. <a href='index.html'>Voltar para a loja.</a>";
-                return;
-            }
-
-            fetchProductDetails(productId);
-        });
-
-        async function fetchProductDetails(id) {
-            try {
-                const doc = await db.collection("products").doc(id).get(); 
-
-                if (!doc.exists) {
-                    loadingDiv.style.display = 'none';
-                    errorDiv.style.display = 'block';
-                    errorDiv.innerHTML = "Erro: Produto não encontrado no banco de dados. <a href='index.html'>Voltar para a loja.</a>";
-                    return;
-                }
-
-                const product = doc.data();
-                const estoque = parseInt(product.estoque || 0);
-                
-                // 5. PROCESSAMENTO DE DADOS E MÍDIA
-                const name = product.name || 'Produto Sem Nome';
-                const description = product.description || 'Descrição não disponível.';
-                const price = product.price || '0';
-                const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=IMAGEM+PRINCIPAL';
-                const videoUrl = product.videoUrl; 
-                const source = product.source || 'pronta-entrega'; 
-
-                let galleryUrls = product.galeria || [];
-                
-                let allMediaUrls = [];
-
-                if (videoUrl) {
-                    allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl });
-                }
-                if (imageUrl) {
-                     allMediaUrls.push({ type: 'image', url: imageUrl, thumb: imageUrl });
-                }
-                galleryUrls.forEach(url => {
-                    allMediaUrls.push({ type: 'image', url: url, thumb: url });
-                });
-                allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i);
-                
-
-                // 6. LÓGICA DO WHATSAPP
-                const priceValue = parseFloat(price.toString().replace(',', '.')); 
-                const precoFormatado = priceValue.toLocaleString('ja-JP', { 
-                    style: 'currency', 
-                    currency: 'JPY',
-                    maximumFractionDigits: 0
-                });
-                
-                let statusText;
-                let whatsappMessage;
-                let statusClass;
-                let buttonText = 'Comprar / Encomendar via WhatsApp';
-                let buttonClass = 'buy-button';
-                let lowStockWarning = '';
-
-
-                if (source === 'pronta-entrega') {
-                    if (estoque === 0) {
-                        statusText = '❌ ESGOTADO! Volte em breve.';
-                        statusClass = 'out-of-stock';
-                        buttonText = 'ESGOTADO';
-                        buttonClass = 'buy-button sold-out-btn';
-                        whatsappMessage = `Olá, Harumi! Infelizmente o produto ${name} (${precoFormatado}) está esgotado no momento. Poderia me avisar quando estiver disponível?`;
-                    } else {
-                        statusText = `✅ Em Estoque! (${estoque} unidades)`;
-                        statusClass = 'in-stock';
-                        whatsappMessage = `Olá, Harumi! Gostaria de comprar o produto ${name} (${precoFormatado}) que está na Pronta Entrega. Qual o procedimento para pagamento e envio/retirada?`;
-                    }
-                } else {
-                    statusText = `📦 Sob Encomenda (${estoque} unidades em estoque de fornecedor)`;
-                    statusClass = 'status-sob-encomenda';
-                    whatsappMessage = `Olá! Gostaria de encomendar o produto ${name} (${precoFormatado}) do Catálogo Completo. Entendi que o prazo é de 3-5 dias. Quais são as opções de recebimento?`;
-                    lowStockWarning = `<p class="low-stock-warning">Prazo de entrega: 3-5 dias após o pedido.</p>`;
-                    if (estoque === 0) {
-                        lowStockWarning += `<p class="low-stock-warning" style="color:var(--error-color);">Atenção: Estoque do fornecedor zerado. O prazo pode ser estendido!</p>`;
-                    }
-                }
-                
-                const whatsappLink = (buttonClass.includes('sold-out-btn')) ? '#' : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
-                
-                // 7. MONTAGEM DO HTML DA MÍDIA PRINCIPAL e MINIATURAS
-                let mainMediaHTML = '';
-                let galleryHTML = '';
-                
-                allMediaUrls.forEach((media, index) => {
-                    const isActive = index === 0;
-                    
-                    const isVideoThumb = media.type === 'video';
-                    const thumbClasses = isVideoThumb ? 'video-thumb' : '';
-                    
-                    galleryHTML += `
-                        <div class="thumb-container ${isActive ? 'active' : ''} ${thumbClasses}" 
-                             data-type="${media.type}"
-                             data-full-src="${media.url}">
