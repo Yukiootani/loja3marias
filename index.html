@@ -108,22 +108,12 @@
         .filter-button.active:first-child { border-left: 2px solid var(--primary-color); }
         .filter-button.active:last-child { border-right: 2px solid var(--primary-color); }
 
-        /* Produtos - MOBILE (2 COLUNAS) */
+        /* Produtos */
         #product-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Padrão Mobile: 2 Colunas */
+            grid-template-columns: 1fr 1fr; /* Mobile: 2 Colunas */
             gap: 25px; 
         }
-
-        /* --- OTIMIZAÇÃO DESKTOP: 3 COLUNAS --- */
-        @media (min-width: 992px) {
-            #product-grid {
-                /* Em telas maiores, cria 3 colunas, tornando a grade mais densa */
-                grid-template-columns: 1fr 1fr 1fr; 
-                gap: 30px; /* Mais espaçamento entre produtos grandes */
-            }
-        }
-        /* --- FIM DA OTIMIZAÇÃO DESKTOP --- */
         
         /* Estilos de Cartão */
         .product-card {
@@ -142,9 +132,21 @@
 
         .product-card img { 
             width: 100%;
-            height: 250px; 
+            height: 250px; /* ALTURA MOBILE (250px) */
             object-fit: cover; 
         }
+        
+        /* --- OTIMIZAÇÃO DESKTOP: 3 COLUNAS E ALTURA MAIOR --- */
+        @media (min-width: 992px) {
+            #product-grid {
+                grid-template-columns: 1fr 1fr 1fr; 
+                gap: 30px; 
+            }
+            .product-card img {
+                height: 350px; /* AUMENTA A ALTURA PARA CABER A IMAGEM VERTICAL */
+            }
+        }
+        /* --- FIM DA OTIMIZAÇÃO DESKTOP --- */
         
         .product-info { 
             padding: 1rem; 
