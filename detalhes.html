@@ -158,7 +158,7 @@
             color: var(--light-text);
         }
         
-        /* --- NOVO CSS PARA VARIANTES (Victoria's Secret Style) --- */
+        /* --- CSS DAS VARIANTES (Victoria's Secret Style) --- */
         .variant-group {
             margin-top: 20px;
         }
@@ -181,6 +181,12 @@
             cursor: pointer;
             transition: transform 0.2s, border-color 0.2s;
             box-sizing: border-box; /* Garante que a borda não aumente o tamanho */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em; /* Para nomes de cor complexos */
+            text-align: center;
+            overflow: hidden;
         }
         .color-swatch:hover {
             transform: scale(1.1);
@@ -255,7 +261,7 @@
         const errorDiv = document.getElementById('error');
         const WHATSAPP_NUMBER = "818074558624"; 
 
-        // --- NOVO: Variáveis globais para guardar estado ---
+        // --- Variáveis globais para guardar estado ---
         let parsedVariants = {}; // Guarda { Cor: [Tamanhos] }
         let selectedColor = null;
         let selectedSize = null;
@@ -296,7 +302,7 @@
                 const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=IMAGEM+PRINCIPAL';
                 const videoUrl = product.videoUrl; 
                 const source = product.source || 'pronta-entrega'; 
-                const variantesString = product.variantes || ''; // NOVO
+                const variantesObj = product.variantes || {}; // NOVO: Já vem como objeto
                 
                 let galleryUrls = product.galeria || [];
                 let allMediaUrls = [];
@@ -332,28 +338,26 @@
 
                 // --- NOVO: HTML das Variantes ---
                 let variantsHTML = '';
-                if (variantesString) {
-                    parsedVariants = parseVariantString(variantesString);
-                    const colors = Object.keys(parsedVariants);
+                parsedVariants = variantesObj; // Já é um objeto
+                const colors = Object.keys(parsedVariants);
+                
+                if (colors.length > 0) {
+                    variantsHTML += `<div class="variant-group">
+                                        <label>Cor:</label>
+                                        <div class="color-selector" id="color-selector">
+                                            ${colors.map(color => `
+                                                <div class="color-swatch" data-color="${color}" title="${color}" style="background-color: ${getSafeColor(color)};">${getSafeColor(color) === color ? color : ''}</div>
+                                            `).join('')}
+                                        </div>
+                                     </div>`;
                     
-                    if (colors.length > 0) {
-                        variantsHTML += `<div class="variant-group">
-                                            <label>Cor:</label>
-                                            <div class="color-selector" id="color-selector">
-                                                ${colors.map(color => `
-                                                    <div class="color-swatch" data-color="${color}" title="${color}" style="background-color: ${getSafeColor(color)};"></div>
-                                                `).join('')}
+                    variantsHTML += `<div class="variant-group">
+                                        <label>Tamanho:</label>
+                                        <div class="size-selector" id="size-selector">
                                             </div>
-                                         </div>`;
-                        
-                        variantsHTML += `<div class="variant-group">
-                                            <label>Tamanho:</label>
-                                            <div class="size-selector" id="size-selector">
-                                                </div>
-                                         </div>`;
-                    }
+                                     </div>`;
                 }
-
+                
                 // --- Renderiza o HTML Completo ---
                 detailsContainer.innerHTML = `
                     <div class="media-area">
@@ -378,7 +382,7 @@
 
                 // --- Adiciona Eventos de Clique ---
                 setupMediaThumbnails();
-                if (variantesString) {
+                if (colors.length > 0) {
                     setupVariantSelectors();
                 }
 
@@ -394,13 +398,14 @@
             const colorContainer = document.getElementById('color-selector');
             
             colorContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('color-swatch')) {
+                const target = e.target.closest('.color-swatch');
+                if (target) {
                     // Remove 'active' de todos
                     colorContainer.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('active'));
                     
                     // Adiciona 'active' no clicado
-                    e.target.classList.add('active');
-                    selectedColor = e.target.dataset.color;
+                    target.classList.add('active');
+                    selectedColor = target.dataset.color;
                     
                     // Atualiza os tamanhos
                     renderSizeOptions(selectedColor);
@@ -441,71 +446,4 @@
                 message += `\nTamanho: ${selectedSize}`;
             }
             // Adiciona a saudação final
-            message += `\n\nQual o procedimento para pagamento e envio/retirada?`;
-            
-            document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-        }
-
-        // Mapeamento simples de cores (português/japonês -> CSS)
-        function getSafeColor(colorName) {
-            const colors = {
-                'preto': 'black', 'branco': 'white', 'vermelho': 'red', 'rosa': '#FFC0CB',
-                'pink': '#FFC0CB', 'azul': 'blue', 'verde': 'green', 'amarelo': 'yellow',
-                'cinza': 'gray', 'bege': '#F5F5DC', 'oncinha': 'tan', 'marrom': 'brown',
-                'nude': '#E3BC9A', 'vinho': '#800000', 'bordô': '#800000'
-            };
-            // Se for oncinha, coloca uma cor de fundo, senão, usa o nome da cor
-            if (colorName.toLowerCase() === 'oncinha') {
-                 return 'tan'; // Cor de fundo para "Oncinha"
-            }
-            return colors[colorName.toLowerCase()] || colorName;
-        }
-
-        // Função para processar o texto do admin
-        function parseVariantString(text) {
-            const variants = {};
-            const lines = text.split('\n');
-            lines.forEach(line => {
-                if (line.includes('Cor:') && line.includes('Tamanhos:')) {
-                    try {
-                        const colorPart = line.split('Tamanhos:')[0].replace('Cor:', '').trim();
-                        const sizePart = line.split('Tamanhos:')[1].trim();
-                        
-                        const colorName = colorPart.replace(',', '').trim();
-                        const sizes = sizePart.split(',').map(s => s.trim());
-                        
-                        variants[colorName] = sizes;
-                    } catch (e) {
-                        console.warn("Linha de variante mal formatada:", line);
-                    }
-                }
-            });
-            return variants;
-        }
-
-        // --- LÓGICA DAS MÍDIAS (Thumbnails) ---
-        function setupMediaThumbnails() {
-            const mainMediaDisplay = document.getElementById('main-media-display');
-            const thumbContainers = document.querySelectorAll('.thumb-container');
-            const productNameEl = document.querySelector('.info-area h1');
-            const productName = productNameEl ? productNameEl.textContent : 'Produto';
-
-            thumbContainers.forEach(container => {
-                container.addEventListener('click', () => {
-                    const newSrc = container.dataset.fullSrc; 
-                    const mediaType = container.dataset.type; 
-                    mainMediaDisplay.innerHTML = ''; 
-                    
-                    if (mediaType === 'video') { 
-                        mainMediaDisplay.innerHTML = `<video src="${newSrc}" controls autoplay loop style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">Vídeo não suportado.</video>`; 
-                    } else { 
-                        mainMediaDisplay.innerHTML = `<img src="${newSrc}" alt="${productName}">`; 
-                    }
-                    thumbContainers.forEach(t => t.classList.remove('active')); 
-                    container.classList.add('active');
-                });
-            });
-        }
-    </script>
-</body>
-</html>
+            message += `\
