@@ -6,6 +6,7 @@
     <title>Detalhes do Produto | 3 Marias</title>
     
     <style>
+        /* [Todo o seu CSS 'Labelly' (idêntico ao anterior) está aqui...] */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
@@ -156,6 +157,67 @@
             font-size: 1.2em;
             color: var(--light-text);
         }
+        
+        /* --- NOVO CSS PARA VARIANTES (Victoria's Secret Style) --- */
+        .variant-group {
+            margin-top: 20px;
+        }
+        .variant-group label {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            display: block;
+        }
+        .color-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            box-sizing: border-box; /* Garante que a borda não aumente o tamanho */
+        }
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+        
+        .size-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .size-button {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: white;
+            cursor: pointer;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+        .size-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .size-button.disabled {
+            background-color: #f9f9f9;
+            color: #ccc;
+            border-color: #eee;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
     </style>
 </head>
 <body>
@@ -193,95 +255,256 @@
         const errorDiv = document.getElementById('error');
         const WHATSAPP_NUMBER = "818074558624"; 
 
-        // LÓGICA DE CARREGAMENTO (Limpas, sem Debug)
+        // --- NOVO: Variáveis globais para guardar estado ---
+        let parsedVariants = {}; // Guarda { Cor: [Tamanhos] }
+        let selectedColor = null;
+        let selectedSize = null;
+        let baseWhatsappMessage = "";
+        let productName = "Produto";
+
+        // LÓGICA DE CARREGAMENTO
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
             if (!productId) {
-                loadingDiv.style.display = 'none';
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = "Erro: ID do produto não encontrado na URL. <a href='index.html'>Voltar para a loja.</a>";
+                showError("Erro: ID do produto não encontrado na URL.");
                 return;
             }
             fetchProductDetails(productId);
         });
 
+        function showError(message) {
+            loadingDiv.style.display = 'none';
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = `${message} <a href='index.html'>Voltar para a loja.</a>`;
+        }
+        
         async function fetchProductDetails(id) {
             try {
                 const docRef = db.collection("products").doc(id);
                 const doc = await docRef.get(); 
 
                 if (!doc.exists) {
-                    loadingDiv.style.display = 'none';
-                    errorDiv.style.display = 'block';
-                    errorDiv.innerHTML = "Erro: Produto não encontrado no banco de dados. <a href='index.html'>Voltar para a loja.</a>";
+                    showError("Erro: Produto não encontrado no banco de dados.");
                     return;
                 }
                 
-                // (Início da lógica copiada)
                 const product = doc.data();
-                const estoque = parseInt(product.estoque || 0);
-                const name = product.name || 'Produto Sem Nome';
+                productName = product.name || 'Produto Sem Nome';
                 const description = product.description || 'Descrição não disponível.';
                 const price = product.price || '0';
                 const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=IMAGEM+PRINCIPAL';
                 const videoUrl = product.videoUrl; 
                 const source = product.source || 'pronta-entrega'; 
+                const variantesString = product.variantes || ''; // NOVO
+                
                 let galleryUrls = product.galeria || [];
                 let allMediaUrls = [];
                 if (videoUrl) { allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl }); }
                 if (imageUrl) { allMediaUrls.push({ type: 'image', url: imageUrl, thumb: imageUrl }); }
                 galleryUrls.forEach(url => { allMediaUrls.push({ type: 'image', url: url, thumb: url }); });
                 allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i);
+                
                 const priceValue = parseFloat(price.toString().replace(',', '.')); 
                 const precoFormatado = priceValue.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 });
-                let statusText, whatsappMessage, statusClass, buttonText = 'Comprar / Encomendar via WhatsApp', buttonClass = 'buy-button', lowStockWarning = '';
+                
+                let statusText, statusClass, buttonText = 'Comprar / Encomendar via WhatsApp', buttonClass = 'buy-button', lowStockWarning = '';
+                
                 if (source === 'pronta-entrega') {
-                    if (estoque === 0) {
-                        statusText = '❌ ESGOTADO! Volte em breve.'; statusClass = 'out-of-stock'; buttonText = 'ESGOTADO'; buttonClass = 'buy-button sold-out-btn';
-                        whatsappMessage = `Olá, Harumi! Infelizmente o produto ${name} (${precoFormatado}) está esgotado no momento. Poderia me avisar quando estiver disponível?`;
-                    } else {
-                        statusText = `✅ Em Estoque! (${estoque} unidades)`; statusClass = 'in-stock';
-                        whatsappMessage = `Olá, Harumi! Gostaria de comprar o produto ${name} (${precoFormatado}) que está na Pronta Entrega. Qual o procedimento para pagamento e envio/retirada?`;
-                    }
+                    statusText = `✅ Pronta Entrega (Envio/Retirada Imediata)`; statusClass = 'status-pronta-entrega';
+                    baseWhatsappMessage = `Olá, Harumi! Gostaria de comprar o produto ${productName} (${precoFormatado}) que está na Pronta Entrega.`;
                 } else {
-                    statusText = `📦 Sob Encomenda (${estoque} unidades em estoque de fornecedor)`; statusClass = 'status-sob-encomenda';
-                    whatsappMessage = `Olá! Gostaria de encomendar o produto ${name} (${precoFormatado}) do Catálogo Completo. Entendi que o prazo é de 3-5 dias. Quais são as opções de recebimento?`;
-                    lowStockWarning = `<p class="low-stock-warning">Prazo de entrega: 3-5 dias após o pedido.</p>`;
-                    if (estoque === 0) { lowStockWarning += `<p class="low-stock-warning" style="color:var(--error-color);">Atenção: Estoque do fornecedor zerado. O prazo pode ser estendido!</p>`; }
+                    statusText = `📦 Sob Encomenda (3-5 dias)`; statusClass = 'status-sob-encomenda';
+                    baseWhatsappMessage = `Olá! Gostaria de encomendar o produto ${productName} (${precoFormatado}) do Catálogo Completo.`;
                 }
-                const whatsappLink = (buttonClass.includes('sold-out-btn')) ? '#' : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+
+                const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(baseWhatsappMessage)}`;
+                
                 let mainMediaHTML = ''; let galleryHTML = '';
                 allMediaUrls.forEach((media, index) => {
-                    const isActive = index === 0; const isVideoThumb = media.type === 'video'; const thumbClasses = isVideoThumb ? 'video-thumb' : '';
-                    galleryHTML += `<div class="thumb-container ${isActive ? 'active' : ''} ${thumbClasses}" data-type="${media.type}" data-full-src="${media.url}"><img src="${media.thumb}" alt="Mídia ${index + 1}">${isVideoThumb ? '<div class="video-overlay"></div>' : ''}</div>`;
+                    const isActive = index === 0; const isVideoThumb = media.type === 'video';
+                    galleryHTML += `<div class="thumb-container ${isActive ? 'active' : ''}" data-type="${media.type}" data-full-src="${media.url}"><img src="${media.thumb}" alt="Mídia ${index + 1}">${isVideoThumb ? '<div class="video-overlay"></div>' : ''}</div>`;
                     if (isActive) {
-                        if (media.type === 'video') { mainMediaHTML = `<video src="${media.url}" controls loop style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">Seu navegador não suporta o formato de vídeo.</video>`; }
-                        else { mainMediaHTML = `<img id="main-image" src="${media.url}" alt="${name}" style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">`; }
+                        if (media.type === 'video') { mainMediaHTML = `<video src="${media.url}" controls loop style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">Vídeo não suportado.</video>`; }
+                        else { mainMediaHTML = `<img id="main-image" src="${media.url}" alt="${productName}">`; }
                     }
                 });
-                detailsContainer.innerHTML = `<div class="media-area"><div id="main-media-display">${mainMediaHTML}</div><div id="thumbnails">${galleryHTML}</div></div><div class="info-area"><span class="status-badge ${statusClass}">${statusText}</span><h1>${name}</h1><p class="price">${precoFormatado}</p>${lowStockWarning}<h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3><p style="color:var(--light-text); font-weight:400;">${description}</p><a href="${whatsappLink}" target="_blank" class="${buttonClass}">${buttonText}</a></div>`;
-                const mainMediaDisplay = document.getElementById('main-media-display');
-                const thumbContainers = document.querySelectorAll('.thumb-container');
-                thumbContainers.forEach(container => {
-                    container.addEventListener('click', () => {
-                        const newSrc = container.dataset.fullSrc; const mediaType = container.dataset.type; mainMediaDisplay.innerHTML = ''; 
-                        if (mediaType === 'video') { mainMediaDisplay.innerHTML = `<video src="${newSrc}" controls loop style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">Seu navegador não suporta o formato de vídeo.</video>`; }
-                        else { mainMediaDisplay.innerHTML = `<img src="${newSrc}" alt="${name}" style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">`; }
-                        thumbContainers.forEach(t => t.classList.remove('active')); container.classList.add('active');
-                    });
-                });
-                // (Fim da lógica copiada)
+
+                // --- NOVO: HTML das Variantes ---
+                let variantsHTML = '';
+                if (variantesString) {
+                    parsedVariants = parseVariantString(variantesString);
+                    const colors = Object.keys(parsedVariants);
+                    
+                    if (colors.length > 0) {
+                        variantsHTML += `<div class="variant-group">
+                                            <label>Cor:</label>
+                                            <div class="color-selector" id="color-selector">
+                                                ${colors.map(color => `
+                                                    <div class="color-swatch" data-color="${color}" title="${color}" style="background-color: ${getSafeColor(color)};"></div>
+                                                `).join('')}
+                                            </div>
+                                         </div>`;
+                        
+                        variantsHTML += `<div class="variant-group">
+                                            <label>Tamanho:</label>
+                                            <div class="size-selector" id="size-selector">
+                                                </div>
+                                         </div>`;
+                    }
+                }
+
+                // --- Renderiza o HTML Completo ---
+                detailsContainer.innerHTML = `
+                    <div class="media-area">
+                        <div id="main-media-display">${mainMediaHTML}</div>
+                        <div id="thumbnails">${galleryHTML}</div>
+                    </div>
+                    <div class="info-area">
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                        <h1>${productName}</h1>
+                        <p class="price">${precoFormatado}</p>
+                        ${lowStockWarning}
+                        
+                        ${variantsHTML} 
+                        
+                        <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3>
+                        <p style="color:var(--light-text); font-weight:400;">${description}</p>
+                        <a href="${whatsappLink}" target="_blank" class="${buttonClass}" id="whatsapp-link">${buttonText}</a>
+                    </div>`;
                 
                 loadingDiv.style.display = 'none';
                 detailsContainer.style.display = 'flex';
 
+                // --- Adiciona Eventos de Clique ---
+                setupMediaThumbnails();
+                if (variantesString) {
+                    setupVariantSelectors();
+                }
+
             } catch (error) {
-                // Se falhar, mostrará o erro
-                loadingDiv.style.display = 'none';
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = `Erro ao carregar os detalhes: ${error.message}. Verifique as Regras do Firestore ou o Console (F12). <a href='index.html'>Voltar.</a>`;
+                console.error("Erro ao carregar detalhes:", error);
+                showError(`Erro ao carregar os detalhes: ${error.message}.`);
             }
+        }
+
+        // --- LÓGICA DAS VARIANTES ---
+
+        function setupVariantSelectors() {
+            const colorContainer = document.getElementById('color-selector');
+            
+            colorContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('color-swatch')) {
+                    // Remove 'active' de todos
+                    colorContainer.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('active'));
+                    
+                    // Adiciona 'active' no clicado
+                    e.target.classList.add('active');
+                    selectedColor = e.target.dataset.color;
+                    
+                    // Atualiza os tamanhos
+                    renderSizeOptions(selectedColor);
+                    updateWhatsappLink();
+                }
+            });
+        }
+
+        function renderSizeOptions(color) {
+            const sizeContainer = document.getElementById('size-selector');
+            sizeContainer.innerHTML = ''; // Limpa os tamanhos antigos
+            selectedSize = null; // Reseta o tamanho
+            
+            const sizes = parsedVariants[color];
+            if (!sizes) return;
+
+            sizes.forEach(size => {
+                sizeContainer.innerHTML += `<div class="size-button" data-size="${size}">${size}</div>`;
+            });
+            
+            // Adiciona evento de clique aos novos botões de tamanho
+            sizeContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('size-button')) {
+                    sizeContainer.querySelectorAll('.size-button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    selectedSize = e.target.dataset.size;
+                    updateWhatsappLink();
+                }
+            });
+        }
+        
+        function updateWhatsappLink() {
+            let message = baseWhatsappMessage;
+            if (selectedColor) {
+                message += `\nCor: ${selectedColor}`;
+            }
+            if (selectedSize) {
+                message += `\nTamanho: ${selectedSize}`;
+            }
+            // Adiciona a saudação final
+            message += `\n\nQual o procedimento para pagamento e envio/retirada?`;
+            
+            document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+        }
+
+        // Mapeamento simples de cores (português/japonês -> CSS)
+        function getSafeColor(colorName) {
+            const colors = {
+                'preto': 'black', 'branco': 'white', 'vermelho': 'red', 'rosa': '#FFC0CB',
+                'pink': '#FFC0CB', 'azul': 'blue', 'verde': 'green', 'amarelo': 'yellow',
+                'cinza': 'gray', 'bege': '#F5F5DC', 'oncinha': 'tan', 'marrom': 'brown',
+                'nude': '#E3BC9A', 'vinho': '#800000', 'bordô': '#800000'
+            };
+            // Se for oncinha, coloca uma cor de fundo, senão, usa o nome da cor
+            if (colorName.toLowerCase() === 'oncinha') {
+                 return 'tan'; // Cor de fundo para "Oncinha"
+            }
+            return colors[colorName.toLowerCase()] || colorName;
+        }
+
+        // Função para processar o texto do admin
+        function parseVariantString(text) {
+            const variants = {};
+            const lines = text.split('\n');
+            lines.forEach(line => {
+                if (line.includes('Cor:') && line.includes('Tamanhos:')) {
+                    try {
+                        const colorPart = line.split('Tamanhos:')[0].replace('Cor:', '').trim();
+                        const sizePart = line.split('Tamanhos:')[1].trim();
+                        
+                        const colorName = colorPart.replace(',', '').trim();
+                        const sizes = sizePart.split(',').map(s => s.trim());
+                        
+                        variants[colorName] = sizes;
+                    } catch (e) {
+                        console.warn("Linha de variante mal formatada:", line);
+                    }
+                }
+            });
+            return variants;
+        }
+
+        // --- LÓGICA DAS MÍDIAS (Thumbnails) ---
+        function setupMediaThumbnails() {
+            const mainMediaDisplay = document.getElementById('main-media-display');
+            const thumbContainers = document.querySelectorAll('.thumb-container');
+            const productNameEl = document.querySelector('.info-area h1');
+            const productName = productNameEl ? productNameEl.textContent : 'Produto';
+
+            thumbContainers.forEach(container => {
+                container.addEventListener('click', () => {
+                    const newSrc = container.dataset.fullSrc; 
+                    const mediaType = container.dataset.type; 
+                    mainMediaDisplay.innerHTML = ''; 
+                    
+                    if (mediaType === 'video') { 
+                        mainMediaDisplay.innerHTML = `<video src="${newSrc}" controls autoplay loop style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">Vídeo não suportado.</video>`; 
+                    } else { 
+                        mainMediaDisplay.innerHTML = `<img src="${newSrc}" alt="${productName}">`; 
+                    }
+                    thumbContainers.forEach(t => t.classList.remove('active')); 
+                    container.classList.add('active');
+                });
+            });
         }
     </script>
 </body>
