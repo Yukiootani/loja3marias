@@ -411,4 +411,38 @@
                 // Salva os URLs antigos
                 oldImageUrl = product.imageUrl || '';
                 oldVideoUrl = product.videoUrl || '';
-                oldGaleria = product.galeria ||
+                oldGaleria = product.galeria || [];
+                
+                // Limpa os campos de input de arquivo (pois não podemos "preenchê-los")
+                imageUrlInput.value = '';
+                videoUrlInput.value = '';
+                galeriaInput.value = '';
+
+                formTitle.textContent = "2. Editando Produto";
+                saveBtn.textContent = "Atualizar Produto";
+                cancelEditBtn.style.display = "block";
+                window.scrollTo(0, 0); // Rola para o topo
+            } catch (error) {
+                showStatus("Erro ao carregar para edição: " + error.message, "error");
+            }
+        }
+
+        // 5. Cancelar Edição
+        cancelEditBtn.addEventListener('click', cancelEditMode);
+        function cancelEditMode() {
+            productIdField.value = '';
+            form.reset();
+            variantsContainer.innerHTML = ''; // Limpa as variantes
+            oldImageUrl = ''; oldVideoUrl = ''; oldGaleria = [];
+            
+            formTitle.textContent = "1. Adicionar Novo Produto";
+            saveBtn.textContent = "Salvar Produto";
+            cancelEditBtn.style.display = "none";
+        }
+
+        // Carregar produtos ao iniciar
+        document.addEventListener('DOMContentLoaded', fetchProducts);
+    </script>
+
+</body>
+</html>
