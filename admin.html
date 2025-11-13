@@ -18,7 +18,7 @@
         h1, h2 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
         form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 20px; background: #fdf7f9; border-radius: 5px; }
         label { font-weight: bold; margin-bottom: -10px; }
-        input[type="text"], input[type="number"], textarea, select {
+        input[type="text"], input[type="number"], textarea, select, input[type="file"] {
             width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;
         }
         textarea { min-height: 100px; }
@@ -38,6 +38,15 @@
         #products-table img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
         .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
         .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; }
+        
+        /* NOVO: Estilo das Variantes */
+        #variants-container { border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: #fff; }
+        .variant-entry { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .variant-entry input[type="text"] { width: 30%; min-width: 150px; }
+        .variant-entry label { font-weight: normal; margin: 0 5px; }
+        .size-checkboxes { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .remove-variant-btn { background: var(--error-color); width: auto; padding: 5px 8px; font-size: 0.8em; }
+        #add-variant-btn { background: var(--accent-color); color: #333; width: auto; padding: 8px 12px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -59,10 +68,12 @@
             <label for="description">Descrição:</label>
             <textarea id="description" rows="4"></textarea>
 
-            <label for="variantes">Variantes (Cor e Tamanho):</label>
-            <textarea id="variantes" rows="4" placeholder="Ex: Cor: Preto, Tamanhos: P, M, G&#10;Cor: Branco, Tamanhos: P, M"></textarea>
+            <label>Variantes (Cores e Tamanhos):</label>
+            <div id="variants-container">
+                </div>
+            <button type="button" id="add-variant-btn">+ Adicionar Cor</button>
 
-            <label for="estoque">Estoque (Número):</label>
+            <label for="estoque">Estoque (Total de Peças):</label>
             <input type="number" id="estoque" value="0" required>
 
             <label for="source">Disponibilidade:</label>
@@ -78,14 +89,14 @@
                 <option value="destaque">🔥 Destaque</option>
             </select>
 
-            <label for="imageUrl">Imagem de Capa (URL):</label>
-            <input type="text" id="imageUrl" placeholder="Cole o link da imagem de capa aqui">
+            <label for="imageUrl">Imagem de Capa (Upload):</label>
+            <input type="file" id="imageUrl" accept="image/png, image/jpeg">
             
-            <label for="videoUrl">Vídeo (URL Opcional):</label>
-            <input type="text" id="videoUrl" placeholder="Cole o link do vídeo (MP4, WebM) aqui">
+            <label for="videoUrl">Vídeo (Upload Opcional):</label>
+            <input type="file" id="videoUrl" accept="video/mp4, video/webm">
 
-            <label for="galeria">Galeria (URLs separados por vírgula):</label>
-            <textarea id="galeria" rows="3" placeholder="Link 1, Link 2, Link 3..."></textarea>
+            <label for="galeria">Galeria (Upload Múltiplo):</label>
+            <input type="file" id="galeria" multiple accept="image/png, image/jpeg">
             
             <button type="submit" id="save-btn">Salvar Produto</button>
             <button type="button" id="cancel-edit-btn" style="display:none; background-color: #777;">Cancelar Edição</button>
@@ -113,6 +124,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script> 
 
     <script>
         // 🚨 CHAVES CORRETAS DA LOJA 3 MARIAS 🚨
@@ -128,6 +140,7 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(); 
+        const storage = firebase.storage(); // 🚨 INICIALIZA O STORAGE
 
         // Elementos do DOM
         const form = document.getElementById('product-form');
@@ -137,24 +150,109 @@
         const productIdField = document.getElementById('productId');
         const saveBtn = document.getElementById('save-btn');
         const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const addVariantBtn = document.getElementById('add-variant-btn');
+        const variantsContainer = document.getElementById('variants-container');
 
         // Campos do formulário
         const nameField = document.getElementById('name');
         const priceField = document.getElementById('price');
         const descField = document.getElementById('description');
-        const variantesField = document.getElementById('variantes'); // NOVO
         const estoqueField = document.getElementById('estoque');
         const sourceField = document.getElementById('source');
         const isFeaturedField = document.getElementById('isFeatured');
-        const imageUrlField = document.getElementById('imageUrl');
-        const videoUrlField = document.getElementById('videoUrl');
-        const galeriaField = document.getElementById('galeria');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const videoUrlInput = document.getElementById('videoUrl');
+        const galeriaInput = document.getElementById('galeria');
+
+        // Guarda os URLs antigos durante a edição
+        let oldImageUrl = '';
+        let oldVideoUrl = '';
+        let oldGaleria = [];
 
         function showStatus(message, type) {
             statusDiv.textContent = message;
             statusDiv.className = type;
-            setTimeout(() => { statusDiv.textContent = ''; statusDiv.className = ''; }, 4000);
+            if (type !== 'loading') {
+                setTimeout(() => { statusDiv.textContent = ''; statusDiv.className = ''; }, 4000);
+            }
         }
+
+        // --- LÓGICA DE UPLOAD ---
+        async function uploadFile(file, path) {
+            const storageRef = storage.ref(path);
+            const uploadTask = await storageRef.put(file);
+            return await uploadTask.ref.getDownloadURL();
+        }
+
+        // --- LÓGICA DE VARIANTES ---
+        addVariantBtn.addEventListener('click', () => {
+            const entryId = Date.now(); // ID único
+            const variantEntry = document.createElement('div');
+            variantEntry.className = 'variant-entry';
+            variantEntry.id = `variant-${entryId}`;
+            variantEntry.innerHTML = `
+                <input type="text" class="variant-color" placeholder="Cor (ex: Preto)">
+                <div class="size-checkboxes">
+                    <input type="checkbox" id="p-${entryId}" data-size="P"><label for="p-${entryId}">P</label>
+                    <input type="checkbox" id="m-${entryId}" data-size="M"><label for="m-${entryId}">M</label>
+                    <input type="checkbox" id="g-${entryId}" data-size="G"><label for="g-${entryId}">G</label>
+                    <input type="checkbox" id="gg-${entryId}" data-size="GG"><label for="gg-${entryId}">GG</label>
+                </div>
+                <button type="button" class="remove-variant-btn" onclick="removeVariant('variant-${entryId}')">X</button>
+            `;
+            variantsContainer.appendChild(variantEntry);
+        });
+
+        window.removeVariant = (id) => {
+            document.getElementById(id).remove();
+        }
+
+        function getVariantsFromForm() {
+            const variants = {};
+            const entries = variantsContainer.querySelectorAll('.variant-entry');
+            entries.forEach(entry => {
+                const color = entry.querySelector('.variant-color').value;
+                if (color) {
+                    const sizes = [];
+                    entry.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+                        sizes.push(cb.dataset.size);
+                    });
+                    variants[color] = sizes;
+                }
+            });
+            return variants;
+        }
+
+        function setVariantsInForm(variants) {
+            variantsContainer.innerHTML = ''; // Limpa
+            if (!variants || Object.keys(variants).length === 0) return;
+
+            for (const color in variants) {
+                const sizes = variants[color];
+                const entryId = Date.now() + Math.random();
+                const variantEntry = document.createElement('div');
+                variantEntry.className = 'variant-entry';
+                variantEntry.id = `variant-${entryId}`;
+                
+                const checkedP = sizes.includes('P') ? 'checked' : '';
+                const checkedM = sizes.includes('M') ? 'checked' : '';
+                const checkedG = sizes.includes('G') ? 'checked' : '';
+                const checkedGG = sizes.includes('GG') ? 'checked' : '';
+
+                variantEntry.innerHTML = `
+                    <input type="text" class="variant-color" value="${color}">
+                    <div class="size-checkboxes">
+                        <input type="checkbox" id="p-${entryId}" data-size="P" ${checkedP}><label for="p-${entryId}">P</label>
+                        <input type="checkbox" id="m-${entryId}" data-size="M" ${checkedM}><label for="m-${entryId}">M</label>
+                        <input type="checkbox" id="g-${entryId}" data-size="G" ${checkedG}><label for="g-${entryId}">G</label>
+                        <input type="checkbox" id="gg-${entryId}" data-size="GG" ${checkedGG}><label for="gg-${entryId}">GG</label>
+                    </div>
+                    <button type="button" class="remove-variant-btn" onclick="removeVariant('variant-${entryId}')">X</button>
+                `;
+                variantsContainer.appendChild(variantEntry);
+            }
+        }
+
 
         // 1. CARREGAR PRODUTOS (READ)
         async function fetchProducts() {
@@ -198,43 +296,77 @@
         // 2. SALVAR/ATUALIZAR PRODUTO (CREATE/UPDATE)
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const galeriaArray = galeriaField.value.split(',')
-                                  .map(url => url.trim())
-                                  .filter(url => url.length > 0);
-            
-            const productData = {
-                name: nameField.value,
-                price: parseFloat(priceField.value),
-                description: descField.value,
-                variantes: variantesField.value, // NOVO
-                estoque: parseInt(estoqueField.value),
-                source: sourceField.value,
-                isFeatured: isFeaturedField.value,
-                imageUrl: imageUrlField.value,
-                videoUrl: videoUrlField.value,
-                galeria: galeriaArray
-            };
+            saveBtn.disabled = true;
+            showStatus("Salvando... Por favor, aguarde o upload.", "loading");
 
-            const currentProductId = productIdField.value;
+            const currentProductId = productIdField.value || `pid_${Date.now()}`;
             
             try {
-                if (currentProductId) {
+                let imageUrl = oldImageUrl;
+                let videoUrl = oldVideoUrl;
+                let galeriaUrls = oldGaleria;
+                
+                // UPLOAD IMAGEM DE CAPA
+                if (imageUrlInput.files[0]) {
+                    showStatus("Fazendo upload da Imagem de Capa...", "loading");
+                    const file = imageUrlInput.files[0];
+                    const path = `products/${currentProductId}/capa_${file.name}`;
+                    imageUrl = await uploadFile(file, path);
+                }
+
+                // UPLOAD VÍDEO
+                if (videoUrlInput.files[0]) {
+                    showStatus("Fazendo upload do Vídeo...", "loading");
+                    const file = videoUrlInput.files[0];
+                    const path = `products/${currentProductId}/video_${file.name}`;
+                    videoUrl = await uploadFile(file, path);
+                }
+                
+                // UPLOAD GALERIA (Múltiplos)
+                if (galeriaInput.files.length > 0) {
+                    showStatus(`Fazendo upload de ${galeriaInput.files.length} imagens da galeria...`, "loading");
+                    galeriaUrls = []; // Reseta a galeria se novos arquivos forem enviados
+                    for (const file of galeriaInput.files) {
+                        const path = `products/${currentProductId}/galeria_${file.name}`;
+                        const url = await uploadFile(file, path);
+                        galeriaUrls.push(url);
+                    }
+                }
+                
+                const productData = {
+                    name: nameField.value,
+                    price: parseFloat(priceField.value),
+                    description: descField.value,
+                    variantes: getVariantsFromForm(), // NOVO
+                    estoque: parseInt(estoqueField.value),
+                    source: sourceField.value,
+                    isFeatured: isFeaturedField.value,
+                    imageUrl: imageUrl,
+                    videoUrl: videoUrl,
+                    galeria: galeriaUrls
+                };
+
+                if (productIdField.value) {
                     // Atualizar (Update)
+                    showStatus("Atualizando produto no banco de dados...", "loading");
                     await db.collection("products").doc(currentProductId).update(productData);
                     showStatus("Produto atualizado com sucesso!", "success");
                 } else {
                     // Criar (Create)
+                    showStatus("Criando produto no banco de dados...", "loading");
                     productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    await db.collection("products").add(productData);
+                    await db.collection("products").doc(currentProductId).set(productData);
                     showStatus("Produto salvo com sucesso!", "success");
                 }
+                
                 form.reset();
                 cancelEditMode();
                 fetchProducts(); // Recarrega a lista
             } catch (error) {
                 console.error("Erro ao salvar:", error);
                 showStatus("Erro ao salvar: " + error.message, "error");
+            } finally {
+                saveBtn.disabled = false;
             }
         });
 
@@ -245,6 +377,7 @@
             }
             try {
                 await db.collection("products").doc(id).delete();
+                // (Nota: Isto não apaga os arquivos do Storage, por segurança)
                 showStatus("Produto excluído com sucesso!", "success");
                 fetchProducts(); // Recarrega a lista
             } catch (error) {
@@ -267,36 +400,15 @@
                 nameField.value = product.name || '';
                 priceField.value = product.price || 0;
                 descField.value = product.description || '';
-                variantesField.value = product.variantes || ''; // NOVO
+                
+                // Popula o campo de variantes visual
+                setVariantsInForm(product.variantes || {});
+                
                 estoqueField.value = product.estoque || 0;
                 sourceField.value = product.source || 'pronta-entrega';
                 isFeaturedField.value = product.isFeatured || 'nenhum';
-                imageUrlField.value = product.imageUrl || '';
-                videoUrlField.value = product.videoUrl || '';
-                galeriaField.value = (product.galeria || []).join(', ');
-
-                formTitle.textContent = "2. Editando Produto";
-                saveBtn.textContent = "Atualizar Produto";
-                cancelEditBtn.style.display = "block";
-                window.scrollTo(0, 0); // Rola para o topo
-            } catch (error) {
-                showStatus("Erro ao carregar para edição: " + error.message, "error");
-            }
-        }
-
-        // 5. Cancelar Edição
-        cancelEditBtn.addEventListener('click', cancelEditMode);
-        function cancelEditMode() {
-            productIdField.value = '';
-            form.reset();
-            formTitle.textContent = "1. Adicionar Novo Produto";
-            saveBtn.textContent = "Salvar Produto";
-            cancelEditBtn.style.display = "none";
-        }
-
-        // Carregar produtos ao iniciar
-        document.addEventListener('DOMContentLoaded', fetchProducts);
-    </script>
-
-</body>
-</html>
+                
+                // Salva os URLs antigos
+                oldImageUrl = product.imageUrl || '';
+                oldVideoUrl = product.videoUrl || '';
+                oldGaleria = product.galeria ||
