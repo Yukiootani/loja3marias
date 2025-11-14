@@ -15,7 +15,7 @@
         }
         body { font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
         .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
-        h1, h2 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
+        h1, h2, h3 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
         form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 20px; background: #fdf7f9; border-radius: 5px; }
         label { font-weight: bold; margin-bottom: -10px; }
         input[type="text"], input[type="number"], textarea, select, input[type="file"], input[type="password"], input[type="email"] {
@@ -25,7 +25,7 @@
         button {
             background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer;
         }
-        /* 🚨 DIV DE STATUS CORRIGIDA */
+        /* DIV DE STATUS */
         #status, #loginStatus { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
         .success { background-color: #e6f9e6; color: #28a745; }
         .error { background-color: #fdeeee; color: var(--error-color); }
@@ -50,11 +50,15 @@
         .size-checkboxes { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
         .remove-variant-btn { background: var(--error-color); width: auto; padding: 5px 8px; font-size: 0.8em; }
         #add-variant-btn { background: var(--accent-color); color: #333; width: auto; padding: 8px 12px; margin-top: 10px; }
-
-        /* 🚨 SEÇÃO DE LOGIN ADICIONADA NOVAMENTE 👇 */
+        
+        /* Estilo de Login */
         #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
         #admin-panel { display: none; } /* Oculto por padrão */
         #btnLogout { background-color: #777; margin-top: 20px; }
+
+        /* Estilo do Preview do Logo */
+        #logo-preview-container { text-align: center; margin-bottom: 15px; }
+        #logo-preview { max-width: 250px; max-height: 100px; border: 1px dashed var(--border-color); padding: 5px; }
     </style>
 </head>
 <body>
@@ -122,8 +126,23 @@
                 <button type="submit" id="save-btn">Salvar Produto</button>
                 <button type="button" id="cancel-edit-btn" style="display:none; background-color: #777;">Cancelar Edição</button>
             </form>
+            
+            <hr>
 
-            <h2>2. Gerenciar Produtos Existentes</h2>
+            <form id="logo-form">
+                <h3>3. Gerir Logo do Site</h3>
+                <div id="logo-preview-container">
+                    <label>Logo Atual:</label>
+                    <img id="logo-preview" src="https://via.placeholder.com/250x100?text=Carregando+Logo..." alt="Logo Atual">
+                </div>
+                <label for="logo-upload">Fazer Upload de Novo Logo:</label>
+                <input type="file" id="logo-upload" accept="image/png, image/jpeg, image/svg+xml">
+                <button type="submit" id="save-logo-btn">Salvar Novo Logo</button>
+            </form>
+            
+            <hr>
+
+            <h2>Gerenciar Produtos Existentes</h2>
             <div id="products-table-container">
                 <table id="products-table">
                     <thead>
@@ -166,9 +185,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(); 
         const storage = firebase.storage(); 
-        const auth = firebase.auth(); // 🚨 INICIALIZA O AUTH
+        const auth = firebase.auth(); 
 
-        // 🚨 CORREÇÃO: Mover todo o código para dentro do DOMContentLoaded
         document.addEventListener('DOMContentLoaded', () => {
 
             // Elementos do DOM
@@ -200,18 +218,23 @@
             const videoUrlInput = document.getElementById('videoUrl');
             const galeriaInput = document.getElementById('galeria');
 
+            // 🚨 NOVO: Elementos do Logo
+            const logoForm = document.getElementById('logo-form');
+            const logoUploadInput = document.getElementById('logo-upload');
+            const logoPreview = document.getElementById('logo-preview');
+
             let oldImageUrl = '';
             let oldVideoUrl = '';
             let oldGaleria = [];
             
             let statusTimeout; 
 
+            // 🚨 FUNÇÃO SHOWSTATUS CORRIGIDA
             function showStatus(div, message, type) {
                 clearTimeout(statusTimeout); 
-                // 🚨 CORREÇÃO: Garante que a mensagem é sempre texto
                 div.textContent = String(message); 
                 div.className = 'status ' + type;
-                div.style.display = 'block'; // Garante que está visível
+                div.style.display = 'block'; 
                 
                 if (type !== 'loading') { 
                     statusTimeout = setTimeout(() => { 
@@ -221,6 +244,22 @@
                     }, 4000);
                 }
             }
+            
+             function showLoginStatus(message, type) {
+                clearTimeout(statusTimeout); 
+                loginStatusDiv.textContent = String(message); 
+                loginStatusDiv.className = 'status ' + type;
+                loginStatusDiv.style.display = 'block'; 
+                
+                if (type !== 'loading') { 
+                    statusTimeout = setTimeout(() => { 
+                        loginStatusDiv.textContent = ''; 
+                        loginStatusDiv.className = '';
+                        loginStatusDiv.style.display = 'none'; 
+                    }, 4000);
+                }
+            }
+
 
             // --- LÓGICA DE UPLOAD ---
             async function uploadFile(file, path) {
@@ -544,18 +583,66 @@
                 cancelEditBtn.style.display = "none";
             }
 
+            // 🚨 NOVO: LÓGICA DO LOGO
+            
+            // Carrega o logo atual
+            async function loadSiteConfig() {
+                try {
+                    const doc = await db.collection("configuracoes").doc("siteInfo").get();
+                    if (doc.exists && doc.data().logoUrl) {
+                        logoPreview.src = doc.data().logoUrl;
+                    } else {
+                        logoPreview.src = "https://via.placeholder.com/250x100?text=Sem+Logo";
+                    }
+                } catch (e) {
+                    console.error("Erro ao carregar logo:", e);
+                    logoPreview.src = "https://via.placeholder.com/250x100?text=Erro+ao+carregar";
+                }
+            }
+            
+            // Salva o novo logo
+            logoForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const file = logoUploadInput.files[0];
+                if (!file) {
+                    showStatus(statusDiv, "Por favor, escolha um ficheiro de logo.", "error");
+                    return;
+                }
+                
+                showStatus(statusDiv, "Fazendo upload do novo logo...", "loading");
+                
+                try {
+                    // Usamos um caminho fixo para substituir o logo antigo
+                    const path = "configuracoes/logo_principal";
+                    const logoUrl = await uploadFile(file, path);
+                    
+                    // Salva o link no Firestore
+                    await db.collection("configuracoes").doc("siteInfo").set({
+                        logoUrl: logoUrl
+                    }, { merge: true });
+                    
+                    showStatus(statusDiv, "Novo logo salvo com sucesso!", "success");
+                    logoPreview.src = logoUrl; // Atualiza a pré-visualização
+                    logoUploadInput.value = ''; // Limpa o input
+                    
+                } catch (error) {
+                    console.error("Erro ao salvar logo:", error);
+                    showStatus(statusDiv, "Erro ao salvar logo: " + String(error.message), "error");
+                }
+            });
+
             // --- LÓGICA DE LOGIN ---
             
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
-                showStatus(loginStatusDiv, 'Tentando entrar...', 'loading');
+                showLoginStatus('Tentando entrar...', 'loading');
                 try {
                     await auth.signInWithEmailAndPassword(email, password);
                     // O onAuthStateChanged vai tratar de mostrar o painel
                 } catch (error) {
-                    showStatus(loginStatusDiv, `Erro de Acesso: ${error.message}`, 'error');
+                    showLoginStatus(`Erro de Acesso: ${error.message}`, 'error');
                 }
             });
 
@@ -570,6 +657,7 @@
                     loginSection.style.display = 'none';
                     adminPanel.style.display = 'block';
                     fetchProducts(); // Carrega os produtos
+                    loadSiteConfig(); // 🚨 NOVO: Carrega o logo
                 } else {
                     // Usuário DESLOGADO
                     loginSection.style.display = 'block';
