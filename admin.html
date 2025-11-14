@@ -218,7 +218,7 @@
             const videoUrlInput = document.getElementById('videoUrl');
             const galeriaInput = document.getElementById('galeria');
 
-            // 🚨 NOVO: Elementos do Logo
+            // Elementos do Logo
             const logoForm = document.getElementById('logo-form');
             const logoUploadInput = document.getElementById('logo-upload');
             const logoPreview = document.getElementById('logo-preview');
@@ -229,7 +229,7 @@
             
             let statusTimeout; 
 
-            // 🚨 FUNÇÃO SHOWSTATUS CORRIGIDA
+            // Função de Status para o Painel Principal
             function showStatus(div, message, type) {
                 clearTimeout(statusTimeout); 
                 div.textContent = String(message); 
@@ -245,6 +245,7 @@
                 }
             }
             
+             // Função de Status para o Login
              function showLoginStatus(message, type) {
                 clearTimeout(statusTimeout); 
                 loginStatusDiv.textContent = String(message); 
