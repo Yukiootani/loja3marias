@@ -7,29 +7,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* [Todo o seu CSS 'Labelly' (idêntico ao anterior) está aqui...] */
+        /* --- NOVO: CSS Minimalista (Victoria's Secret Style) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
             --whatsapp-green: #28a745; 
             --text-color: #333; 
             --light-text: #666; 
-            --bg-color: #fcfcfc; 
-            --border-color: #e0e0e0; 
+            --bg-color: #FFFFFF; /* Fundo principal Branco */
+            --border-color: #f0f0f0; /* Bordas bem claras */
             --error-color: #dc3545;
         }
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             margin: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
             padding-bottom: 80px; /* Espaço para o carrinho */
         }
+        /* Cabeçalho Minimalista */
         header {
             background-color: white; 
             color: var(--text-color); 
-            padding: 1rem 0;
-            text-align: center;
+            padding: 1rem 1rem;
+            text-align: left; /* Alinhado à esquerda */
             border-bottom: 1px solid var(--border-color); 
         }
         header a {
@@ -40,7 +41,7 @@
         }
         main {
             max-width: 1000px;
-            margin: 30px auto;
+            margin: 20px auto;
             padding: 0 15px;
         }
         #product-details {
@@ -48,13 +49,13 @@
             flex-wrap: wrap;
             gap: 30px;
             background-color: white;
-            padding: 20px;
+            padding: 0; /* Remove padding antigo */
             border-radius: 0; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border-color);
+            box-shadow: none; /* Remove sombra antiga */
+            border: none; /* Remove borda antiga */
         }
         .media-area {
-            flex: 1 1 45%; 
+            flex: 1 1 50%; 
             min-width: 300px;
         }
         #main-media-display {
@@ -63,7 +64,7 @@
             padding-top: 150%; 
             margin-bottom: 15px;
             border-radius: 0; 
-            background-color: var(--bg-color);
+            background-color: #f9f9f9;
             border: 1px solid var(--border-color);
             overflow: hidden;
         }
@@ -84,9 +85,9 @@
         }
         .thumb-container {
             position: relative;
-            width: 80px;
-            height: 80px;
-            border-radius: 2px;
+            width: 70px; /* Menor */
+            height: 70px;
+            border-radius: 4px; /* Mais suave */
             cursor: pointer;
             border: 1px solid var(--border-color);
             transition: border 0.3s;
@@ -96,7 +97,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 2px;
+            border-radius: 4px;
         }
         .video-overlay::before {
             content: '▶';
@@ -112,11 +113,11 @@
             z-index: 10;
         }
         .info-area {
-            flex: 1 1 45%;
+            flex: 1 1 40%;
             padding-top: 10px;
         }
-        .info-area h1 { color: var(--text-color); margin-top: 0; font-size: 2em; font-weight: 600; }
-        .info-area .price { font-size: 1.8em; font-weight: bold; color: var(--primary-color); margin: 15px 0; }
+        .info-area h1 { color: var(--text-color); margin-top: 0; font-size: 1.8em; font-weight: 700; }
+        .info-area .price { font-size: 1.6em; font-weight: 700; color: var(--primary-color); margin: 15px 0; }
         .info-area p { line-height: 1.6; color: var(--light-text); }
         .status-badge {
             font-size: 0.9em;
@@ -130,23 +131,23 @@
         .status-pronta-entrega { background-color: #e6f9e6; color: var(--whatsapp-green); border-color: #d0edd4; }
         .status-sob-encomenda { background-color: #f7f7e6; color: #856404; border-color: #eaeaa0; }
         
-        /* 🚨 BOTÃO ATUALIZADO */
+        /* Botão "Adicionar ao Carrinho" */
         .buy-button {
             display: block;
-            background-color: var(--whatsapp-green); 
+            background-color: var(--primary-color); /* Rosa como CTA principal */
             color: white;
             text-align: center;
-            padding: 12px;
+            padding: 15px; /* Mais alto */
             text-decoration: none;
             font-size: 1.1em;
             font-weight: bold;
-            border-radius: 4px;
+            border-radius: 5px;
             margin-top: 30px;
             transition: background-color 0.3s;
             cursor: pointer;
             border: none;
         }
-        .buy-button:hover { background-color: #1e7e34; }
+        .buy-button:hover { background-color: #a15a70; }
         .buy-button:disabled {
             background-color: #ccc;
             cursor: not-allowed;
@@ -175,8 +176,8 @@
             gap: 10px;
         }
         .color-swatch {
-            width: 40px;
-            height: 40px;
+            width: 35px; /* Menor */
+            height: 35px;
             border-radius: 50%;
             border: 2px solid var(--border-color);
             cursor: pointer;
@@ -218,7 +219,7 @@
             border-color: var(--primary-color);
         }
         
-        /* --- NOVO: CSS DO CARRINHO WHATSAPP --- */
+        /* --- CSS DO CARRINHO WHATSAPP (Sem Alterações) --- */
         #cart-icon {
             position: fixed;
             bottom: 20px;
@@ -276,7 +277,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
     <script>
         // 🚨 CHAVES CORRETAS DA LOJA 3 MARIAS 🚨
         const firebaseConfig = {
@@ -295,7 +295,7 @@
         const detailsContainer = document.getElementById('product-details');
         const loadingDiv = document.getElementById('loading');
         const errorDiv = document.getElementById('error');
-        const cartCountEl = document.getElementById('cart-count'); // NOVO
+        const cartCountEl = document.getElementById('cart-count'); 
         const WHATSAPP_NUMBER = "818074558624"; 
 
         // --- Variáveis globais para guardar estado ---
@@ -316,7 +316,7 @@
                 return;
             }
             fetchProductDetails(currentProductId);
-            updateCartIcon(); // NOVO: Atualiza o ícone ao carregar a página
+            updateCartIcon(); 
         });
 
         function showError(message) {
@@ -422,7 +422,6 @@
                     setupVariantSelectors();
                 }
                 
-                // 🚨 NOVO: Evento de clique para Adicionar ao Carrinho
                 document.getElementById('add-to-cart-btn').addEventListener('click', handleAddToCart);
 
             } catch (error) {
@@ -461,8 +460,8 @@
                 alert("Por favor, selecione uma cor.");
                 return;
             }
-            if (colorsAvailable && !selectedSize) {
-                alert("Por favor, selecione um tamanho.");
+            if (colorsAvailable && selectedColor && !selectedSize) {
+                 alert("Por favor, selecione um tamanho.");
                 return;
             }
 
@@ -472,10 +471,8 @@
             const itemId = `${currentProductId}_${selectedColor || 'padrao'}_${selectedSize || 'padrao'}`;
             
             if (cart.items[itemId]) {
-                // Se o item exato já existe, apenas incrementa a quantidade
                 cart.items[itemId].quantity += 1;
             } else {
-                // Se é um item novo, adiciona ao carrinho
                 cart.items[itemId] = {
                     id: currentProductId,
                     name: productName,
