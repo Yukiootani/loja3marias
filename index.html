@@ -7,51 +7,106 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* [Seu CSS 'Labelly' (Rosa/Dourado) está aqui...] */
+        /* --- NOVO: CSS Minimalista (Victoria's Secret Style) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
             --text-color: #333; 
             --light-text: #666; 
-            --bg-color: #fcfcfc; 
-            --border-color: #e0e0e0; 
+            --bg-color: #FFFFFF; /* Fundo principal Branco */
+            --border-color: #f0f0f0; /* Bordas bem claras */
             --whatsapp-green: #28a745; 
         }
-        body { font-family: Arial, sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); padding-bottom: 80px; /* Espaço para o carrinho */ }
-        header { background-color: var(--primary-color); color: white; padding: 2rem 1rem; text-align: center; }
-        header h1 { margin: 0; font-size: 2.5em; }
-        header p { font-size: 1.1em; }
-        main { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+            margin: 0; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            padding-bottom: 80px; 
+        }
         
+        /* Cabeçalho Minimalista */
+        header { 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            padding: 1.5rem 1rem; 
+            text-align: center; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        header h1 { 
+            margin: 0; 
+            font-size: 1.8em; 
+            font-weight: 700;
+            color: var(--primary-color); /* Título principal rosa */
+        }
+        header p { 
+            font-size: 1em; 
+            color: var(--light-text);
+            margin: 5px 0 0 0;
+        }
+        
+        main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+        
+        /* Controles de Filtro Minimalistas */
         #controls {
-            display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;
-            padding: 15px; background-color: #fff; border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); align-items: center;
+            display: flex; 
+            flex-direction: row; /* Lado a lado */
+            gap: 10px; 
+            margin-bottom: 20px;
+            padding: 10px; 
+            background-color: var(--bg-color); 
+            border-radius: 8px;
+            justify-content: center;
         }
         .filter-button {
-            background-color: white; color: var(--primary-color); padding: 12px 20px;
-            border-radius: 8px; border: 2px solid var(--primary-color);
-            font-size: 1.1em; font-weight: bold; cursor: pointer;
-            transition: background-color 0.3s, border-color 0.3s;
-            width: 100%; max-width: 350px; text-align: center; box-sizing: border-box;
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            padding: 10px 15px;
+            border-radius: 20px; /* Mais arredondado */
+            border: 1px solid #ccc; /* Borda cinza clara */
+            font-size: 0.9em; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center; 
+            box-sizing: border-box;
         }
         .filter-button.active {
-            background-color: var(--primary-color); color: white;
-            border-color: var(--primary-color); box-shadow: 0 0 10px rgba(183, 110, 134, 0.5);
+            background-color: var(--primary-color); 
+            color: white;
+            border-color: var(--primary-color); 
         }
         
+        /* Título da Seção Limpo */
+        .section-title {
+            font-size: 1.5em;
+            color: var(--text-color); 
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: left;
+            border-bottom: none; /* Remove a linha antiga */
+        }
+        
+        /* Grid de Produtos Limpa */
         #products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(2, 1fr); /* 2 colunas no mobile */
+            gap: 15px;
         }
         .product-card {
-            background-color: white; border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            overflow: hidden; text-decoration: none; color: var(--text-color);
-            transition: transform 0.2s; position: relative;
+            background-color: white; 
+            border-radius: 8px;
+            box-shadow: none; /* Remove a sombra */
+            border: 1px solid var(--border-color); /* Borda fina */
+            overflow: hidden; 
+            text-decoration: none; 
+            color: var(--text-color);
+            transition: transform 0.2s; 
+            position: relative;
         }
-        .product-card:hover { transform: translateY(-5px); }
+        .product-card:hover { 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Sombra suave no hover */
+        }
         .product-image-container {
             width: 100%;
             padding-top: 150%; /* Proporção 2:3 (vertical) */
@@ -61,11 +116,11 @@
         .product-image {
             position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
-            object-fit: cover; /* Cobre todo o espaço */
+            object-fit: cover; 
         }
-        .product-info { padding: 15px; text-align: center; }
-        .product-name { font-size: 1.1em; font-weight: 600; margin: 0 0 10px 0; }
-        .product-price { font-size: 1.2em; font-weight: bold; color: var(--primary-color); margin: 0 0 15px 0; }
+        .product-info { padding: 15px; text-align: left; }
+        .product-name { font-size: 1em; font-weight: 600; margin: 0 0 5px 0; }
+        .product-price { font-size: 1.1em; font-weight: 700; color: var(--primary-color); margin: 0 0 15px 0; }
         .details-button {
             display: inline-block;
             background-color: var(--primary-color);
@@ -75,6 +130,10 @@
             font-weight: bold;
             text-decoration: none;
             transition: background-color 0.3s;
+            font-size: 0.9em;
+            width: 100%; /* Botão ocupa a largura toda */
+            box-sizing: border-box;
+            text-align: center;
         }
         .details-button:hover { background-color: #a15a70; }
         .badge {
@@ -94,7 +153,7 @@
             color: var(--light-text); font-size: 0.9em; border-top: 1px solid var(--border-color);
         }
 
-        /* --- NOVO: CSS DO CARRINHO WHATSAPP --- */
+        /* --- CSS DO CARRINHO WHATSAPP (Sem Alterações) --- */
         #cart-icon {
             position: fixed;
             bottom: 20px;
@@ -112,6 +171,7 @@
             cursor: pointer;
             z-index: 1000;
             transition: transform 0.2s;
+            text-decoration: none; /* Remove sublinhado do link */
         }
         #cart-icon:hover {
             transform: scale(1.1);
@@ -130,9 +190,17 @@
             display: none; /* Começa oculto */
         }
 
-        @media (min-width: 600px) {
-            #controls { flex-direction: row; justify-content: center; }
-            .filter-button { width: auto; }
+        /* Media Query para telas maiores (Desktop) */
+        @media (min-width: 768px) {
+            #products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* 3 ou 4 colunas */
+            }
+            .section-title {
+                font-size: 1.8em;
+                text-align: center;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -146,10 +214,10 @@
     <main>
         <div id="controls">
             <button class="filter-button active" data-filter="pronta-entrega">
-                FILTRAR: PRONTA ENTREGA
+                Pronta Entrega
             </button>
             <button class="filter-button" data-filter="sob-encomenda">
-                FILTRAR: SOB ENCOMENDA
+                Sob Encomenda
             </button>
         </div>
 
@@ -171,7 +239,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
     <script>
         // 🚨 CHAVES CORRETAS DA LOJA 3 MARIAS 🚨
         const firebaseConfig = {
@@ -193,13 +260,10 @@
         const errorMsg = document.getElementById('error-message');
         const filterButtons = document.querySelectorAll('.filter-button');
         const collectionTitle = document.getElementById('collection-title');
-        const cartCountEl = document.getElementById('cart-count'); // NOVO
+        const cartCountEl = document.getElementById('cart-count'); 
         let currentFilter = 'pronta-entrega';
-
-        // --- NOVO: LÓGICA DO CARRINHO ---
         
         function getCart() {
-            // Pega o carrinho da memória do navegador, ou um carrinho vazio se não existir
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
         }
 
@@ -215,20 +279,15 @@
             }
         }
         
-        // --- FIM DA LÓGICA DO CARRINHO ---
-        
-
         async function fetchProducts() {
             loadingMsg.style.display = 'block';
             errorMsg.style.display = 'none';
             grid.innerHTML = '';
 
             try {
-                // Esta consulta requer um Índice Composto do Firebase
-                // (products: source ASC, isFeatured DESC, createdAt DESC)
                 const snapshot = await db.collection("products")
                                     .where("source", "==", currentFilter)
-                                    .orderBy("isFeatured", "desc") // 'novo' e 'destaque' vêm primeiro
+                                    .orderBy("isFeatured", "desc") 
                                     .orderBy("createdAt", "desc")
                                     .get();
 
@@ -301,7 +360,7 @@
         // Carregamento Inicial
         document.addEventListener('DOMContentLoaded', () => {
             fetchProducts();
-            updateCartIcon(); // NOVO: Atualiza o ícone ao carregar a home
+            updateCartIcon(); 
         });
     </script>
 </body>
