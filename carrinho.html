@@ -6,15 +6,15 @@
     <title>Meu Carrinho | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* --- NOVO: CSS Minimalista (Victoria's Secret Style) --- */
+        /* --- CSS Minimalista --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
             --whatsapp-green: #28a745; 
             --text-color: #333; 
             --light-text: #666; 
-            --bg-color: #FFFFFF; /* Fundo principal Branco */
-            --border-color: #f0f0f0; /* Bordas bem claras */
+            --bg-color: #FFFFFF; 
+            --border-color: #f0f0f0; 
             --error-color: #dc3545;
         }
         body {
@@ -23,13 +23,16 @@
             background-color: var(--bg-color);
             color: var(--text-color);
         }
-        /* Cabeçalho Minimalista */
+        /* 🚨 CABEÇALHO ATUALIZADO PARA LOGO */
         header {
             background-color: white; 
             color: var(--text-color); 
             padding: 1rem 1rem;
-            text-align: left; /* Alinhado à esquerda */
+            text-align: center; /* Centralizado */
             border-bottom: 1px solid var(--border-color); 
+            display: flex; /* Para alinhar logo e link */
+            justify-content: space-between;
+            align-items: center;
         }
         header a {
             color: var(--text-color); 
@@ -37,6 +40,18 @@
             font-size: 1em;
             font-weight: 500;
         }
+        .header-logo-container {
+            flex: 1; /* Ocupa o espaço central */
+            text-align: center; /* Centraliza o logo */
+        }
+        .header-logo {
+            max-width: 180px; /* Logo menor nas páginas internas */
+            height: 60px; 
+            object-fit: contain; 
+            display: block;
+            margin: 0 auto;
+        }
+        
         main {
             max-width: 800px;
             margin: 30px auto;
@@ -54,7 +69,7 @@
         /* Estilo do Carrinho */
         #cart-items-container {
             background-color: white;
-            padding: 0; /* Remove padding */
+            padding: 0; 
             border-radius: 0;
             box-shadow: none;
         }
@@ -145,9 +160,11 @@
 </head>
 <body>
 
-    <header>
+    <header id="main-header">
         <a href="index.html" style="color: var(--text-color);">&larr; Voltar para a Loja</a>
-    </header>
+        <div class="header-logo-container">
+            </div>
+        <div style="width: 80px;"></div> </header>
 
     <main>
         <h1>Meu Carrinho WhatsApp</h1>
@@ -167,12 +184,44 @@
         
     </main>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
+        // 🚨 CHAVES CORRETAS DA LOJA 3 MARIAS 🚨
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
+            authDomain: "loja3marias-50204.firebaseapp.com",
+            projectId: "loja3marias-50204",
+            storageBucket: "loja3marias-50204.firebasestorage.app",
+            messagingSenderId: "405330133487",
+            appId: "1:405330133487:web:606de41211df52245f761a",
+            measurementId: "G-TK877V6P0S"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(); 
+
         const WHATSAPP_NUMBER = "818074558624"; 
         const cartItemsContainer = document.getElementById('cart-items-container');
         const cartSummary = document.getElementById('cart-summary');
         const cartTotalEl = document.getElementById('cart-total');
         const checkoutBtn = document.getElementById('whatsapp-checkout-btn');
+        const headerEl = document.getElementById('main-header'); // NOVO
+
+        // 🚨 NOVO: Carrega o Logo
+        async function fetchSiteConfig() {
+            try {
+                const doc = await db.collection("configuracoes").doc("siteInfo").get();
+                if (doc.exists && doc.data().logoUrl) {
+                    const logoContainer = headerEl.querySelector('.header-logo-container');
+                    if (logoContainer) {
+                        logoContainer.innerHTML = `<img src="${doc.data().logoUrl}" alt="3 Marias Logo" class="header-logo">`;
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao carregar logo.", error);
+            }
+        }
         
         function getCart() {
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
@@ -258,7 +307,10 @@
         });
 
         // Carregamento Inicial
-        document.addEventListener('DOMContentLoaded', renderCart);
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+            fetchSiteConfig(); // 🚨 NOVO: Chama a função do logo
+        });
 
     </script>
 </body>
