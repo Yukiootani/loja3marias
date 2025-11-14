@@ -18,14 +18,14 @@
         h1, h2 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
         form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 20px; background: #fdf7f9; border-radius: 5px; }
         label { font-weight: bold; margin-bottom: -10px; }
-        input[type="text"], input[type="number"], textarea, select, input[type="file"] {
+        input[type="text"], input[type="number"], textarea, select, input[type="file"], input[type="password"], input[type="email"] {
             width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;
         }
         textarea { min-height: 100px; }
         button {
             background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer;
         }
-        #status { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; }
+        #status, #loginStatus { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; }
         .success { background-color: #e6f9e6; color: #28a745; }
         .error { background-color: #fdeeee; color: var(--error-color); }
         .loading { background-color: #e6f2ff; color: #007bff; }
@@ -39,7 +39,7 @@
         .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
         .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; }
         
-        /* NOVO: Estilo das Variantes */
+        /* Estilo das Variantes */
         #variants-container { border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: #fff; }
         .variant-entry { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
         .variant-entry input[type="text"] { width: 30%; min-width: 150px; }
@@ -47,6 +47,11 @@
         .size-checkboxes { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .remove-variant-btn { background: var(--error-color); width: auto; padding: 5px 8px; font-size: 0.8em; }
         #add-variant-btn { background: var(--accent-color); color: #333; width: auto; padding: 8px 12px; margin-top: 10px; }
+        
+        /* NOVO: Estilo de Login */
+        #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
+        #admin-panel { display: none; } /* Oculto por padrão */
+        #btnLogout { background-color: #777; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -55,76 +60,93 @@
         <h1>Painel de Administração</h1>
         <h2>3 Marias Moda Feminina</h2>
 
-        <div id="status"></div>
+        <section id="login-section">
+            <h3>Login de Admin</h3>
+            <form id="loginForm">
+                <label for="login-email">Email:</label>
+                <input type="email" id="login-email" required>
+                <label for="login-password">Senha:</label>
+                <input type="password" id="login-password" required>
+                <button type="submit" id="btnLogin">Entrar</button>
+            </form>
+            <div id="loginStatus" class="status"></div>
+        </section>
 
-        <form id="product-form">
-            <h3 id="form-title">1. Adicionar Novo Produto</h3>
-            <input type="hidden" id="productId"> <label for="name">Nome do Produto:</label>
-            <input type="text" id="name" required>
+        <section id="admin-panel">
+            <div id="status"></div>
 
-            <label for="price">Preço (¥):</label>
-            <input type="number" id="price" required>
+            <form id="product-form">
+                <h3 id="form-title">1. Adicionar Novo Produto</h3>
+                <input type="hidden" id="productId"> <label for="name">Nome do Produto:</label>
+                <input type="text" id="name" required>
 
-            <label for="description">Descrição:</label>
-            <textarea id="description" rows="4"></textarea>
+                <label for="price">Preço (¥):</label>
+                <input type="number" id="price" required>
 
-            <label>Variantes (Cores e Tamanhos):</label>
-            <div id="variants-container">
-                </div>
-            <button type="button" id="add-variant-btn">+ Adicionar Cor</button>
+                <label for="description">Descrição:</label>
+                <textarea id="description" rows="4"></textarea>
 
-            <label for="estoque">Estoque (Total de Peças):</label>
-            <input type="number" id="estoque" value="0" required>
+                <label>Variantes (Cores e Tamanhos):</label>
+                <div id="variants-container">
+                    </div>
+                <button type="button" id="add-variant-btn">+ Adicionar Cor</button>
 
-            <label for="source">Disponibilidade:</label>
-            <select id="source" required>
-                <option value="pronta-entrega">Pronta Entrega</option>
-                <option value="sob-encomenda">Sob Encomenda (3-5 dias)</option>
-            </select>
+                <label for="estoque">Estoque (Total de Peças):</label>
+                <input type="number" id="estoque" value="0" required>
 
-            <label for="isFeatured">Selo:</label>
-            <select id="isFeatured">
-                <option value="nenhum">Nenhum</option>
-                <option value="novo">✨ Novidade</option>
-                <option value="destaque">🔥 Destaque</option>
-            </select>
+                <label for="source">Disponibilidade:</label>
+                <select id="source" required>
+                    <option value="pronta-entrega">Pronta Entrega</option>
+                    <option value="sob-encomenda">Sob Encomenda (3-5 dias)</option>
+                </select>
 
-            <label for="imageUrl">Imagem de Capa (Upload):</label>
-            <input type="file" id="imageUrl" accept="image/png, image/jpeg">
+                <label for="isFeatured">Selo:</label>
+                <select id="isFeatured">
+                    <option value="nenhum">Nenhum</option>
+                    <option value="novo">✨ Novidade</option>
+                    <option value="destaque">🔥 Destaque</option>
+                </select>
+
+                <label for="imageUrl">Imagem de Capa (Upload):</label>
+                <input type="file" id="imageUrl" accept="image/png, image/jpeg">
+                
+                <label for="videoUrl">Vídeo (Upload Opcional):</label>
+                <input type="file" id="videoUrl" accept="video/mp4, video/webm">
+
+                <label for="galeria">Galeria (Upload Múltiplo):</label>
+                <input type="file" id="galeria" multiple accept="image/png, image/jpeg">
+                
+                <button type="submit" id="save-btn">Salvar Produto</button>
+                <button type="button" id="cancel-edit-btn" style="display:none; background-color: #777;">Cancelar Edição</button>
+            </form>
+
+            <h2>2. Gerenciar Produtos Existentes</h2>
+            <div id="products-table-container">
+                <table id="products-table">
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Nome</th>
+                            <th>Preço (¥)</th>
+                            <th>Estoque</th>
+                            <th>Disponibilidade</th>
+                            <th>Selo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-list">
+                        </tbody>
+                </table>
+            </div>
             
-            <label for="videoUrl">Vídeo (Upload Opcional):</label>
-            <input type="file" id="videoUrl" accept="video/mp4, video/webm">
-
-            <label for="galeria">Galeria (Upload Múltiplo):</label>
-            <input type="file" id="galeria" multiple accept="image/png, image/jpeg">
-            
-            <button type="submit" id="save-btn">Salvar Produto</button>
-            <button type="button" id="cancel-edit-btn" style="display:none; background-color: #777;">Cancelar Edição</button>
-        </form>
-
-        <h2>2. Gerenciar Produtos Existentes</h2>
-        <div id="products-table-container">
-            <table id="products-table">
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>Nome</th>
-                        <th>Preço (¥)</th>
-                        <th>Estoque</th>
-                        <th>Disponibilidade</th>
-                        <th>Selo</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="products-list">
-                    </tbody>
-            </table>
-        </div>
+            <button id="btnLogout">Sair (Logout)</button>
+        </section>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
 
     <script>
         // 🚨 CHAVES CORRETAS DA LOJA 3 MARIAS 🚨
@@ -140,7 +162,8 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(); 
-        const storage = firebase.storage(); // 🚨 INICIALIZA O STORAGE
+        const storage = firebase.storage(); 
+        const auth = firebase.auth(); // 🚨 INICIALIZA O AUTH
 
         // Elementos do DOM
         const form = document.getElementById('product-form');
@@ -153,6 +176,13 @@
         const addVariantBtn = document.getElementById('add-variant-btn');
         const variantsContainer = document.getElementById('variants-container');
 
+        // NOVO: Elementos de Login
+        const loginSection = document.getElementById('login-section');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginForm = document.getElementById('loginForm');
+        const loginStatusDiv = document.getElementById('loginStatus');
+        const btnLogout = document.getElementById('btnLogout');
+
         // Campos do formulário
         const nameField = document.getElementById('name');
         const priceField = document.getElementById('price');
@@ -164,16 +194,15 @@
         const videoUrlInput = document.getElementById('videoUrl');
         const galeriaInput = document.getElementById('galeria');
 
-        // Guarda os URLs antigos durante a edição
         let oldImageUrl = '';
         let oldVideoUrl = '';
         let oldGaleria = [];
 
-        function showStatus(message, type) {
-            statusDiv.textContent = message;
-            statusDiv.className = type;
+        function showStatus(div, message, type) {
+            div.textContent = message;
+            div.className = 'status ' + type;
             if (type !== 'loading') {
-                setTimeout(() => { statusDiv.textContent = ''; statusDiv.className = ''; }, 4000);
+                setTimeout(() => { div.textContent = ''; div.className = ''; }, 4000);
             }
         }
 
@@ -289,7 +318,7 @@
                 productsList.innerHTML = html;
             } catch (error) {
                 console.error("Erro ao carregar produtos:", error);
-                showStatus("Erro ao carregar produtos: " + error.message, "error");
+                showStatus(statusDiv, "Erro ao carregar produtos: " + error.message, "error");
             }
         }
 
@@ -364,7 +393,7 @@
                 fetchProducts(); // Recarrega a lista
             } catch (error) {
                 console.error("Erro ao salvar:", error);
-                showStatus("Erro ao salvar: " + error.message, "error");
+                showStatus(statusDiv, "Erro ao salvar: " + error.message, "error");
             } finally {
                 saveBtn.disabled = false;
             }
@@ -440,8 +469,39 @@
             cancelEditBtn.style.display = "none";
         }
 
-        // Carregar produtos ao iniciar
-        document.addEventListener('DOMContentLoaded', fetchProducts);
+        // --- LÓGICA DE LOGIN ---
+        
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            showStatus(loginStatusDiv, 'Tentando entrar...', 'loading');
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                // O onAuthStateChanged vai tratar de mostrar o painel
+            } catch (error) {
+                showStatus(loginStatusDiv, `Erro de Acesso: ${error.message}`, 'error');
+            }
+        });
+
+        btnLogout.addEventListener('click', async () => {
+            await auth.signOut();
+        });
+
+        // Verificação de Estado de Autenticação
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Usuário LOGADO
+                loginSection.style.display = 'none';
+                adminPanel.style.display = 'block';
+                fetchProducts(); // Carrega os produtos
+            } else {
+                // Usuário DESLOGADO
+                loginSection.style.display = 'block';
+                adminPanel.style.display = 'none';
+            }
+        });
+        
     </script>
 
 </body>
