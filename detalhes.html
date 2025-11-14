@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes do Produto | 3 Marias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
         /* [Todo o seu CSS 'Labelly' (idêntico ao anterior) está aqui...] */
@@ -22,6 +23,7 @@
             margin: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
+            padding-bottom: 80px; /* Espaço para o carrinho */
         }
         header {
             background-color: white; 
@@ -116,7 +118,6 @@
         .info-area h1 { color: var(--text-color); margin-top: 0; font-size: 2em; font-weight: 600; }
         .info-area .price { font-size: 1.8em; font-weight: bold; color: var(--primary-color); margin: 15px 0; }
         .info-area p { line-height: 1.6; color: var(--light-text); }
-        .low-stock-warning { color: var(--error-color); font-size: 0.9em; font-weight: normal; margin-top: 5px; }
         .status-badge {
             font-size: 0.9em;
             padding: 8px 15px;
@@ -128,8 +129,8 @@
         }
         .status-pronta-entrega { background-color: #e6f9e6; color: var(--whatsapp-green); border-color: #d0edd4; }
         .status-sob-encomenda { background-color: #f7f7e6; color: #856404; border-color: #eaeaa0; }
-        .in-stock { color: var(--whatsapp-green); }
-        .out-of-stock { color: var(--error-color); }
+        
+        /* 🚨 BOTÃO ATUALIZADO */
         .buy-button {
             display: block;
             background-color: var(--whatsapp-green); 
@@ -142,15 +143,15 @@
             border-radius: 4px;
             margin-top: 30px;
             transition: background-color 0.3s;
-            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); 
+            cursor: pointer;
+            border: none;
         }
         .buy-button:hover { background-color: #1e7e34; }
-        .sold-out-btn {
-            background-color: var(--error-color); 
-            color: white;
-            cursor: default;
-            pointer-events: none;
+        .buy-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
+        
         #loading, #error {
             text-align: center;
             padding: 50px;
@@ -158,7 +159,7 @@
             color: var(--light-text);
         }
         
-        /* --- CSS DAS VARIANTES (Victoria's Secret Style) --- */
+        /* CSS DAS VARIANTES (Victoria's Secret Style) */
         .variant-group {
             margin-top: 20px;
         }
@@ -180,11 +181,11 @@
             border: 2px solid var(--border-color);
             cursor: pointer;
             transition: transform 0.2s, border-color 0.2s;
-            box-sizing: border-box; /* Garante que a borda não aumente o tamanho */
+            box-sizing: border-box; 
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7em; /* Para nomes de cor complexos */
+            font-size: 0.7em; 
             text-align: center;
             overflow: hidden;
         }
@@ -216,12 +217,42 @@
             color: white;
             border-color: var(--primary-color);
         }
-        .size-button.disabled {
-            background-color: #f9f9f9;
-            color: #ccc;
-            border-color: #eee;
-            cursor: not-allowed;
-            text-decoration: line-through;
+        
+        /* --- NOVO: CSS DO CARRINHO WHATSAPP --- */
+        #cart-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--whatsapp-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.2s;
+            text-decoration: none;
+        }
+        #cart-icon:hover {
+            transform: scale(1.1);
+        }
+        #cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 7px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid white;
+            display: none; /* Começa oculto */
         }
 
     </style>
@@ -237,6 +268,11 @@
         <div id="error" style="display: none;"></div>
         <div id="product-details" style="display: none;"></div>
     </main>
+
+    <a id="cart-icon" href="carrinho.html">
+        <i class="fas fa-shopping-bag"></i>
+        <span id="cart-count">0</span>
+    </a>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -259,24 +295,28 @@
         const detailsContainer = document.getElementById('product-details');
         const loadingDiv = document.getElementById('loading');
         const errorDiv = document.getElementById('error');
+        const cartCountEl = document.getElementById('cart-count'); // NOVO
         const WHATSAPP_NUMBER = "818074558624"; 
 
         // --- Variáveis globais para guardar estado ---
-        let parsedVariants = {}; // Guarda { Cor: [Tamanhos] }
+        let currentProductId = null;
+        let parsedVariants = {}; 
         let selectedColor = null;
         let selectedSize = null;
-        let baseWhatsappMessage = "";
         let productName = "Produto";
+        let productPrice = 0;
+        let productImageUrl = '';
 
         // LÓGICA DE CARREGAMENTO
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
-            if (!productId) {
+            currentProductId = urlParams.get('id');
+            if (!currentProductId) {
                 showError("Erro: ID do produto não encontrado na URL.");
                 return;
             }
-            fetchProductDetails(productId);
+            fetchProductDetails(currentProductId);
+            updateCartIcon(); // NOVO: Atualiza o ícone ao carregar a página
         });
 
         function showError(message) {
@@ -297,34 +337,30 @@
                 
                 const product = doc.data();
                 productName = product.name || 'Produto Sem Nome';
+                productPrice = product.price || 0;
+                productImageUrl = product.imageUrl || 'https://via.placeholder.com/400x600?text=3+Marias';
+                
                 const description = product.description || 'Descrição não disponível.';
-                const price = product.price || '0';
-                const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=IMAGEM+PRINCIPAL';
                 const videoUrl = product.videoUrl; 
                 const source = product.source || 'pronta-entrega'; 
-                const variantesObj = product.variantes || {}; // NOVO: Já vem como objeto
+                const variantesObj = product.variantes || {};
                 
                 let galleryUrls = product.galeria || [];
                 let allMediaUrls = [];
-                if (videoUrl) { allMediaUrls.push({ type: 'video', url: videoUrl, thumb: imageUrl }); }
-                if (imageUrl) { allMediaUrls.push({ type: 'image', url: imageUrl, thumb: imageUrl }); }
+                if (videoUrl) { allMediaUrls.push({ type: 'video', url: videoUrl, thumb: productImageUrl }); }
+                if (productImageUrl) { allMediaUrls.push({ type: 'image', url: productImageUrl, thumb: productImageUrl }); }
                 galleryUrls.forEach(url => { allMediaUrls.push({ type: 'image', url: url, thumb: url }); });
                 allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i);
                 
-                const priceValue = parseFloat(price.toString().replace(',', '.')); 
+                const priceValue = parseFloat(productPrice.toString().replace(',', '.')); 
                 const precoFormatado = priceValue.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 });
                 
-                let statusText, statusClass, buttonText = 'Comprar / Encomendar via WhatsApp', buttonClass = 'buy-button', lowStockWarning = '';
-                
+                let statusText, statusClass;
                 if (source === 'pronta-entrega') {
                     statusText = `✅ Pronta Entrega (Envio/Retirada Imediata)`; statusClass = 'status-pronta-entrega';
-                    baseWhatsappMessage = `Olá, Harumi! Gostaria de comprar o produto ${productName} (${precoFormatado}) que está na Pronta Entrega.`;
                 } else {
                     statusText = `📦 Sob Encomenda (3-5 dias)`; statusClass = 'status-sob-encomenda';
-                    baseWhatsappMessage = `Olá! Gostaria de encomendar o produto ${productName} (${precoFormatado}) do Catálogo Completo.`;
                 }
-
-                const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(baseWhatsappMessage)}`;
                 
                 let mainMediaHTML = ''; let galleryHTML = '';
                 allMediaUrls.forEach((media, index) => {
@@ -338,7 +374,7 @@
 
                 // --- NOVO: HTML das Variantes ---
                 let variantsHTML = '';
-                parsedVariants = variantesObj; // Já é um objeto
+                parsedVariants = variantesObj; 
                 const colors = Object.keys(parsedVariants);
                 
                 if (colors.length > 0) {
@@ -368,13 +404,13 @@
                         <span class="status-badge ${statusClass}">${statusText}</span>
                         <h1>${productName}</h1>
                         <p class="price">${precoFormatado}</p>
-                        ${lowStockWarning}
                         
                         ${variantsHTML} 
                         
-                        <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600;">Descrição</h3>
+                        <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600; margin-top: 20px;">Descrição</h3>
                         <p style="color:var(--light-text); font-weight:400;">${description}</p>
-                        <a href="${whatsappLink}" target="_blank" class="${buttonClass}" id="whatsapp-link">${buttonText}</a>
+                        
+                        <button class="buy-button" id="add-to-cart-btn">Adicionar ao Carrinho</button>
                     </div>`;
                 
                 loadingDiv.style.display = 'none';
@@ -385,11 +421,83 @@
                 if (colors.length > 0) {
                     setupVariantSelectors();
                 }
+                
+                // 🚨 NOVO: Evento de clique para Adicionar ao Carrinho
+                document.getElementById('add-to-cart-btn').addEventListener('click', handleAddToCart);
 
             } catch (error) {
                 console.error("Erro ao carregar detalhes:", error);
                 showError(`Erro ao carregar os detalhes: ${error.message}.`);
             }
+        }
+
+        // --- LÓGICA DO CARRINHO ---
+        
+        function getCart() {
+            return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem('whatsappCart', JSON.stringify(cart));
+        }
+
+        function updateCartIcon() {
+            const cart = getCart();
+            const count = Object.keys(cart.items).length;
+            
+            if (count > 0) {
+                cartCountEl.textContent = count;
+                cartCountEl.style.display = 'flex';
+            } else {
+                cartCountEl.style.display = 'none';
+            }
+        }
+        
+        function handleAddToCart() {
+            const colorsAvailable = Object.keys(parsedVariants).length > 0;
+            
+            // Validação
+            if (colorsAvailable && !selectedColor) {
+                alert("Por favor, selecione uma cor.");
+                return;
+            }
+            if (colorsAvailable && !selectedSize) {
+                alert("Por favor, selecione um tamanho.");
+                return;
+            }
+
+            const cart = getCart();
+            
+            // Cria um ID único para o item (Produto + Cor + Tamanho)
+            const itemId = `${currentProductId}_${selectedColor || 'padrao'}_${selectedSize || 'padrao'}`;
+            
+            if (cart.items[itemId]) {
+                // Se o item exato já existe, apenas incrementa a quantidade
+                cart.items[itemId].quantity += 1;
+            } else {
+                // Se é um item novo, adiciona ao carrinho
+                cart.items[itemId] = {
+                    id: currentProductId,
+                    name: productName,
+                    price: productPrice,
+                    color: selectedColor,
+                    size: selectedSize,
+                    image: productImageUrl,
+                    quantity: 1
+                };
+            }
+
+            saveCart(cart);
+            updateCartIcon();
+            
+            // Feedback visual
+            const btn = document.getElementById('add-to-cart-btn');
+            btn.textContent = "Adicionado! ✓";
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.textContent = "Adicionar ao Carrinho";
+                btn.disabled = false;
+            }, 2000);
         }
 
         // --- LÓGICA DAS VARIANTES ---
@@ -400,24 +508,18 @@
             colorContainer.addEventListener('click', (e) => {
                 const target = e.target.closest('.color-swatch');
                 if (target) {
-                    // Remove 'active' de todos
                     colorContainer.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('active'));
-                    
-                    // Adiciona 'active' no clicado
                     target.classList.add('active');
                     selectedColor = target.dataset.color;
-                    
-                    // Atualiza os tamanhos
                     renderSizeOptions(selectedColor);
-                    updateWhatsappLink();
                 }
             });
         }
 
         function renderSizeOptions(color) {
             const sizeContainer = document.getElementById('size-selector');
-            sizeContainer.innerHTML = ''; // Limpa os tamanhos antigos
-            selectedSize = null; // Reseta o tamanho
+            sizeContainer.innerHTML = ''; 
+            selectedSize = null; 
             
             const sizes = parsedVariants[color];
             if (!sizes) return;
@@ -426,32 +528,15 @@
                 sizeContainer.innerHTML += `<div class="size-button" data-size="${size}">${size}</div>`;
             });
             
-            // Adiciona evento de clique aos novos botões de tamanho
             sizeContainer.addEventListener('click', (e) => {
                 if (e.target.classList.contains('size-button')) {
                     sizeContainer.querySelectorAll('.size-button').forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
                     selectedSize = e.target.dataset.size;
-                    updateWhatsappLink();
                 }
             });
         }
         
-        function updateWhatsappLink() {
-            let message = baseWhatsappMessage;
-            if (selectedColor) {
-                message += `\nCor: ${selectedColor}`;
-            }
-            if (selectedSize) {
-                message += `\nTamanho: ${selectedSize}`;
-            }
-            // Adiciona a saudação final
-            message += `\n\nQual o procedimento para pagamento e envio/retirada?`;
-            
-            document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-        }
-
-        // Mapeamento simples de cores (português/japonês -> CSS)
         function getSafeColor(colorName) {
             const colors = {
                 'preto': 'black', 'branco': 'white', 'vermelho': 'red', 'rosa': '#FFC0CB',
@@ -459,10 +544,9 @@
                 'cinza': 'gray', 'bege': '#F5F5DC', 'oncinha': 'tan', 'marrom': 'brown',
                 'nude': '#E3BC9A', 'vinho': '#800000', 'bordô': '#800000'
             };
-            // Se for oncinha, coloca uma cor de fundo, senão, usa o nome da cor
             const lowerColor = colorName.toLowerCase();
             if (lowerColor === 'oncinha' || lowerColor === 'onça') {
-                 return 'tan'; // Cor de fundo para "Oncinha"
+                 return 'tan'; 
             }
             return colors[lowerColor] || colorName;
         }
