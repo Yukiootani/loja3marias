@@ -13,8 +13,8 @@
             --accent-color: #DAA520; 
             --text-color: #333; 
             --light-text: #666; 
-            --bg-color: #FFFFFF; /* Fundo principal Branco */
-            --border-color: #f0f0f0; /* Bordas bem claras */
+            --bg-color: #FFFFFF; 
+            --border-color: #f0f0f0; 
             --whatsapp-green: #28a745; 
         }
         body { 
@@ -25,20 +25,24 @@
             padding-bottom: 80px; 
         }
         
-        /* Cabeçalho Minimalista */
+        /* Cabeçalho Minimalista com Logo */
         header { 
             background-color: var(--bg-color); 
             color: var(--text-color); 
-            padding: 1.5rem 1rem; 
+            padding: 1rem 1rem; /* Reduzido */
             text-align: center; 
             border-bottom: 1px solid var(--border-color); 
         }
-        header h1 { 
-            margin: 0; 
-            font-size: 1.8em; 
-            font-weight: 700;
-            color: var(--primary-color); /* Título principal rosa */
+        
+        /* 🚨 NOVO: Estilo do Logo */
+        .header-logo {
+            max-width: 250px; /* Largura máxima para o logo */
+            height: 80px; /* Altura fixa para consistência */
+            object-fit: contain; /* Garante que o logo caiba sem distorcer */
+            margin: 0 auto 5px auto; /* Centraliza */
+            display: block; 
         }
+        
         header p { 
             font-size: 1em; 
             color: var(--light-text);
@@ -50,7 +54,7 @@
         /* Controles de Filtro Minimalistas */
         #controls {
             display: flex; 
-            flex-direction: row; /* Lado a lado */
+            flex-direction: row; 
             gap: 10px; 
             margin-bottom: 20px;
             padding: 10px; 
@@ -62,8 +66,8 @@
             background-color: var(--bg-color); 
             color: var(--text-color); 
             padding: 10px 15px;
-            border-radius: 20px; /* Mais arredondado */
-            border: 1px solid #ccc; /* Borda cinza clara */
+            border-radius: 20px; 
+            border: 1px solid #ccc; 
             font-size: 0.9em; 
             font-weight: 600; 
             cursor: pointer;
@@ -77,27 +81,26 @@
             border-color: var(--primary-color); 
         }
         
-        /* Título da Seção Limpo */
         .section-title {
             font-size: 1.5em;
             color: var(--text-color); 
             margin-bottom: 20px;
             font-weight: 600;
             text-align: left;
-            border-bottom: none; /* Remove a linha antiga */
+            border-bottom: none; 
         }
         
         /* Grid de Produtos Limpa */
         #products-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 colunas no mobile */
+            grid-template-columns: repeat(2, 1fr); 
             gap: 15px;
         }
         .product-card {
             background-color: white; 
             border-radius: 8px;
-            box-shadow: none; /* Remove a sombra */
-            border: 1px solid var(--border-color); /* Borda fina */
+            box-shadow: none; 
+            border: 1px solid var(--border-color); 
             overflow: hidden; 
             text-decoration: none; 
             color: var(--text-color);
@@ -105,11 +108,11 @@
             position: relative;
         }
         .product-card:hover { 
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Sombra suave no hover */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
         }
         .product-image-container {
             width: 100%;
-            padding-top: 150%; /* Proporção 2:3 (vertical) */
+            padding-top: 150%; 
             position: relative;
             background-color: #f0f0f0;
         }
@@ -131,7 +134,7 @@
             text-decoration: none;
             transition: background-color 0.3s;
             font-size: 0.9em;
-            width: 100%; /* Botão ocupa a largura toda */
+            width: 100%; 
             box-sizing: border-box;
             text-align: center;
         }
@@ -153,7 +156,7 @@
             color: var(--light-text); font-size: 0.9em; border-top: 1px solid var(--border-color);
         }
 
-        /* --- CSS DO CARRINHO WHATSAPP (Sem Alterações) --- */
+        /* --- CSS DO CARRINHO WHATSAPP --- */
         #cart-icon {
             position: fixed;
             bottom: 20px;
@@ -171,7 +174,7 @@
             cursor: pointer;
             z-index: 1000;
             transition: transform 0.2s;
-            text-decoration: none; /* Remove sublinhado do link */
+            text-decoration: none; 
         }
         #cart-icon:hover {
             transform: scale(1.1);
@@ -187,13 +190,12 @@
             font-size: 14px;
             font-weight: bold;
             border: 2px solid white;
-            display: none; /* Começa oculto */
+            display: none; 
         }
 
-        /* Media Query para telas maiores (Desktop) */
         @media (min-width: 768px) {
             #products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* 3 ou 4 colunas */
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
             }
             .section-title {
                 font-size: 1.8em;
@@ -206,8 +208,8 @@
 </head>
 <body>
     
-    <header>
-        <h1>3 MARIAS MODA FEMININA</h1>
+    <header id="main-header">
+        <h1>3 MARIAS MODA FEMININA</h1> 
         <p>A moda íntima brasileira que te entende, no Japão.</p>
     </header>
 
@@ -261,6 +263,7 @@
         const filterButtons = document.querySelectorAll('.filter-button');
         const collectionTitle = document.getElementById('collection-title');
         const cartCountEl = document.getElementById('cart-count'); 
+        const headerEl = document.getElementById('main-header'); // NOVO
         let currentFilter = 'pronta-entrega';
         
         function getCart() {
@@ -339,6 +342,21 @@
                 errorMsg.innerHTML = `Erro: Não foi possível carregar os produtos.<br>Verifique o painel /admin e os Índices do Firebase.`;
             }
         }
+        
+        // 🚨 NOVO: Carrega o Logo
+        async function fetchSiteConfig() {
+            try {
+                const doc = await db.collection("configuracoes").doc("siteInfo").get();
+                if (doc.exists && doc.data().logoUrl) {
+                    headerEl.innerHTML = `
+                        <img src="${doc.data().logoUrl}" alt="3 Marias Moda Feminina Logo" class="header-logo">
+                        <p>A moda íntima brasileira que te entende, no Japão.</p>
+                    `;
+                }
+            } catch (error) {
+                console.error("Erro ao carregar logo, usando texto padrão.", error);
+            }
+        }
 
         // Lógica dos Filtros
         filterButtons.forEach(button => {
@@ -361,6 +379,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetchProducts();
             updateCartIcon(); 
+            fetchSiteConfig(); // 🚨 NOVO: Chama a função do logo
         });
     </script>
 </body>
