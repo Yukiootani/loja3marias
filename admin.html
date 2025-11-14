@@ -25,7 +25,8 @@
         button {
             background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer;
         }
-        #status { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+        /* 🚨 DIV DE STATUS CORRIGIDA */
+        #status { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
         .success { background-color: #e6f9e6; color: #28a745; }
         .error { background-color: #fdeeee; color: var(--error-color); }
         .loading { background-color: #e6f2ff; color: #007bff; }
@@ -39,7 +40,7 @@
         .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
         .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; }
         
-        /* NOVO: Estilo das Variantes */
+        /* Estilo das Variantes */
         #variants-container { border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: #fff; }
         .variant-entry { border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
         .variant-entry:last-child { border-bottom: none; }
@@ -57,7 +58,7 @@
         <h1>Painel de Administração</h1>
         <h2>3 Marias Moda Feminina</h2>
 
-        <div id="status" style="display: none;"></div>
+        <div id="status"></div>
 
         <form id="product-form">
             <h3 id="form-title">1. Adicionar Novo Produto</h3>
@@ -144,7 +145,6 @@
         const db = firebase.firestore(); 
         const storage = firebase.storage(); 
 
-        // 🚨 CORREÇÃO: Mover todo o código para dentro do DOMContentLoaded
         document.addEventListener('DOMContentLoaded', () => {
 
             // Elementos do DOM
@@ -175,9 +175,11 @@
             
             let statusTimeout; 
 
+            // 🚨 FUNÇÃO SHOWSTATUS CORRIGIDA
             function showStatus(message, type) {
                 clearTimeout(statusTimeout); 
-                statusDiv.textContent = message;
+                // Garante que a mensagem é sempre texto, não um objeto
+                statusDiv.textContent = String(message); 
                 statusDiv.className = 'status ' + type;
                 statusDiv.style.display = 'block'; // Garante que está visível
                 
@@ -362,7 +364,7 @@
                     productsList.innerHTML = html;
                 } catch (error) {
                     console.error("Erro ao carregar produtos:", error);
-                    showStatus(statusDiv, "Erro ao carregar produtos: " + error.message, "error");
+                    showStatus("Erro ao carregar produtos: " + String(error.message), "error");
                 }
             }
 
@@ -370,7 +372,7 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 saveBtn.disabled = true;
-                showStatus(statusDiv, "Salvando... Por favor, aguarde o upload.", "loading");
+                showStatus("Salvando... Por favor, aguarde o upload.", "loading");
 
                 const currentProductId = productIdField.value || `pid_${Date.now()}`;
                 
@@ -381,7 +383,7 @@
                     
                     // UPLOAD IMAGEM DE CAPA
                     if (imageUrlInput.files[0]) {
-                        showStatus(statusDiv, "Fazendo upload da Imagem de Capa (1/3)...", "loading");
+                        showStatus("Fazendo upload da Imagem de Capa (1/3)...", "loading");
                         const file = imageUrlInput.files[0];
                         const path = `products/${currentProductId}/capa_${file.name}`;
                         imageUrl = await uploadFile(file, path);
@@ -389,7 +391,7 @@
 
                     // UPLOAD VÍDEO
                     if (videoUrlInput.files[0]) {
-                        showStatus(statusDiv, "Fazendo upload do Vídeo (2/3)...", "loading");
+                        showStatus("Fazendo upload do Vídeo (2/3)...", "loading");
                         const file = videoUrlInput.files[0];
                         const path = `products/${currentProductId}/video_${file.name}`;
                         videoUrl = await uploadFile(file, path);
@@ -397,7 +399,7 @@
                     
                     // UPLOAD GALERIA (Múltiplos)
                     if (galeriaInput.files.length > 0) {
-                        showStatus(statusDiv, `Fazendo upload de ${galeriaInput.files.length} imagens da galeria (3/3)...`, "loading");
+                        showStatus(`Fazendo upload de ${galeriaInput.files.length} imagens da galeria (3/3)...`, "loading");
                         galeriaUrls = []; // Reseta a galeria se novos arquivos forem enviados
                         for (const file of galeriaInput.files) {
                             const path = `products/${currentProductId}/galeria_${file.name}`;
@@ -421,22 +423,22 @@
 
                     if (productIdField.value) {
                         // Atualizar (Update)
-                        showStatus(statusDiv, "Atualizando produto no banco de dados...", "loading");
+                        showStatus("Atualizando produto no banco de dados...", "loading");
                         await db.collection("products").doc(currentProductId).update(productData);
                         showStatus("Produto atualizado com sucesso!", "success");
                     } else {
                         // Criar (Create)
-                        showStatus(statusDiv, "Criando produto no banco de dados...", "loading");
+                        showStatus("Criando produto no banco de dados...", "loading");
                         productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                         await db.collection("products").doc(currentProductId).set(productData);
                         showStatus("Produto salvo com sucesso!", "success");
                     }
                     
-                    cancelEditMode(); // 🚨 CORREÇÃO: Isto agora limpa o formulário
+                    cancelEditMode(); 
                     fetchProducts(); // Recarrega a lista
                 } catch (error) {
                     console.error("Erro ao salvar:", error);
-                    showStatus(statusDiv, "Erro ao salvar: " + error.message, "error");
+                    showStatus("Erro ao salvar: " + String(error.message), "error");
                 } finally {
                     saveBtn.disabled = false;
                 }
@@ -452,11 +454,11 @@
                     if (!confirm("Tem certeza que deseja excluir este produto?")) return;
                     try {
                         await db.collection("products").doc(id).delete();
-                        showStatus(statusDiv, "Produto excluído com sucesso!", "success");
+                        showStatus("Produto excluído com sucesso!", "success");
                         fetchProducts(); // Recarrega a lista
                     } catch (error) {
                         console.error("Erro ao excluir:", error);
-                        showStatus(statusDiv, "Erro ao excluir: " + error.message, "error");
+                        showStatus("Erro ao excluir: " + String(error.message), "error");
                     }
                 }
                 
@@ -465,7 +467,7 @@
                     try {
                         const doc = await db.collection("products").doc(id).get();
                         if (!doc.exists) {
-                            showStatus(statusDiv, "Erro: Produto não encontrado.", "error");
+                            showStatus("Erro: Produto não encontrado.", "error");
                             return;
                         }
                         const product = doc.data();
@@ -494,7 +496,7 @@
                         cancelEditBtn.style.display = "block";
                         window.scrollTo(0, 0); // Rola para o topo
                     } catch (error) {
-                        showStatus(statusDiv, "Erro ao carregar para edição: " + error.message, "error");
+                        showStatus("Erro ao carregar para edição: " + String(error.message), "error");
                     }
                 }
             });
