@@ -7,15 +7,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* --- NOVO: CSS Minimalista (Victoria's Secret Style) --- */
+        /* --- CSS Minimalista (Sem Alterações) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
             --whatsapp-green: #28a745; 
             --text-color: #333; 
             --light-text: #666; 
-            --bg-color: #FFFFFF; /* Fundo principal Branco */
-            --border-color: #f0f0f0; /* Bordas bem claras */
+            --bg-color: #FFFFFF; 
+            --border-color: #f0f0f0; 
             --error-color: #dc3545;
         }
         body {
@@ -23,14 +23,13 @@
             margin: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding-bottom: 80px; /* Espaço para o carrinho */
+            padding-bottom: 80px; 
         }
-        /* Cabeçalho Minimalista */
         header {
             background-color: white; 
             color: var(--text-color); 
             padding: 1rem 1rem;
-            text-align: left; /* Alinhado à esquerda */
+            text-align: left; 
             border-bottom: 1px solid var(--border-color); 
         }
         header a {
@@ -49,10 +48,10 @@
             flex-wrap: wrap;
             gap: 30px;
             background-color: white;
-            padding: 0; /* Remove padding antigo */
+            padding: 0; 
             border-radius: 0; 
-            box-shadow: none; /* Remove sombra antiga */
-            border: none; /* Remove borda antiga */
+            box-shadow: none; 
+            border: none; 
         }
         .media-area {
             flex: 1 1 50%; 
@@ -85,9 +84,9 @@
         }
         .thumb-container {
             position: relative;
-            width: 70px; /* Menor */
+            width: 70px; 
             height: 70px;
-            border-radius: 4px; /* Mais suave */
+            border-radius: 4px; 
             cursor: pointer;
             border: 1px solid var(--border-color);
             transition: border 0.3s;
@@ -160,7 +159,7 @@
             color: var(--light-text);
         }
         
-        /* CSS DAS VARIANTES (Victoria's Secret Style) */
+        /* CSS DAS VARIANTES */
         .variant-group {
             margin-top: 20px;
         }
@@ -176,7 +175,7 @@
             gap: 10px;
         }
         .color-swatch {
-            width: 35px; /* Menor */
+            width: 35px; 
             height: 35px;
             border-radius: 50%;
             border: 2px solid var(--border-color);
@@ -219,7 +218,7 @@
             border-color: var(--primary-color);
         }
         
-        /* --- CSS DO CARRINHO WHATSAPP (Sem Alterações) --- */
+        /* CSS DO CARRINHO WHATSAPP */
         #cart-icon {
             position: fixed;
             bottom: 20px;
@@ -347,11 +346,30 @@
                 
                 let galleryUrls = product.galeria || [];
                 let allMediaUrls = [];
-                if (videoUrl) { allMediaUrls.push({ type: 'video', url: videoUrl, thumb: productImageUrl }); }
-                if (productImageUrl) { allMediaUrls.push({ type: 'image', url: productImageUrl, thumb: productImageUrl }); }
-                galleryUrls.forEach(url => { allMediaUrls.push({ type: 'image', url: url, thumb: url }); });
+
+                // 🚨🚨 A CORREÇÃO ESTÁ AQUI 👇 🚨🚨
+                
+                // 1. Imagem de capa PRIMEIRO (para ser a Padrão)
+                if (productImageUrl) { 
+                    allMediaUrls.push({ type: 'image', url: productImageUrl, thumb: productImageUrl }); 
+                }
+                
+                // 2. Galeria de imagens
+                galleryUrls.forEach(url => { 
+                    allMediaUrls.push({ type: 'image', url: url, thumb: url }); 
+                });
+                
+                // 3. Vídeo por ÚLTIMO
+                if (videoUrl) { 
+                    // O thumbnail do vídeo será a imagem de capa (productImageUrl)
+                    allMediaUrls.push({ type: 'video', url: videoUrl, thumb: productImageUrl }); 
+                }
+
+                // Remove duplicados (caso a imagem de capa esteja na galeria)
                 allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i);
                 
+                // 🚨🚨 FIM DA CORREÇÃO 🚨🚨
+
                 const priceValue = parseFloat(productPrice.toString().replace(',', '.')); 
                 const precoFormatado = priceValue.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 });
                 
@@ -364,15 +382,17 @@
                 
                 let mainMediaHTML = ''; let galleryHTML = '';
                 allMediaUrls.forEach((media, index) => {
-                    const isActive = index === 0; const isVideoThumb = media.type === 'video';
+                    const isActive = index === 0; // A Imagem de Capa será sempre a ativa
+                    const isVideoThumb = media.type === 'video';
                     galleryHTML += `<div class="thumb-container ${isActive ? 'active' : ''}" data-type="${media.type}" data-full-src="${media.url}"><img src="${media.thumb}" alt="Mídia ${index + 1}">${isVideoThumb ? '<div class="video-overlay"></div>' : ''}</div>`;
+                    
                     if (isActive) {
-                        if (media.type === 'video') { mainMediaHTML = `<video src="${media.url}" controls loop style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">Vídeo não suportado.</video>`; }
-                        else { mainMediaHTML = `<img id="main-image" src="${media.url}" alt="${productName}">`; }
+                        // Como a imagem de capa é sempre a primeira, nunca vai carregar o vídeo primeiro
+                        mainMediaHTML = `<img id="main-image" src="${media.url}" alt="${productName}">`;
                     }
                 });
 
-                // --- NOVO: HTML das Variantes ---
+                // --- HTML das Variantes ---
                 let variantsHTML = '';
                 parsedVariants = variantesObj; 
                 const colors = Object.keys(parsedVariants);
@@ -430,7 +450,7 @@
             }
         }
 
-        // --- LÓGICA DO CARRINHO ---
+        // --- LÓGICA DO CARRINHO (Sem Alterações) ---
         
         function getCart() {
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
@@ -455,7 +475,6 @@
         function handleAddToCart() {
             const colorsAvailable = Object.keys(parsedVariants).length > 0;
             
-            // Validação
             if (colorsAvailable && !selectedColor) {
                 alert("Por favor, selecione uma cor.");
                 return;
@@ -466,8 +485,6 @@
             }
 
             const cart = getCart();
-            
-            // Cria um ID único para o item (Produto + Cor + Tamanho)
             const itemId = `${currentProductId}_${selectedColor || 'padrao'}_${selectedSize || 'padrao'}`;
             
             if (cart.items[itemId]) {
@@ -487,7 +504,6 @@
             saveCart(cart);
             updateCartIcon();
             
-            // Feedback visual
             const btn = document.getElementById('add-to-cart-btn');
             btn.textContent = "Adicionado! ✓";
             btn.disabled = true;
@@ -497,7 +513,7 @@
             }, 2000);
         }
 
-        // --- LÓGICA DAS VARIANTES ---
+        // --- LÓGICA DAS VARIANTES (Sem Alterações) ---
 
         function setupVariantSelectors() {
             const colorContainer = document.getElementById('color-selector');
