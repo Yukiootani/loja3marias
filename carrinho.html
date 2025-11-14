@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Carrinho | 3 Marias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #b76e86; 
+            --accent-color: #DAA520; 
+            --whatsapp-green: #28a745; 
+            --text-color: #333; 
+            --light-text: #666; 
+            --bg-color: #fcfcfc; 
+            --border-color: #e0e0e0; 
+            --error-color: #dc3545;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        header {
+            background-color: white; 
+            color: var(--text-color); 
+            padding: 1rem 0;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color); 
+        }
+        header a {
+            color: var(--text-color); 
+            text-decoration: none; 
+            font-size: 1em;
+            font-weight: 500;
+        }
+        main {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+        
+        /* Estilo do Carrinho */
+        #cart-items-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .cart-item {
+            display: flex;
+            gap: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+        .cart-item-info {
+            flex: 1;
+        }
+        .cart-item-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1em;
+        }
+        .cart-item-info p {
+            margin: 0;
+            font-size: 0.9em;
+            color: var(--light-text);
+        }
+        .cart-item-price {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-align: right;
+        }
+        .cart-item-remove {
+            color: var(--error-color);
+            font-size: 0.9em;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        #cart-summary {
+            margin-top: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .checkout-button {
+            display: block;
+            background-color: var(--whatsapp-green); 
+            color: white;
+            text-align: center;
+            padding: 15px;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); 
+        }
+        .checkout-button:hover {
+            background-color: #1e7e34;
+        }
+        #empty-cart-message {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--light-text);
+            padding: 40px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" style="color: var(--text-color);">&larr; Voltar para a Loja</a>
+    </header>
+
+    <main>
+        <h1>Meu Carrinho WhatsApp</h1>
+
+        <div id="cart-items-container">
+            </div>
+
+        <div id="cart-summary" style="display: none;">
+            <div class="summary-total">
+                <span>Total:</span>
+                <span id="cart-total">¥0</span>
+            </div>
+            <a href="#" id="whatsapp-checkout-btn" class="checkout-button">
+                <i class="fab fa-whatsapp"></i> Enviar Pedido via WhatsApp
+            </a>
+        </div>
+        
+    </main>
+
+    <script>
+        const WHATSAPP_NUMBER = "818074558624"; 
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const cartSummary = document.getElementById('cart-summary');
+        const cartTotalEl = document.getElementById('cart-total');
+        const checkoutBtn = document.getElementById('whatsapp-checkout-btn');
+
+        // --- LÓGICA DO CARRINHO ---
+        
+        function getCart() {
+            return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem('whatsappCart', JSON.stringify(cart));
+        }
+
+        function renderCart() {
+            const cart = getCart();
+            const items = cart.items;
+            
+            cartItemsContainer.innerHTML = ''; // Limpa o carrinho
+            let total = 0;
+
+            if (Object.keys(items).length === 0) {
+                cartItemsContainer.innerHTML = '<p id="empty-cart-message">Seu carrinho está vazio.</p>';
+                cartSummary.style.display = 'none';
+                return;
+            }
+
+            cartSummary.style.display = 'block';
+            let whatsappMessage = "Olá, Harumi! Gostaria de fazer o seguinte pedido:\n\n";
+
+            for (const itemId in items) {
+                const item = items[itemId];
+                const itemPrice = parseFloat(item.price);
+                const itemTotal = itemPrice * item.quantity;
+                total += itemTotal;
+
+                const precoFormatado = itemPrice.toLocaleString('ja-JP');
+                
+                let variantText = '';
+                if (item.color) variantText += `Cor: ${item.color}`;
+                if (item.size) variantText += `, Tamanho: ${item.size}`;
+
+                // Adiciona ao HTML
+                cartItemsContainer.innerHTML += `
+                    <div class="cart-item" id="item-${itemId}">
+                        <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                        <div class="cart-item-info">
+                            <h3>${item.name}</h3>
+                            <p>${variantText}</p>
+                            <p>Qtd: ${item.quantity}</p>
+                            <span class="cart-item-remove" data-id="${itemId}">Remover</span>
+                        </div>
+                        <div class="cart-item-price">
+                            ¥${precoFormatado}
+                        </div>
+                    </div>
+                `;
+
+                // Adiciona à mensagem do WhatsApp
+                whatsappMessage += `*${item.quantity}x* - ${item.name}\n`;
+                if (variantText) {
+                    whatsappMessage += `  (${variantText})\n`;
+                }
+                whatsappMessage += `  (Preço: ¥${precoFormatado})\n\n`;
+            }
+
+            // Atualiza o total
+            cartTotalEl.textContent = `¥${total.toLocaleString('ja-JP')}`;
+
+            // Configura o botão do WhatsApp
+            whatsappMessage += `*Total do Pedido: ¥${total.toLocaleString('ja-JP')}*`;
+            whatsappMessage += `\n\nAguardo as instruções para pagamento.`;
+            checkoutBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+        }
+
+        // Lógica para remover item
+        cartItemsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('cart-item-remove')) {
+                const itemId = e.target.dataset.id;
+                
+                if (confirm("Tem certeza que deseja remover este item do carrinho?")) {
+                    const cart = getCart();
+                    delete cart.items[itemId];
+                    saveCart(cart);
+                    renderCart(); // Re-renderiza o carrinho
+                }
+            }
+        });
+
+        // Carregamento Inicial
+        document.addEventListener('DOMContentLoaded', renderCart);
+
+    </script>
+</body>
+</html>
