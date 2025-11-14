@@ -208,7 +208,9 @@
                 clearTimeout(statusTimeout); // Limpa qualquer timeout anterior
                 div.textContent = message;
                 div.className = 'status ' + type;
-                if (type !== 'loading') { // Só limpa se for sucesso ou erro
+                
+                // 🚨 CORREÇÃO: A barra de loading não deve ter timeout
+                if (type !== 'loading') { 
                     statusTimeout = setTimeout(() => { div.textContent = ''; div.className = ''; }, 4000);
                 }
             }
@@ -243,9 +245,6 @@
                     document.getElementById(`variant-${this.dataset.id}`).remove();
                 });
             });
-
-            // (Função global removida, evento é adicionado na criação)
-            // window.removeVariant = (id) => { ... } 
 
             function getVariantsFromForm() {
                 const variants = {};
@@ -394,13 +393,13 @@
                         // Atualizar (Update)
                         showStatus(statusDiv, "Atualizando produto no banco de dados...", "loading");
                         await db.collection("products").doc(currentProductId).update(productData);
-                        showStatus("Produto atualizado com sucesso!", "success");
+                        showStatus(statusDiv, "Produto atualizado com sucesso!", "success");
                     } else {
                         // Criar (Create)
                         showStatus(statusDiv, "Criando produto no banco de dados...", "loading");
                         productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                         await db.collection("products").doc(currentProductId).set(productData);
-                        showStatus("Produto salvo com sucesso!", "success");
+                        showStatus(statusDiv, "Produto salvo com sucesso!", "success");
                     }
                     
                     cancelEditMode(); // 🚨 CORREÇÃO: Isto agora limpa o formulário
