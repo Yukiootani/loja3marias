@@ -25,7 +25,7 @@
         button {
             background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer;
         }
-        #status { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; }
+        #status { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
         .success { background-color: #e6f9e6; color: #28a745; }
         .error { background-color: #fdeeee; color: var(--error-color); }
         .loading { background-color: #e6f2ff; color: #007bff; }
@@ -39,19 +39,16 @@
         .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
         .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; }
         
-        /* Estilo das Variantes */
+        /* NOVO: Estilo das Variantes */
         #variants-container { border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: #fff; }
-        .variant-entry { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
-        .variant-entry input[type="text"] { width: 30%; min-width: 150px; }
-        .variant-entry label { font-weight: normal; margin: 0 5px; }
-        .size-checkboxes { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .variant-entry { border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
+        .variant-entry:last-child { border-bottom: none; }
+        .variant-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .variant-row label { font-weight: normal; margin: 0; }
+        .variant-row select, .variant-row input[type="text"] { width: auto; min-width: 150px; }
+        .size-checkboxes { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
         .remove-variant-btn { background: var(--error-color); width: auto; padding: 5px 8px; font-size: 0.8em; }
         #add-variant-btn { background: var(--accent-color); color: #333; width: auto; padding: 8px 12px; margin-top: 10px; }
-        
-        /* Estilo de Login */
-        #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
-        #admin-panel { display: none; } /* Oculto por padrão */
-        #btnLogout { background-color: #777; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -60,94 +57,77 @@
         <h1>Painel de Administração</h1>
         <h2>3 Marias Moda Feminina</h2>
 
-        <section id="login-section">
-            <h3>Login de Admin</h3>
-            <form id="loginForm">
-                <label for="login-email">Email:</label>
-                <input type="email" id="login-email" required>
-                <label for="login-password">Senha:</label>
-                <input type="password" id="login-password" required>
-                <button type="submit" id="btnLogin">Entrar</button>
-            </form>
-            <div id="loginStatus" class="status"></div>
-        </section>
+        <div id="status" style="display: none;"></div>
 
-        <section id="admin-panel">
-            <div id="status"></div>
+        <form id="product-form">
+            <h3 id="form-title">1. Adicionar Novo Produto</h3>
+            <input type="hidden" id="productId"> <label for="name">Nome do Produto:</label>
+            <input type="text" id="name" required>
 
-            <form id="product-form">
-                <h3 id="form-title">1. Adicionar Novo Produto</h3>
-                <input type="hidden" id="productId"> <label for="name">Nome do Produto:</label>
-                <input type="text" id="name" required>
+            <label for="price">Preço (¥):</label>
+            <input type="number" id="price" required>
 
-                <label for="price">Preço (¥):</label>
-                <input type="number" id="price" required>
+            <label for="description">Descrição:</label>
+            <textarea id="description" rows="4"></textarea>
 
-                <label for="description">Descrição:</label>
-                <textarea id="description" rows="4"></textarea>
+            <label>Variantes (Cores e Tamanhos):</label>
+            <div id="variants-container">
+                </div>
+            <button type="button" id="add-variant-btn">+ Adicionar Cor</button>
 
-                <label>Variantes (Cores e Tamanhos):</label>
-                <div id="variants-container">
-                    </div>
-                <button type="button" id="add-variant-btn">+ Adicionar Cor</button>
+            <label for="estoque">Estoque (Total de Peças):</label>
+            <input type="number" id="estoque" value="0" required>
 
-                <label for="estoque">Estoque (Total de Peças):</label>
-                <input type="number" id="estoque" value="0" required>
+            <label for="source">Disponibilidade:</label>
+            <select id="source" required>
+                <option value="pronta-entrega">Pronta Entrega</option>
+                <option value="sob-encomenda">Sob Encomenda (3-5 dias)</option>
+            </select>
 
-                <label for="source">Disponibilidade:</label>
-                <select id="source" required>
-                    <option value="pronta-entrega">Pronta Entrega</option>
-                    <option value="sob-encomenda">Sob Encomenda (3-5 dias)</option>
-                </select>
+            <label for="isFeatured">Selo:</label>
+            <select id="isFeatured">
+                <option value="nenhum">Nenhum</option>
+                <option value="novo">✨ Novidade</option>
+                <option value="destaque">🔥 Destaque</option>
+            </select>
 
-                <label for="isFeatured">Selo:</label>
-                <select id="isFeatured">
-                    <option value="nenhum">Nenhum</option>
-                    <option value="novo">✨ Novidade</option>
-                    <option value="destaque">🔥 Destaque</option>
-                </select>
-
-                <label for="imageUrl">Imagem de Capa (Upload):</label>
-                <input type="file" id="imageUrl" accept="image/png, image/jpeg">
-                
-                <label for="videoUrl">Vídeo (Upload Opcional):</label>
-                <input type="file" id="videoUrl" accept="video/mp4, video/webm">
-
-                <label for="galeria">Galeria (Upload Múltiplo):</label>
-                <input type="file" id="galeria" multiple accept="image/png, image/jpeg">
-                
-                <button type="submit" id="save-btn">Salvar Produto</button>
-                <button type="button" id="cancel-edit-btn" style="display:none; background-color: #777;">Cancelar Edição</button>
-            </form>
-
-            <h2>2. Gerenciar Produtos Existentes</h2>
-            <div id="products-table-container">
-                <table id="products-table">
-                    <thead>
-                        <tr>
-                            <th>Foto</th>
-                            <th>Nome</th>
-                            <th>Preço (¥)</th>
-                            <th>Estoque</th>
-                            <th>Disponibilidade</th>
-                            <th>Selo</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="products-list">
-                        </tbody>
-                </table>
-            </div>
+            <label for="imageUrl">Imagem de Capa (Upload):</label>
+            <input type="file" id="imageUrl" accept="image/png, image/jpeg">
             
-            <button id="btnLogout">Sair (Logout)</button>
-        </section>
+            <label for="videoUrl">Vídeo (Upload Opcional):</label>
+            <input type="file" id="videoUrl" accept="video/mp4, video/webm">
+
+            <label for="galeria">Galeria (Upload Múltiplo):</label>
+            <input type="file" id="galeria" multiple accept="image/png, image/jpeg">
+            
+            <button type="submit" id="save-btn">Salvar Produto</button>
+            <button type="button" id="cancel-edit-btn" style="display:none; background-color: #777;">Cancelar Edição</button>
+        </form>
+
+        <h2>2. Gerenciar Produtos Existentes</h2>
+        <div id="products-table-container">
+            <table id="products-table">
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>Nome</th>
+                        <th>Preço (¥)</th>
+                        <th>Estoque</th>
+                        <th>Disponibilidade</th>
+                        <th>Selo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="products-list">
+                    </tbody>
+            </table>
+        </div>
+        
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script> 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
-
     <script>
         // 🚨 CHAVES CORRETAS DA LOJA 3 MARIAS 🚨
         const firebaseConfig = {
@@ -163,7 +143,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(); 
         const storage = firebase.storage(); 
-        const auth = firebase.auth(); 
 
         // 🚨 CORREÇÃO: Mover todo o código para dentro do DOMContentLoaded
         document.addEventListener('DOMContentLoaded', () => {
@@ -178,13 +157,6 @@
             const cancelEditBtn = document.getElementById('cancel-edit-btn');
             const addVariantBtn = document.getElementById('add-variant-btn');
             const variantsContainer = document.getElementById('variants-container');
-
-            // Elementos de Login
-            const loginSection = document.getElementById('login-section');
-            const adminPanel = document.getElementById('admin-panel');
-            const loginForm = document.getElementById('loginForm');
-            const loginStatusDiv = document.getElementById('loginStatus');
-            const btnLogout = document.getElementById('btnLogout');
 
             // Campos do formulário
             const nameField = document.getElementById('name');
@@ -201,17 +173,20 @@
             let oldVideoUrl = '';
             let oldGaleria = [];
             
-            // 🚨 CORREÇÃO: Variável de timeout para a barra de status
             let statusTimeout; 
 
-            function showStatus(div, message, type) {
-                clearTimeout(statusTimeout); // Limpa qualquer timeout anterior
-                div.textContent = message;
-                div.className = 'status ' + type;
+            function showStatus(message, type) {
+                clearTimeout(statusTimeout); 
+                statusDiv.textContent = message;
+                statusDiv.className = 'status ' + type;
+                statusDiv.style.display = 'block'; // Garante que está visível
                 
-                // 🚨 CORREÇÃO: A barra de loading não deve ter timeout
                 if (type !== 'loading') { 
-                    statusTimeout = setTimeout(() => { div.textContent = ''; div.className = ''; }, 4000);
+                    statusTimeout = setTimeout(() => { 
+                        statusDiv.textContent = ''; 
+                        statusDiv.className = '';
+                        statusDiv.style.display = 'none'; 
+                    }, 4000);
                 }
             }
 
@@ -223,13 +198,38 @@
             }
 
             // --- LÓGICA DE VARIANTES ---
+            const predefinedColors = [
+                { name: "Preto", value: "black" },
+                { name: "Branco", value: "white" },
+                { name: "Vermelho", value: "red" },
+                { name: "Rosa", value: "#FFC0CB" },
+                { name: "Azul", value: "blue" },
+                { name: "Verde", value: "green" },
+                { name: "Amarelo", value: "yellow" },
+                { name: "Cinza", value: "gray" },
+                { name: "Bege", value: "#F5F5DC" },
+                { name: "Nude", value: "#E3BC9A" },
+                { name: "Vinho", value: "#800000" },
+                { name: "Oncinha", value: "tan" }
+            ];
+
             addVariantBtn.addEventListener('click', () => {
-                const entryId = Date.now(); // ID único
+                const entryId = Date.now();
                 const variantEntry = document.createElement('div');
                 variantEntry.className = 'variant-entry';
                 variantEntry.id = `variant-${entryId}`;
+                
+                let colorOptions = predefinedColors.map(c => `<option value="${c.name}" style="background-color:${c.value}; color:${c.value === 'black' ? 'white' : 'black'};">${c.name}</option>`).join('');
+
                 variantEntry.innerHTML = `
-                    <input type="text" class="variant-color" placeholder="Cor (ex: Preto)">
+                    <div class="variant-row">
+                        <select class="variant-color-select">
+                            <option value="">Escolha uma cor...</option>
+                            ${colorOptions}
+                            <option value="custom">Outra (Personalizada)</option>
+                        </select>
+                        <input type="text" class="variant-color-custom" placeholder="Cor Personalizada" style="display:none;">
+                    </div>
                     <div class="size-checkboxes">
                         <input type="checkbox" id="p-${entryId}" data-size="P"><label for="p-${entryId}">P</label>
                         <input type="checkbox" id="m-${entryId}" data-size="M"><label for="m-${entryId}">M</label>
@@ -240,7 +240,13 @@
                 `;
                 variantsContainer.appendChild(variantEntry);
                 
-                // Adiciona o evento de clique ao novo botão de remover
+                // Evento para mostrar/esconder o campo "Outra Cor"
+                variantEntry.querySelector('.variant-color-select').addEventListener('change', function() {
+                    const customInput = variantEntry.querySelector('.variant-color-custom');
+                    customInput.style.display = (this.value === 'custom') ? 'block' : 'none';
+                });
+                
+                // Evento para o botão de remover
                 variantEntry.querySelector('.remove-variant-btn').addEventListener('click', function() {
                     document.getElementById(`variant-${this.dataset.id}`).remove();
                 });
@@ -250,7 +256,11 @@
                 const variants = {};
                 const entries = variantsContainer.querySelectorAll('.variant-entry');
                 entries.forEach(entry => {
-                    const color = entry.querySelector('.variant-color').value;
+                    const select = entry.querySelector('.variant-color-select');
+                    const custom = entry.querySelector('.variant-color-custom');
+                    
+                    let color = (select.value === 'custom') ? custom.value : select.value;
+                    
                     if (color) {
                         const sizes = [];
                         entry.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
@@ -273,13 +283,25 @@
                     variantEntry.className = 'variant-entry';
                     variantEntry.id = `variant-${entryId}`;
                     
+                    let colorOptions = predefinedColors.map(c => `<option value="${c.name}" style="background-color:${c.value}; color:${c.value === 'black' ? 'white' : 'black'};">${c.name}</option>`).join('');
+                    let isCustom = !predefinedColors.find(c => c.name === color);
+                    let customValue = isCustom ? color : '';
+                    let selectValue = isCustom ? 'custom' : color;
+                    
                     const checkedP = sizes.includes('P') ? 'checked' : '';
                     const checkedM = sizes.includes('M') ? 'checked' : '';
                     const checkedG = sizes.includes('G') ? 'checked' : '';
                     const checkedGG = sizes.includes('GG') ? 'checked' : '';
 
                     variantEntry.innerHTML = `
-                        <input type="text" class="variant-color" value="${color}">
+                        <div class="variant-row">
+                             <select class="variant-color-select">
+                                <option value="">Escolha uma cor...</option>
+                                ${colorOptions}
+                                <option value="custom">Outra (Personalizada)</option>
+                            </select>
+                            <input type="text" class="variant-color-custom" value="${customValue}" style="display:${isCustom ? 'block' : 'none'};">
+                        </div>
                         <div class="size-checkboxes">
                             <input type="checkbox" id="p-${entryId}" data-size="P" ${checkedP}><label for="p-${entryId}">P</label>
                             <input type="checkbox" id="m-${entryId}" data-size="M" ${checkedM}><label for="m-${entryId}">M</label>
@@ -289,7 +311,15 @@
                         <button type="button" class="remove-variant-btn" data-id="${entryId}">X</button>
                     `;
                     variantsContainer.appendChild(variantEntry);
-                    // Adiciona o evento de clique ao novo botão de remover
+                    
+                    // Define o valor selecionado
+                    variantEntry.querySelector('.variant-color-select').value = selectValue;
+                    
+                    // Adiciona os eventos novamente
+                    variantEntry.querySelector('.variant-color-select').addEventListener('change', function() {
+                        const customInput = variantEntry.querySelector('.variant-color-custom');
+                        customInput.style.display = (this.value === 'custom') ? 'block' : 'none';
+                    });
                     variantEntry.querySelector('.remove-variant-btn').addEventListener('click', function() {
                         document.getElementById(`variant-${this.dataset.id}`).remove();
                     });
@@ -393,13 +423,13 @@
                         // Atualizar (Update)
                         showStatus(statusDiv, "Atualizando produto no banco de dados...", "loading");
                         await db.collection("products").doc(currentProductId).update(productData);
-                        showStatus(statusDiv, "Produto atualizado com sucesso!", "success");
+                        showStatus("Produto atualizado com sucesso!", "success");
                     } else {
                         // Criar (Create)
                         showStatus(statusDiv, "Criando produto no banco de dados...", "loading");
                         productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                         await db.collection("products").doc(currentProductId).set(productData);
-                        showStatus(statusDiv, "Produto salvo com sucesso!", "success");
+                        showStatus("Produto salvo com sucesso!", "success");
                     }
                     
                     cancelEditMode(); // 🚨 CORREÇÃO: Isto agora limpa o formulário
@@ -483,37 +513,10 @@
             }
 
             // --- LÓGICA DE LOGIN ---
+            // (Removida, pois este admin é público/local)
             
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                showStatus(loginStatusDiv, 'Tentando entrar...', 'loading');
-                try {
-                    await auth.signInWithEmailAndPassword(email, password);
-                    // O onAuthStateChanged vai tratar de mostrar o painel
-                } catch (error) {
-                    showStatus(loginStatusDiv, `Erro de Acesso: ${error.message}`, 'error');
-                }
-            });
-
-            btnLogout.addEventListener('click', async () => {
-                await auth.signOut();
-            });
-
-            // Verificação de Estado de Autenticação
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    // Usuário LOGADO
-                    loginSection.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    fetchProducts(); // Carrega os produtos
-                } else {
-                    // Usuário DESLOGADO
-                    loginSection.style.display = 'block';
-                    adminPanel.style.display = 'none';
-                }
-            });
+            // Carregar produtos ao iniciar
+            fetchProducts();
         
         }); // FIM DO DOMCONTENTLOADED
     </script>
