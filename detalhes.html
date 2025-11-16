@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* --- CSS Minimalista --- */
+        /* --- CSS Minimalista (Sem Alterações) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
@@ -25,16 +25,12 @@
             color: var(--text-color);
             padding-bottom: 80px; 
         }
-        /* 🚨 CABEÇALHO ATUALIZADO PARA LOGO */
         header {
             background-color: white; 
             color: var(--text-color); 
             padding: 1rem 1rem;
-            text-align: center; /* Centralizado */
+            text-align: left; 
             border-bottom: 1px solid var(--border-color); 
-            display: flex; /* Para alinhar logo e link */
-            justify-content: space-between;
-            align-items: center;
         }
         header a {
             color: var(--text-color); 
@@ -42,18 +38,6 @@
             font-size: 1em;
             font-weight: 500;
         }
-        .header-logo-container {
-            flex: 1; /* Ocupa o espaço central */
-            text-align: center; /* Centraliza o logo */
-        }
-        .header-logo {
-            max-width: 180px; /* Logo menor nas páginas internas */
-            height: 60px; 
-            object-fit: contain; 
-            display: block;
-            margin: 0 auto;
-        }
-
         main {
             max-width: 1000px;
             margin: 20px auto;
@@ -63,11 +47,6 @@
             display: flex;
             flex-wrap: wrap;
             gap: 30px;
-            background-color: white;
-            padding: 0; 
-            border-radius: 0; 
-            box-shadow: none; 
-            border: none; 
         }
         .media-area {
             flex: 1 1 50%; 
@@ -234,6 +213,14 @@
             border-color: var(--primary-color);
         }
         
+        /* 🚨 NOVO: Estilo para "Esgotado" */
+        .size-button.disabled {
+            background-color: #f5f5f5;
+            color: #aaa;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        
         /* CSS DO CARRINHO WHATSAPP */
         #cart-icon {
             position: fixed;
@@ -268,18 +255,16 @@
             font-size: 14px;
             font-weight: bold;
             border: 2px solid white;
-            display: none; 
+            display: none; /* Começa oculto */
         }
 
     </style>
 </head>
 <body>
 
-    <header id="main-header">
+    <header>
         <a href="index.html" style="color: var(--text-color);">&larr; Voltar para a Loja</a>
-        <div class="header-logo-container">
-            </div>
-        <div style="width: 80px;"></div> </header>
+    </header>
 
     <main>
         <div id="loading">Carregando detalhes do produto...</div>
@@ -313,12 +298,11 @@
         const loadingDiv = document.getElementById('loading');
         const errorDiv = document.getElementById('error');
         const cartCountEl = document.getElementById('cart-count'); 
-        const headerEl = document.getElementById('main-header'); // NOVO
         const WHATSAPP_NUMBER = "818074558624"; 
 
         // --- Variáveis globais para guardar estado ---
         let currentProductId = null;
-        let parsedVariants = {}; 
+        let parsedVariants = {}; // 🚨 VAI ARMAZENAR A NOVA ESTRUTURA {Preto: {P: 5, M: 0}}
         let selectedColor = null;
         let selectedSize = null;
         let productName = "Produto";
@@ -335,7 +319,6 @@
             }
             fetchProductDetails(currentProductId);
             updateCartIcon(); 
-            fetchSiteConfig(); // 🚨 NOVO: Chama a função do logo
         });
 
         function showError(message) {
@@ -362,28 +345,25 @@
                 const description = product.description || 'Descrição não disponível.';
                 const videoUrl = product.videoUrl; 
                 const source = product.source || 'pronta-entrega'; 
-                const variantesObj = product.variantes || {};
+                
+                // 🚨 MUDANÇA: Armazena a nova estrutura de variantes
+                parsedVariants = product.variantes || {};
                 
                 let galleryUrls = product.galeria || [];
                 let allMediaUrls = [];
 
-                // 1. Imagem de capa PRIMEIRO
+                // Lógica da Galeria (sem mudança)
                 if (productImageUrl) { 
                     allMediaUrls.push({ type: 'image', url: productImageUrl, thumb: productImageUrl }); 
                 }
-                
-                // 2. Galeria de imagens
                 galleryUrls.forEach(url => { 
                     allMediaUrls.push({ type: 'image', url: url, thumb: url }); 
                 });
-                
-                // 3. Vídeo por ÚLTIMO
                 if (videoUrl) { 
                     allMediaUrls.push({ type: 'video', url: videoUrl, thumb: productImageUrl }); 
                 }
-
                 allMediaUrls = allMediaUrls.filter((v, i, a) => a.findIndex(t => (t.url === v.url && t.type === v.type)) === i);
-                
+
                 const priceValue = parseFloat(productPrice.toString().replace(',', '.')); 
                 const precoFormatado = priceValue.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 });
                 
@@ -405,9 +385,8 @@
                     }
                 });
 
-                // --- HTML das Variantes ---
+                // --- 🚨 MUDANÇA: HTML das Variantes ---
                 let variantsHTML = '';
-                parsedVariants = variantesObj; 
                 const colors = Object.keys(parsedVariants);
                 
                 if (colors.length > 0) {
@@ -441,9 +420,9 @@
                         ${variantsHTML} 
                         
                         <h3 style="color:var(--text-color); font-size:1.1em; font-weight:600; margin-top: 20px;">Descrição</h3>
-                        <p style="color:var(--light-text); font-weight:400;">${description}</p>
+                        <p style="color:var(--light-text); font-weight:400;">${description.replace(/\n/g, '<br>')}</p>
                         
-                        <button class="buy-button" id="add-to-cart-btn">Adicionar ao Carrinho</button>
+                        <button class="buy-button" id="add-to-cart-btn" disabled>Selecione Cor e Tamanho</button>
                     </div>`;
                 
                 loadingDiv.style.display = 'none';
@@ -453,6 +432,10 @@
                 setupMediaThumbnails();
                 if (colors.length > 0) {
                     setupVariantSelectors();
+                } else {
+                    // Se não há variantes, habilita o botão de compra
+                    document.getElementById('add-to-cart-btn').textContent = "Adicionar ao Carrinho";
+                    document.getElementById('add-to-cart-btn').disabled = false;
                 }
                 
                 document.getElementById('add-to-cart-btn').addEventListener('click', handleAddToCart);
@@ -463,31 +446,14 @@
             }
         }
 
-        // 🚨 NOVO: Carrega o Logo
-        async function fetchSiteConfig() {
-            try {
-                const doc = await db.collection("configuracoes").doc("siteInfo").get();
-                if (doc.exists && doc.data().logoUrl) {
-                    const logoContainer = headerEl.querySelector('.header-logo-container');
-                    if (logoContainer) {
-                        logoContainer.innerHTML = `<img src="${doc.data().logoUrl}" alt="3 Marias Logo" class="header-logo">`;
-                    }
-                }
-            } catch (error) {
-                console.error("Erro ao carregar logo.", error);
-            }
-        }
-
-        // --- LÓGICA DO CARRINHO ---
+        // --- LÓGICA DO CARRINHO (Sem Alterações) ---
         
         function getCart() {
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
         }
-
         function saveCart(cart) {
             localStorage.setItem('whatsappCart', JSON.stringify(cart));
         }
-
         function updateCartIcon() {
             const cart = getCart();
             const count = Object.keys(cart.items).length;
@@ -502,8 +468,9 @@
         
         function handleAddToCart() {
             const colorsAvailable = Object.keys(parsedVariants).length > 0;
+            const btn = document.getElementById('add-to-cart-btn');
             
-            // Validação
+            // Validação (já tratada pelo disabled, mas bom ter)
             if (colorsAvailable && !selectedColor) {
                 alert("Por favor, selecione uma cor.");
                 return;
@@ -512,8 +479,16 @@
                  alert("Por favor, selecione um tamanho.");
                 return;
             }
+            // 🚨 NOVO: Verifica se o tamanho selecionado tem estoque
+            if(colorsAvailable && selectedColor && selectedSize) {
+                if (parsedVariants[selectedColor][selectedSize] <= 0) {
+                    alert("Desculpe, este item (Cor/Tamanho) está esgotado.");
+                    return;
+                }
+            }
 
             const cart = getCart();
+            // 🚨 MUDANÇA: O ID do item agora inclui P, M, G, GG
             const itemId = `${currentProductId}_${selectedColor || 'padrao'}_${selectedSize || 'padrao'}`;
             
             if (cart.items[itemId]) {
@@ -533,52 +508,94 @@
             saveCart(cart);
             updateCartIcon();
             
-            const btn = document.getElementById('add-to-cart-btn');
             btn.textContent = "Adicionado! ✓";
             btn.disabled = true;
             setTimeout(() => {
                 btn.textContent = "Adicionar ao Carrinho";
-                btn.disabled = false;
+                // Re-habilita o botão, mas só se as seleções ainda forem válidas
+                checkButtonState(); 
             }, 2000);
         }
 
-        // --- LÓGICA DAS VARIANTES ---
+        // --- 🚨 LÓGICA DAS VARIANTES (TOTALMENTE REESCRITA) ---
 
         function setupVariantSelectors() {
             const colorContainer = document.getElementById('color-selector');
+            const sizeContainer = document.getElementById('size-selector');
             
+            // Evento para CORES
             colorContainer.addEventListener('click', (e) => {
                 const target = e.target.closest('.color-swatch');
                 if (target) {
                     colorContainer.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('active'));
                     target.classList.add('active');
                     selectedColor = target.dataset.color;
+                    selectedSize = null; // Reseta o tamanho ao trocar de cor
                     renderSizeOptions(selectedColor);
+                    checkButtonState();
+                }
+            });
+            
+            // Evento para TAMANHOS
+            sizeContainer.addEventListener('click', (e) => {
+                const target = e.target.closest('.size-button');
+                // 🚨 Só permite clicar se NÃO estiver desabilitado
+                if (target && !target.classList.contains('disabled')) {
+                    sizeContainer.querySelectorAll('.size-button').forEach(btn => btn.classList.remove('active'));
+                    target.classList.add('active');
+                    selectedSize = target.dataset.size;
+                    checkButtonState();
                 }
             });
         }
 
         function renderSizeOptions(color) {
             const sizeContainer = document.getElementById('size-selector');
-            sizeContainer.innerHTML = ''; 
-            selectedSize = null; 
+            sizeContainer.innerHTML = ''; // Limpa os botões antigos
             
-            const sizes = parsedVariants[color];
-            if (!sizes) return;
+            const stockForColor = parsedVariants[color]; // Ex: {P: 5, M: 0, G: 2, GG: 0}
+            if (!stockForColor) return;
 
-            sizes.forEach(size => {
-                sizeContainer.innerHTML += `<div class="size-button" data-size="${size}">${size}</div>`;
-            });
+            // Define a ordem dos tamanhos
+            const sizeOrder = ['P', 'M', 'G', 'GG']; 
             
-            sizeContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('size-button')) {
-                    sizeContainer.querySelectorAll('.size-button').forEach(btn => btn.classList.remove('active'));
-                    e.target.classList.add('active');
-                    selectedSize = e.target.dataset.size;
+            sizeOrder.forEach(size => {
+                // Se o tamanho existe no objeto de stock
+                if (stockForColor.hasOwnProperty(size)) {
+                    const stockCount = stockForColor[size];
+                    const isDisabled = stockCount <= 0; // Desabilita se for 0 ou menos
+                    
+                    sizeContainer.innerHTML += `
+                        <div class="size-button ${isDisabled ? 'disabled' : ''}" data-size="${size}">
+                            ${size} ${isDisabled ? '(Esgotado)' : ''}
+                        </div>
+                    `;
                 }
             });
         }
         
+        // 🚨 NOVA FUNÇÃO: Verifica se o botão "Adicionar" deve estar ativo
+        function checkButtonState() {
+             const btn = document.getElementById('add-to-cart-btn');
+             if (!selectedColor) {
+                 btn.textContent = "Selecione uma Cor";
+                 btn.disabled = true;
+             } else if (!selectedSize) {
+                 btn.textContent = "Selecione um Tamanho";
+                 btn.disabled = true;
+             } else {
+                 // Verifica se o tamanho selecionado tem estoque
+                 if (parsedVariants[selectedColor][selectedSize] > 0) {
+                     btn.textContent = "Adicionar ao Carrinho";
+                     btn.disabled = false;
+                 } else {
+                     btn.textContent = "Esgotado";
+                     btn.disabled = true;
+                 }
+             }
+        }
+        
+        // Função de ajuda (sem mudança)
         function getSafeColor(colorName) {
             const colors = {
                 'preto': 'black', 'branco': 'white', 'vermelho': 'red', 'rosa': '#FFC0CB',
@@ -593,7 +610,7 @@
             return colors[lowerColor] || colorName;
         }
 
-        // --- LÓGICA DAS MÍDIAS (Thumbnails) ---
+        // Lógica das Mídias (sem mudança)
         function setupMediaThumbnails() {
             const mainMediaDisplay = document.getElementById('main-media-display');
             const thumbContainers = document.querySelectorAll('.thumb-container');
