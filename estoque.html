@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Estoque | 3 Marias</title>
+    <style>
+        :root {
+            --primary-color: #b76e86;
+            --accent-color: #DAA520;
+            --text-color: #333;
+            --bg-color: #fdf7f9;
+            --border-color: #e0e0e0;
+            --error-color: #dc3545;
+        }
+        body { font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+        h1, h2, h3 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
+        form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 20px; background: #fdf7f9; border-radius: 5px; }
+        label { font-weight: bold; margin-bottom: -10px; }
+        input[type="text"], input[type="number"], input[type="password"], input[type="email"] {
+            width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;
+        }
+        button {
+            background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer;
+        }
+        #loginStatus, #status { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
+        .success { background-color: #e6f9e6; color: #28a745; }
+        .error { background-color: #fdeeee; color: var(--error-color); }
+        .loading { background-color: #e6f2ff; color: #007bff; }
+        
+        /* Tabela de Gerenciamento */
+        #stock-table-container { overflow-x: auto; margin-top: 20px;}
+        #stock-table { width: 100%; border-collapse: collapse; }
+        #stock-table th, #stock-table td { border: 1px solid var(--border-color); padding: 10px; text-align: left; vertical-align: middle; }
+        #stock-table th { background-color: #f9f2f4; }
+        #stock-table img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
+        .variant-list { font-size: 0.9em; color: #555; margin: 0; padding-left: 15px; }
+        
+        /* Estilo de Login */
+        #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
+        #stock-panel { display: none; } /* Oculto por padrão */
+        #btnLogout { background-color: #777; margin-top: 20px; width: auto; padding: 10px 20px; }
+
+        /* NOVO: Filtros */
+        #filter-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .filter-btn {
+            background-color: #f0f0f0; color: #555; border: 1px solid #ccc; padding: 10px 15px;
+            font-size: 0.9em; border-radius: 5px; cursor: pointer;
+        }
+        .filter-btn.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+        /* NOVO: Edição Rápida de Estoque */
+        .stock-edit-cell { display: flex; gap: 10px; align-items: center; }
+        .stock-input { width: 70px !important; padding: 8px !important; text-align: center; }
+        .update-btn {
+            background-color: var(--accent-color); color: #333; font-size: 0.8em;
+            padding: 8px 12px; width: auto; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Gestão Rápida de Estoque</h1>
+        <h2>3 Marias Moda Feminina</h2>
+
+        <section id="login-section">
+            <h3>Login de Admin</h3>
+            <form id="loginForm">
+                <label for="login-email">Email:</label>
+                <input type="email" id="login-email" required>
+                <label for="login-password">Senha:</label>
+                <input type="password" id="login-password" required>
+                <button type="submit" id="btnLogin">Entrar</button>
+            </form>
+            <div id="loginStatus" class="status"></div>
+        </section>
+
+        <section id="stock-panel">
+            <div id="status"></div>
+            
+            <div id="filter-controls">
+                <button class="filter-btn active" data-filter="todos">Ver Todos</button>
+                <button class="filter-btn" data-filter="pronta-entrega">Somente Pronta Entrega</button>
+                <button class="filter-btn" data-filter="sob-encomenda">Somente Sob Encomenda</button>
+            </div>
+
+            <div id="stock-table-container">
+                <table id="stock-table">
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Produto</th>
+                            <th>Estoque Atual</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stock-list">
+                        </tbody>
+                </table>
+            </div>
+            
+            <button id="btnLogout">Sair (Logout)</button>
+        </section>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        // 🚨 CHAVES CORRETAS DA LOJA 3 MARIAS 🚨
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
+            authDomain: "loja3marias-50204.firebaseapp.com",
+            projectId: "loja3marias-50204",
+            storageBucket: "loja3marias-50204.firebasestorage.app",
+            messagingSenderId: "405330133487",
+            appId: "1:405330133487:web:606de41211df52245f761a",
+            measurementId: "G-TK877V6P0S"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Elementos do DOM
+            const stockList = document.getElementById('stock-list');
+            const statusDiv = document.getElementById('status');
+            const filterControls = document.getElementById('filter-controls');
+
+            // Elementos de Login
+            const loginSection = document.getElementById('login-section');
+            const stockPanel = document.getElementById('stock-panel');
+            const loginForm = document.getElementById('loginForm');
+            const loginStatusDiv = document.getElementById('loginStatus');
+            const btnLogout = document.getElementById('btnLogout');
+            
+            let statusTimeout;
+            let currentFilter = 'todos'; // 'todos', 'pronta-entrega', 'sob-encomenda'
+
+            // --- Funções de Status ---
+            function showStatus(message, type) {
+                clearTimeout(statusTimeout);
+                statusDiv.textContent = String(message);
+                statusDiv.className = 'status ' + type;
+                statusDiv.style.display = 'block';
+                window.scrollTo(0, 0);
+
+                if (type !== 'loading') {
+                    statusTimeout = setTimeout(() => {
+                        statusDiv.style.display = 'none';
+                    }, 4000);
+                }
+            }
+            
+            function showLoginStatus(message, type) {
+                clearTimeout(statusTimeout);
+                loginStatusDiv.textContent = String(message);
+                loginStatusDiv.className = 'status ' + type;
+                loginStatusDiv.style.display = 'block';
+
+                if (type !== 'loading') {
+                    statusTimeout = setTimeout(() => {
+                        loginStatusDiv.style.display = 'none';
+                    }, 4000);
+                }
+            }
+            
+            // 1. CARREGAR ESTOQUE (COM FILTRO)
+            async function fetchStock() {
+                try {
+                    stockList.innerHTML = '<tr><td colspan="4">Carregando estoque...</td></tr>';
+                    
+                    let query = db.collection("products");
+
+                    if (currentFilter === 'pronta-entrega') {
+                        query = query.where("source", "==", "pronta-entrega");
+                    } else if (currentFilter === 'sob-encomenda') {
+                        query = query.where("source", "==", "sob-encomenda");
+                    }
+                    // Se for 'todos', não aplica filtro de 'source'
+
+                    const snapshot = await query.orderBy("name", "asc").get();
+
+                    if (snapshot.empty) {
+                        stockList.innerHTML = '<tr><td colspan="4">Nenhum produto encontrado para este filtro.</td></tr>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const product = doc.data();
+                        const id = doc.id;
+                        
+                        // Define a cor de fundo com base no tipo
+                        let rowStyle = '';
+                        if(product.source === 'pronta-entrega') {
+                            rowStyle = 'style="background-color: #f0f9f0;"'; // Verde claro
+                        } else if (product.source === 'sob-encomenda') {
+                            rowStyle = 'style="background-color: #f9f9f0;"'; // Amarelo claro
+                        }
+
+                        html += `
+                            <tr ${rowStyle}>
+                                <td><img src="${product.imageUrl || 'https://via.placeholder.com/60'}" alt="${product.name}"></td>
+                                <td>
+                                    <strong>${product.name || 'Sem nome'}</strong><br>
+                                    <small>${product.source === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda'}</small>
+                                </td>
+                                <td class="stock-edit-cell">
+                                    <input type="number" class="stock-input" value="${product.estoque || 0}" data-id="${id}">
+                                </td>
+                                <td>
+                                    <button class="update-btn" data-id="${id}">Atualizar</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    stockList.innerHTML = html;
+                } catch (error) {
+                    console.error("Erro ao carregar estoque:", error);
+                    stockList.innerHTML = `<tr><td colspan="4" style="color:red;">Erro ao carregar estoque: ${error.message}</td></tr>`;
+                }
+            }
+            
+            // 2. LÓGICA DOS FILTROS
+            filterControls.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const newFilter = e.target.dataset.filter;
+                    if (newFilter === currentFilter) return; // Não faz nada se já for o filtro atual
+
+                    currentFilter = newFilter;
+                    
+                    // Atualiza a classe 'active'
+                    filterControls.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+                    
+                    // Recarrega a tabela
+                    fetchStock();
+                }
+            });
+            
+            // 3. LÓGICA DE ATUALIZAÇÃO (EDIÇÃO RÁPIDA)
+            stockList.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('update-btn')) {
+                    const id = e.target.dataset.id;
+                    const input = stockList.querySelector(`.stock-input[data-id="${id}"]`);
+                    const newStock = parseInt(input.value);
+
+                    if (isNaN(newStock) || newStock < 0) {
+                        showStatus("Erro: O valor do estoque deve ser um número positivo.", "error");
+                        return;
+                    }
+
+                    // Desabilita o botão para evitar cliques duplos
+                    e.target.disabled = true;
+                    e.target.textContent = "Salvando...";
+                    showStatus("Atualizando estoque...", "loading");
+
+                    try {
+                        const docRef = db.collection("products").doc(id);
+                        await docRef.update({
+                            estoque: newStock
+                        });
+                        
+                        showStatus("Estoque atualizado com sucesso!", "success");
+                        
+                        // Reabilita o botão
+                        e.target.disabled = false;
+                        e.target.textContent = "Atualizar";
+
+                    } catch (error) {
+                        console.error("Erro ao atualizar estoque:", error);
+                        showStatus(`Erro: ${error.message}`, "error");
+                        // Reabilita o botão em caso de erro
+                        e.target.disabled = false;
+                        e.target.textContent = "Atualizar";
+                    }
+                }
+            });
+
+            // --- LÓGICA DE LOGIN ---
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                showLoginStatus('Tentando entrar...', 'loading');
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                } catch (error) {
+                    showLoginStatus(`Erro de Acesso: ${error.message}`, 'error');
+                }
+            });
+
+            btnLogout.addEventListener('click', async () => {
+                await auth.signOut();
+            });
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // Usuário LOGADO
+                    loginSection.style.display = 'none';
+                    stockPanel.style.display = 'block';
+                    fetchStock(); // Carrega o estoque
+                } else {
+                    // Usuário DESLOGADO
+                    loginSection.style.display = 'block';
+                    stockPanel.style.display = 'none';
+                }
+            });
+        
+        }); // FIM DO DOMCONTENTLOADED
+    </script>
+
+</body>
+</html>
