@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Estoque | 3 Marias</title>
+    <title>Gestão de Estoque por Tamanho | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -14,7 +14,7 @@
             --error-color: #dc3545;
         }
         body { font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
         h1, h2, h3 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
         form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 20px; background: #fdf7f9; border-radius: 5px; }
         label { font-weight: bold; margin-bottom: -10px; }
@@ -35,14 +35,13 @@
         #stock-table th, #stock-table td { border: 1px solid var(--border-color); padding: 10px; text-align: left; vertical-align: middle; }
         #stock-table th { background-color: #f9f2f4; }
         #stock-table img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
-        .variant-list { font-size: 0.9em; color: #555; margin: 0; padding-left: 15px; }
         
         /* Estilo de Login */
         #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
         #stock-panel { display: none; } /* Oculto por padrão */
         #btnLogout { background-color: #777; margin-top: 20px; width: auto; padding: 10px 20px; }
 
-        /* NOVO: Filtros */
+        /* Filtros */
         #filter-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
         .filter-btn {
             background-color: #f0f0f0; color: #555; border: 1px solid #ccc; padding: 10px 15px;
@@ -50,20 +49,32 @@
         }
         .filter-btn.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-        /* NOVO: Edição Rápida de Estoque */
-        .stock-edit-cell { display: flex; gap: 10px; align-items: center; }
-        .stock-input { width: 70px !important; padding: 8px !important; text-align: center; }
+        /* 🚨 NOVO: Estilo de Edição Rápida por Tamanho */
+        .variant-stock-row {
+            padding: 8px;
+            border-bottom: 1px dashed #eee;
+        }
+        .variant-stock-row:last-child { border-bottom: none; }
+        .variant-color-label { font-weight: bold; color: #333; }
+        .size-inputs { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+        .size-inputs label { font-size: 0.9em; font-weight: normal; margin: 0; }
+        .stock-input {
+            width: 50px !important; padding: 5px !important; text-align: center;
+        }
         .update-btn {
             background-color: var(--accent-color); color: #333; font-size: 0.8em;
-            padding: 8px 12px; width: auto; font-weight: bold;
+            padding: 8px 12px; width: auto; font-weight: bold; margin-top: 10px;
+        }
+        .total-stock-display {
+            font-size: 1.1em; font-weight: bold; color: var(--primary-color);
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Gestão Rápida de Estoque</h1>
-        <h2>3 Marias Moda Feminina</h2>
+        <h1>Gestão de Estoque (V3)</h1>
+        <h2>3 Marias - Por Cor e Tamanho</h2>
 
         <section id="login-section">
             <h3>Login de Admin</h3>
@@ -92,8 +103,8 @@
                         <tr>
                             <th>Foto</th>
                             <th>Produto</th>
-                            <th>Estoque Atual</th>
-                            <th>Ação</th>
+                            <th>Estoque por Cor/Tamanho</th>
+                            <th>Estoque Total</th>
                         </tr>
                     </thead>
                     <tbody id="stock-list">
@@ -127,12 +138,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
 
-            // Elementos do DOM
             const stockList = document.getElementById('stock-list');
             const statusDiv = document.getElementById('status');
             const filterControls = document.getElementById('filter-controls');
-
-            // Elementos de Login
             const loginSection = document.getElementById('login-section');
             const stockPanel = document.getElementById('stock-panel');
             const loginForm = document.getElementById('loginForm');
@@ -140,23 +148,22 @@
             const btnLogout = document.getElementById('btnLogout');
             
             let statusTimeout;
-            let currentFilter = 'todos'; // 'todos', 'pronta-entrega', 'sob-encomenda'
+            let currentFilter = 'todos'; 
 
             // --- Funções de Status ---
-            function showStatus(message, type) {
+            function showStatus(message, type, sticky = false) {
                 clearTimeout(statusTimeout);
                 statusDiv.textContent = String(message);
                 statusDiv.className = 'status ' + type;
                 statusDiv.style.display = 'block';
                 window.scrollTo(0, 0);
 
-                if (type !== 'loading') {
+                if (type !== 'loading' && !sticky) {
                     statusTimeout = setTimeout(() => {
                         statusDiv.style.display = 'none';
                     }, 4000);
                 }
             }
-            
             function showLoginStatus(message, type) {
                 clearTimeout(statusTimeout);
                 loginStatusDiv.textContent = String(message);
@@ -170,6 +177,35 @@
                 }
             }
             
+            // 🚨 NOVO: Gera o HTML para os campos de estoque
+            function formatVariants(productId, variants) {
+                if (!variants || Object.keys(variants).length === 0) {
+                    return "Nenhuma variante cadastrada.";
+                }
+                
+                let html = '';
+                for (const color in variants) {
+                    const stockData = variants[color]; // {P: 5, M: 3, ...}
+                    html += `
+                        <div class="variant-stock-row" data-product-id="${productId}" data-color="${color}">
+                            <div class="variant-color-label">${color}:</div>
+                            <div class="size-inputs">
+                                <label>P:</label>
+                                <input type="number" class="stock-input" data-size="P" value="${stockData.P || 0}" min="0">
+                                <label>M:</label>
+                                <input type="number" class="stock-input" data-size="M" value="${stockData.M || 0}" min="0">
+                                <label>G:</label>
+                                <input type="number" class="stock-input" data-size="G" value="${stockData.G || 0}" min="0">
+                                <label>GG:</label>
+                                <input type="number" class="stock-input" data-size="GG" value="${stockData.GG || 0}" min="0">
+                            </div>
+                            <button class="update-btn" data-product-id="${productId}" data-color="${color}">Atualizar ${color}</button>
+                        </div>
+                    `;
+                }
+                return html;
+            }
+
             // 1. CARREGAR ESTOQUE (COM FILTRO)
             async function fetchStock() {
                 try {
@@ -182,7 +218,6 @@
                     } else if (currentFilter === 'sob-encomenda') {
                         query = query.where("source", "==", "sob-encomenda");
                     }
-                    // Se for 'todos', não aplica filtro de 'source'
 
                     const snapshot = await query.orderBy("name", "asc").get();
 
@@ -196,13 +231,9 @@
                         const product = doc.data();
                         const id = doc.id;
                         
-                        // Define a cor de fundo com base no tipo
                         let rowStyle = '';
-                        if(product.source === 'pronta-entrega') {
-                            rowStyle = 'style="background-color: #f0f9f0;"'; // Verde claro
-                        } else if (product.source === 'sob-encomenda') {
-                            rowStyle = 'style="background-color: #f9f9f0;"'; // Amarelo claro
-                        }
+                        if(product.source === 'pronta-entrega') rowStyle = 'style="background-color: #f0f9f0;"';
+                        else if (product.source === 'sob-encomenda') rowStyle = 'style="background-color: #f9f9f0;"';
 
                         html += `
                             <tr ${rowStyle}>
@@ -211,11 +242,11 @@
                                     <strong>${product.name || 'Sem nome'}</strong><br>
                                     <small>${product.source === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda'}</small>
                                 </td>
-                                <td class="stock-edit-cell">
-                                    <input type="number" class="stock-input" value="${product.estoque || 0}" data-id="${id}">
-                                </td>
                                 <td>
-                                    <button class="update-btn" data-id="${id}">Atualizar</button>
+                                    ${formatVariants(id, product.variantes)}
+                                </td>
+                                <td class="total-stock-display" id="total-${id}">
+                                    ${product.estoqueTotal || 0}
                                 </td>
                             </tr>
                         `;
@@ -230,57 +261,76 @@
             // 2. LÓGICA DOS FILTROS
             filterControls.addEventListener('click', (e) => {
                 if (e.target.tagName === 'BUTTON') {
-                    const newFilter = e.target.dataset.filter;
-                    if (newFilter === currentFilter) return; // Não faz nada se já for o filtro atual
-
-                    currentFilter = newFilter;
-                    
-                    // Atualiza a classe 'active'
-                    filterControls.querySelectorAll('.filter-btn').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
+                    currentFilter = e.target.dataset.filter;
+                    filterControls.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
-                    
-                    // Recarrega a tabela
                     fetchStock();
                 }
             });
             
-            // 3. LÓGICA DE ATUALIZAÇÃO (EDIÇÃO RÁPIDA)
+            // 3. 🚨 LÓGICA DE ATUALIZAÇÃO (POR COR/TAMANHO)
             stockList.addEventListener('click', async (e) => {
                 if (e.target.classList.contains('update-btn')) {
-                    const id = e.target.dataset.id;
-                    const input = stockList.querySelector(`.stock-input[data-id="${id}"]`);
-                    const newStock = parseInt(input.value);
+                    const productId = e.target.dataset.productId;
+                    const color = e.target.dataset.color;
+                    
+                    const row = stockList.querySelector(`.variant-stock-row[data-product-id="${productId}"][data-color="${color}"]`);
+                    const inputs = row.querySelectorAll('.stock-input');
+                    
+                    const newStockData = {};
+                    let newTotalStockForVariant = 0;
+                    
+                    inputs.forEach(input => {
+                        const size = input.dataset.size;
+                        const stock = parseInt(input.value) || 0;
+                        if (stock < 0) {
+                            showStatus("Erro: O estoque não pode ser negativo.", "error");
+                            return; // Para a execução
+                        }
+                        newStockData[size] = stock;
+                        newTotalStockForVariant += stock;
+                    });
 
-                    if (isNaN(newStock) || newStock < 0) {
-                        showStatus("Erro: O valor do estoque deve ser um número positivo.", "error");
-                        return;
-                    }
-
-                    // Desabilita o botão para evitar cliques duplos
                     e.target.disabled = true;
                     e.target.textContent = "Salvando...";
                     showStatus("Atualizando estoque...", "loading");
 
                     try {
-                        const docRef = db.collection("products").doc(id);
-                        await docRef.update({
-                            estoque: newStock
-                        });
+                        const docRef = db.collection("products").doc(productId);
                         
-                        showStatus("Estoque atualizado com sucesso!", "success");
+                        // 1. Atualiza o objeto da variante específica
+                        // A notação 'variantes.Cor' permite atualizar um campo dentro de um objeto
+                        const updatePayload = {};
+                        updatePayload[`variantes.${color}`] = newStockData; 
                         
-                        // Reabilita o botão
-                        e.target.disabled = false;
-                        e.target.textContent = "Atualizar";
+                        await docRef.update(updatePayload);
 
+                        // 2. Recalcula o Estoque Total do Produto (lendo todos os 'variantes')
+                        const doc = await docRef.get();
+                        const allVariants = doc.data().variantes;
+                        let newEstoqueTotal = 0;
+                        for (const c in allVariants) {
+                            for (const s in allVariants[c]) {
+                                newEstoqueTotal += (parseInt(allVariants[c][s]) || 0);
+                            }
+                        }
+                        
+                        // 3. Salva o novo Estoque Total
+                        await docRef.update({
+                            estoqueTotal: newEstoqueTotal
+                        });
+
+                        // 4. Atualiza o total na tela
+                        document.getElementById(`total-${productId}`).textContent = newEstoqueTotal;
+
+                        showStatus(`Estoque do ${color} atualizado com sucesso!`, "success");
+                        
                     } catch (error) {
                         console.error("Erro ao atualizar estoque:", error);
-                        showStatus(`Erro: ${error.message}`, "error");
-                        // Reabilita o botão em caso de erro
+                        showStatus(`Erro: ${error.message}`, "error", true); // Deixa o erro visível
+                    } finally {
                         e.target.disabled = false;
-                        e.target.textContent = "Atualizar";
+                        e.target.textContent = `Atualizar ${color}`;
                     }
                 }
             });
@@ -304,12 +354,10 @@
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // Usuário LOGADO
                     loginSection.style.display = 'none';
                     stockPanel.style.display = 'block';
                     fetchStock(); // Carrega o estoque
                 } else {
-                    // Usuário DESLOGADO
                     loginSection.style.display = 'block';
                     stockPanel.style.display = 'none';
                 }
