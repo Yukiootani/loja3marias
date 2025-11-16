@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Carrinho | 3 Marias</title>
+    <title>Meu Carrinho (V3.1) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* --- CSS Minimalista (Victoria's Secret Style) --- */
@@ -247,15 +247,12 @@
             updateCartIcon();
         }
         
-        // Atualiza o ícone do carrinho (baseado no total de QTD)
         function updateCartIcon() {
             const cart = getCart();
             let count = 0;
             Object.values(cart.items).forEach(item => {
                 count += item.quantity;
             });
-            // Esta função só existe no 'detalhes.html' e 'index.html',
-            // então não vai dar erro, mas também não vai atualizar aqui.
         }
 
         async function getProductData(productId) {
@@ -284,8 +281,7 @@
             let total = 0;
             let whatsappMessage = "Olá, Harumi! Gostaria de fazer o seguinte pedido:\n\n";
             
-            // 🚨 NOVO: Array para marcar "itens fantasma"
-            let itemsToDelete = [];
+            let itemsToDelete = []; // Array para marcar "itens fantasma"
 
             if (Object.keys(items).length === 0) {
                 cartItemsContainer.innerHTML = '<p id="empty-cart-message">Seu carrinho está vazio.</p>';
@@ -309,9 +305,9 @@
                 let stockStatusClass = "stock-sob-encomenda";
                 let stockCount = 0;
                 
-                // 🚨 MUDANÇA: Verifica se o produto AINDA EXISTE
+                // 🚨 Verifica se o produto AINDA EXISTE
                 if (product) {
-                    // Produto existe, continua a lógica normal
+                    // Produto existe
                     if(product.source === 'pronta-entrega') {
                         stockStatus = "Pronta Entrega";
                         stockStatusClass = "stock-pronta-entrega";
@@ -330,13 +326,13 @@
                     }
                     
                 } else {
-                    // 🚨 NOVO: Produto NÃO foi encontrado (foi apagado)
+                    // 🚨 Produto NÃO foi encontrado (foi apagado)
                     cartItemsContainer.innerHTML += `
                         <div class="cart-item cart-item-removed">
                             <p>O produto <strong>"${item.name || 'Item desconhecido'}"</strong> não está mais disponível e foi removido do seu carrinho.</p>
                         </div>`;
                     itemsToDelete.push(itemId); // Marca para apagar
-                    continue; // Pula para o próximo item
+                    continue; 
                 }
                 
                 // Validação de Estoque
@@ -344,16 +340,13 @@
                     item.quantity = maxStock;
                 }
                 if (maxStock === 0) {
-                    // 🚨 NOVO: Se o estoque é 0, remove também
                     cartItemsContainer.innerHTML += `
                         <div class="cart-item cart-item-removed">
                             <p>O produto <strong>"${item.name}"</strong> (${item.color}/${item.size}) ficou sem estoque e foi removido.</p>
                         </div>`;
                     itemsToDelete.push(itemId);
-                    continue; // Pula para o próximo item
+                    continue; 
                 }
-                
-                // --- Se passou em tudo, renderiza o item ---
                 
                 const itemPrice = parseFloat(item.price);
                 const itemTotal = itemPrice * item.quantity;
@@ -409,17 +402,16 @@
             whatsappMessage += `\n\nAguardo as instruções para pagamento.`;
             checkoutBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
             
-            // 🚨 NOVO: Seção para limpar os "itens fantasma" do localStorage
+            // 🚨 Seção para limpar os "itens fantasma" do localStorage
             if (itemsToDelete.length > 0) {
                 itemsToDelete.forEach(id => {
                     delete cart.items[id];
                 });
             }
             
-            // Salva o carrinho (com correções de estoque E remoção de fantasmas)
-            saveCart(cart);
+            saveCart(cart); // Salva o carrinho (com correções e remoções)
             
-            // 🚨 NOVO: Se o carrinho ficou vazio após a limpeza, mostra a mensagem
+            // 🚨 Se o carrinho ficou vazio após a limpeza, mostra a mensagem
             if (Object.keys(cart.items).length === 0) {
                 cartItemsContainer.innerHTML = '<p id="empty-cart-message">Seu carrinho está vazio (itens esgotados ou removidos).</p>';
                 cartSummary.style.display = 'none';
