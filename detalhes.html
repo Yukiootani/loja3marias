@@ -213,7 +213,7 @@
             border-color: var(--primary-color);
         }
         
-        /* 🚨 NOVO: Estilo para "Esgotado" */
+        /* Estilo para "Esgotado" */
         .size-button.disabled {
             background-color: #f5f5f5;
             color: #aaa;
@@ -302,7 +302,7 @@
 
         // --- Variáveis globais para guardar estado ---
         let currentProductId = null;
-        let parsedVariants = {}; // 🚨 VAI ARMAZENAR A NOVA ESTRUTURA {Preto: {P: 5, M: 0}}
+        let parsedVariants = {}; 
         let selectedColor = null;
         let selectedSize = null;
         let productName = "Produto";
@@ -346,13 +346,11 @@
                 const videoUrl = product.videoUrl; 
                 const source = product.source || 'pronta-entrega'; 
                 
-                // 🚨 MUDANÇA: Armazena a nova estrutura de variantes
                 parsedVariants = product.variantes || {};
                 
                 let galleryUrls = product.galeria || [];
                 let allMediaUrls = [];
 
-                // Lógica da Galeria (sem mudança)
                 if (productImageUrl) { 
                     allMediaUrls.push({ type: 'image', url: productImageUrl, thumb: productImageUrl }); 
                 }
@@ -385,7 +383,7 @@
                     }
                 });
 
-                // --- 🚨 MUDANÇA: HTML das Variantes ---
+                // --- HTML das Variantes ---
                 let variantsHTML = '';
                 const colors = Object.keys(parsedVariants);
                 
@@ -433,9 +431,10 @@
                 if (colors.length > 0) {
                     setupVariantSelectors();
                 } else {
-                    // Se não há variantes, habilita o botão de compra
+                    // 🚨 CORREÇÃO: Habilita botão se não houver variantes
                     document.getElementById('add-to-cart-btn').textContent = "Adicionar ao Carrinho";
                     document.getElementById('add-to-cart-btn').disabled = false;
+                    checkButtonState(); // Verifica o estoque de produtos sem variantes (se tivéssemos essa lógica)
                 }
                 
                 document.getElementById('add-to-cart-btn').addEventListener('click', handleAddToCart);
@@ -446,7 +445,7 @@
             }
         }
 
-        // --- LÓGICA DO CARRINHO (Sem Alterações) ---
+        // --- LÓGICA DO CARRINHO ---
         
         function getCart() {
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
@@ -456,7 +455,11 @@
         }
         function updateCartIcon() {
             const cart = getCart();
-            const count = Object.keys(cart.items).length;
+            // Calcula a contagem total de itens (soma das quantidades)
+            let count = 0;
+            Object.values(cart.items).forEach(item => {
+                count += item.quantity;
+            });
             
             if (count > 0) {
                 cartCountEl.textContent = count;
@@ -466,31 +469,41 @@
             }
         }
         
+        // 🚨 FUNÇÃO handleAddToCart (TOTALMENTE REESCRITA) 🚨
         function handleAddToCart() {
-            const colorsAvailable = Object.keys(parsedVariants).length > 0;
             const btn = document.getElementById('add-to-cart-btn');
+            const colorsAvailable = Object.keys(parsedVariants).length > 0;
             
-            // Validação (já tratada pelo disabled, mas bom ter)
-            if (colorsAvailable && !selectedColor) {
-                alert("Por favor, selecione uma cor.");
-                return;
-            }
-            if (colorsAvailable && selectedColor && !selectedSize) {
-                 alert("Por favor, selecione um tamanho.");
-                return;
-            }
-            // 🚨 NOVO: Verifica se o tamanho selecionado tem estoque
-            if(colorsAvailable && selectedColor && selectedSize) {
-                if (parsedVariants[selectedColor][selectedSize] <= 0) {
-                    alert("Desculpe, este item (Cor/Tamanho) está esgotado.");
+            // 1. Define o ID e o Estoque Máximo
+            let itemId;
+            let maxStock = 999; // Estoque padrão para itens sem variantes
+            
+            if (colorsAvailable) {
+                // Se tem variantes
+                if (!selectedColor || !selectedSize) {
+                    alert("Selecione uma cor e um tamanho.");
                     return;
                 }
+                itemId = `${currentProductId}_${selectedColor}_${selectedSize}`;
+                maxStock = parsedVariants[selectedColor][selectedSize];
+            } else {
+                // Se NÃO tem variantes
+                itemId = `${currentProductId}_padrao_padrao`;
+                // (Aqui poderíamos buscar um 'estoqueTotal' se produtos sem variantes tivessem)
             }
 
+            // 2. Verifica o estoque vs. carrinho
             const cart = getCart();
-            // 🚨 MUDANÇA: O ID do item agora inclui P, M, G, GG
-            const itemId = `${currentProductId}_${selectedColor || 'padrao'}_${selectedSize || 'padrao'}`;
+            const quantityInCart = cart.items[itemId] ? cart.items[itemId].quantity : 0;
             
+            if (quantityInCart >= maxStock) {
+                alert("Desculpe, você já atingiu o limite de estoque para este item no seu carrinho.");
+                btn.textContent = "Limite de estoque";
+                btn.disabled = true;
+                return;
+            }
+
+            // 3. Adiciona ao Carrinho
             if (cart.items[itemId]) {
                 cart.items[itemId].quantity += 1;
             } else {
@@ -508,62 +521,63 @@
             saveCart(cart);
             updateCartIcon();
             
-            btn.textContent = "Adicionado! ✓";
-            btn.disabled = true;
-            setTimeout(() => {
-                btn.textContent = "Adicionar ao Carrinho";
-                // Re-habilita o botão, mas só se as seleções ainda forem válidas
-                checkButtonState(); 
-            }, 2000);
+            // 4. Atualiza o estado do botão
+            const newQuantityInCart = cart.items[itemId].quantity;
+            if (newQuantityInCart >= maxStock) {
+                btn.textContent = "Limite de estoque";
+                btn.disabled = true;
+            } else {
+                btn.textContent = "Adicionado! ✓";
+                btn.disabled = true;
+                setTimeout(() => {
+                    checkButtonState(); // Re-verifica o estado
+                }, 2000);
+            }
         }
 
-        // --- 🚨 LÓGICA DAS VARIANTES (TOTALMENTE REESCRITA) ---
+
+        // --- LÓGICA DAS VARIANTES (COM CORREÇÕES) ---
 
         function setupVariantSelectors() {
             const colorContainer = document.getElementById('color-selector');
             const sizeContainer = document.getElementById('size-selector');
             
-            // Evento para CORES
             colorContainer.addEventListener('click', (e) => {
                 const target = e.target.closest('.color-swatch');
                 if (target) {
                     colorContainer.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('active'));
                     target.classList.add('active');
                     selectedColor = target.dataset.color;
-                    selectedSize = null; // Reseta o tamanho ao trocar de cor
+                    selectedSize = null; // Reseta o tamanho
                     renderSizeOptions(selectedColor);
-                    checkButtonState();
+                    checkButtonState(); // Atualiza o botão
                 }
             });
             
-            // Evento para TAMANHOS
             sizeContainer.addEventListener('click', (e) => {
                 const target = e.target.closest('.size-button');
-                // 🚨 Só permite clicar se NÃO estiver desabilitado
                 if (target && !target.classList.contains('disabled')) {
                     sizeContainer.querySelectorAll('.size-button').forEach(btn => btn.classList.remove('active'));
                     target.classList.add('active');
                     selectedSize = target.dataset.size;
-                    checkButtonState();
+                    checkButtonState(); // Atualiza o botão
                 }
             });
         }
 
         function renderSizeOptions(color) {
             const sizeContainer = document.getElementById('size-selector');
-            sizeContainer.innerHTML = ''; // Limpa os botões antigos
+            sizeContainer.innerHTML = ''; 
             
-            const stockForColor = parsedVariants[color]; // Ex: {P: 5, M: 0, G: 2, GG: 0}
+            const stockForColor = parsedVariants[color]; 
             if (!stockForColor) return;
 
-            // Define a ordem dos tamanhos
             const sizeOrder = ['P', 'M', 'G', 'GG']; 
             
             sizeOrder.forEach(size => {
-                // Se o tamanho existe no objeto de stock
                 if (stockForColor.hasOwnProperty(size)) {
                     const stockCount = stockForColor[size];
-                    const isDisabled = stockCount <= 0; // Desabilita se for 0 ou menos
+                    const isDisabled = stockCount <= 0; 
                     
                     sizeContainer.innerHTML += `
                         <div class="size-button ${isDisabled ? 'disabled' : ''}" data-size="${size}">
@@ -574,9 +588,19 @@
             });
         }
         
-        // 🚨 NOVA FUNÇÃO: Verifica se o botão "Adicionar" deve estar ativo
+        // 🚨 checkButtonState (TOTALMENTE REESCRITA) 🚨
         function checkButtonState() {
              const btn = document.getElementById('add-to-cart-btn');
+             const colorsAvailable = Object.keys(parsedVariants).length > 0;
+             
+             // Se não houver variantes, verifica o estoque "geral" (que no nosso caso, é só habilitar)
+             if (!colorsAvailable) {
+                 btn.textContent = "Adicionar ao Carrinho";
+                 btn.disabled = false;
+                 return;
+             }
+             
+             // Se houver variantes...
              if (!selectedColor) {
                  btn.textContent = "Selecione uma Cor";
                  btn.disabled = true;
@@ -584,13 +608,21 @@
                  btn.textContent = "Selecione um Tamanho";
                  btn.disabled = true;
              } else {
-                 // Verifica se o tamanho selecionado tem estoque
-                 if (parsedVariants[selectedColor][selectedSize] > 0) {
-                     btn.textContent = "Adicionar ao Carrinho";
-                     btn.disabled = false;
-                 } else {
+                 // Cor e Tamanho estão selecionados
+                 const maxStock = parsedVariants[selectedColor][selectedSize];
+                 const cart = getCart();
+                 const itemId = `${currentProductId}_${selectedColor}_${selectedSize}`;
+                 const quantityInCart = cart.items[itemId] ? cart.items[itemId].quantity : 0;
+                 
+                 if (maxStock <= 0) {
                      btn.textContent = "Esgotado";
                      btn.disabled = true;
+                 } else if (quantityInCart >= maxStock) {
+                     btn.textContent = "Limite de estoque";
+                     btn.disabled = true;
+                 } else {
+                     btn.textContent = "Adicionar ao Carrinho";
+                     btn.disabled = false;
                  }
              }
         }
