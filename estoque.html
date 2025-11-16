@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Estoque (V3.8) | 3 Marias</title>
+    <title>Gestão de Estoque (V3.9) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -34,6 +34,12 @@
         #stock-table-container { overflow-x: auto; margin-top: 20px;}
         #stock-table { width: 100%; border-collapse: collapse; }
         #stock-table th, #stock-table td { border: 1px solid var(--border-color); padding: 10px; text-align: left; vertical-align: middle; }
+        
+        /* 🚨 MUDANÇA: Linha de baixo mais forte para separar produtos */
+        #stock-table td {
+            border-bottom: 2px solid #bbb; 
+        }
+
         #stock-table th { background-color: #f9f2f4; }
         #stock-table img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
         
@@ -118,7 +124,7 @@
         }
         
         
-        /* 🚨 OTIMIZAÇÃO MOBILE (V3.8 - 4 Colunas) 🚨 */
+        /* OTIMIZAÇÃO MOBILE (V3.9 - 4 Colunas, Linhas Fortes) */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 10px; }
@@ -131,7 +137,6 @@
                 width: 100%;
             }
             
-            /* 🚨 MUDANÇA: Fonte BEM pequena para caber tudo */
             #stock-table th, #stock-table td {
                 padding: 4px; 
                 font-size: 0.75em; /* Fonte bem pequena */
@@ -140,17 +145,21 @@
                 text-align: left;
             }
             
-            /* 🚨 MUDANÇA: Largura das 4 colunas */
+            /* 🚨 MUDANÇA: Linha de baixo mais forte para separar produtos */
+            #stock-table td {
+                border-bottom: 2px solid #aaa; /* Era #bbb, deixei mais escura */
+            }
+            
+            /* 🚨 MUDANÇA: Largura das 4 colunas (dando mais espaço para edição) */
             #stock-table th:nth-child(1) { width: 15%; } /* Foto */
-            #stock-table th:nth-child(2) { width: 25%; } /* Produto */
-            #stock-table th:nth-child(3) { width: 45%; } /* Estoque Cor/Tamanho */
+            #stock-table th:nth-child(2) { width: 20%; } /* Produto */
+            #stock-table th:nth-child(3) { width: 50%; } /* Estoque Cor/Tamanho */
             #stock-table th:nth-child(4) { width: 15%; } /* Estoque Total */
             
-            /* 🚨 MUDANÇA: "Estoque Total" volta a ser visível */
             .total-stock-display {
                 display: table-cell; 
                 text-align: center;
-                font-size: 1em; /* Fonte pequena */
+                font-size: 1em; 
                 font-weight: bold;
                 padding-top: 10px;
             }
@@ -163,18 +172,18 @@
                 display: flex; 
                 justify-content: space-between; 
                 align-items: center;
-                padding: 8px 0; /* Menos padding */
+                padding: 8px 0; 
                 border-bottom: 1px solid var(--border-color);
             }
             .size-input-group:last-child {
                 border-bottom: none;
             }
             .size-input-group label {
-                font-size: 1.1em; /* Fonte menor */
+                font-size: 1.1em; 
                 font-weight: bold;
             }
             
-            /* 🚨 MUDANÇA: Botões e números menores */
+            /* Botões e números menores */
             .qty-btn {
                 width: 30px; 
                 height: 30px;
@@ -196,7 +205,7 @@
 <body>
 
     <div class="container">
-        <h1>Gestão de Estoque (V3.8)</h1>
+        <h1>Gestão de Estoque (V3.9)</h1>
         <h2>3 Marias - Por Cor e Tamanho</h2>
 
         <section id="login-section">
