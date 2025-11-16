@@ -40,7 +40,7 @@
         .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
         .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; }
         
-        /* 🚨 NOVO Estilo das Variantes (com Stock) */
+        /* NOVO Estilo das Variantes (com Stock) */
         #variants-container { border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: #fff; }
         .variant-entry { border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
         .variant-entry:last-child { border-bottom: none; }
@@ -124,7 +124,7 @@
                 <input type="file" id="videoUrl" accept="video/mp4, video/webm">
 
                 <label for="galeria">Galeria (Upload Múltiplo):</label>
-                <input type="file" id="galeria" multiple accept="image/png, image/jpeg">
+                <input type="file" id="galeria" **multiple** accept="image/png, image/jpeg">
                 
                 <button type="submit" id="save-btn">Salvar Produto</button>
                 <button type="button" id="cancel-edit-btn" style="display:none; background-color: #777;">Cancelar Edição</button>
@@ -153,7 +153,8 @@
                             <th>Foto</th>
                             <th>Nome</th>
                             <th>Preço (¥)</th>
-                            <th>Estoque (Total)</th> <th>Disponibilidade</th>
+                            <th>Estoque (Total)</th>
+                            <th>Disponibilidade</th>
                             <th>Selo</th>
                             <th>Ações</th>
                         </tr>
@@ -213,12 +214,11 @@
             const nameField = document.getElementById('name');
             const priceField = document.getElementById('price');
             const descField = document.getElementById('description');
-            // O 'estoqueField' foi REMOVIDO
             const sourceField = document.getElementById('source');
             const isFeaturedField = document.getElementById('isFeatured');
             const imageUrlInput = document.getElementById('imageUrl');
             const videoUrlInput = document.getElementById('videoUrl');
-            const galeriaInput = document.getElementById('galeria');
+            const galeriaInput = document.getElementById('galeria'); // 🚨 É ESTE INPUT
 
             // Elementos do Logo
             const logoForm = document.getElementById('logo-form');
@@ -268,7 +268,7 @@
                 return await uploadTask.ref.getDownloadURL();
             }
 
-            // --- 🚨 LÓGICA DE VARIANTES (TOTALMENTE REESCRITA) ---
+            // --- LÓGICA DE VARIANTES (V3 - Stock por Tamanho) ---
             const predefinedColors = [
                 { name: "Preto", value: "black" },
                 { name: "Branco", value: "white" },
@@ -285,19 +285,17 @@
             ];
 
             addVariantBtn.addEventListener('click', () => {
-                // Adiciona uma nova linha de variante (com campos de stock)
                 createVariantEntry(); 
             });
             
             function createVariantEntry(color = '', stockData = { P: 0, M: 0, G: 0, GG: 0 }) {
-                const entryId = Date.now() + Math.random(); // ID único para a linha
+                const entryId = Date.now() + Math.random(); 
                 const variantEntry = document.createElement('div');
                 variantEntry.className = 'variant-entry';
                 variantEntry.id = `variant-${entryId}`;
                 
                 let colorOptions = predefinedColors.map(c => `<option value="${c.name}" style="background-color:${c.value}; color:${c.value === 'black' ? 'white' : 'black'};">${c.name}</option>`).join('');
                 
-                // Verifica se a cor vindo do BD é personalizada
                 let isCustom = color && !predefinedColors.find(c => c.name === color);
                 let customValue = isCustom ? color : '';
                 let selectValue = isCustom ? 'custom' : color;
@@ -328,22 +326,18 @@
                 `;
                 variantsContainer.appendChild(variantEntry);
                 
-                // Define a cor selecionada (se estiver editando)
                 variantEntry.querySelector('.variant-color-select').value = selectValue;
                 
-                // Evento para mostrar/esconder o campo "Outra Cor"
                 variantEntry.querySelector('.variant-color-select').addEventListener('change', function() {
                     const customInput = variantEntry.querySelector('.variant-color-custom');
                     customInput.style.display = (this.value === 'custom') ? 'block' : 'none';
                 });
                 
-                // Evento para o botão de remover
                 variantEntry.querySelector('.remove-variant-btn').addEventListener('click', function() {
                     document.getElementById(`variant-${this.dataset.id}`).remove();
                 });
             }
 
-            // Pega as variantes e seus estoques do formulário
             function getVariantsFromForm() {
                 const variants = {};
                 const entries = variantsContainer.querySelectorAll('.variant-entry');
@@ -364,7 +358,6 @@
                 return variants;
             }
             
-            // 🚨 NOVO: Calcula o estoque total somando todas as variantes
             function calculateTotalStock(variants) {
                 let total = 0;
                 for (const color in variants) {
@@ -375,13 +368,12 @@
                 return total;
             }
 
-            // Preenche o formulário quando clicamos em "Editar"
             function setVariantsInForm(variants) {
-                variantsContainer.innerHTML = ''; // Limpa
+                variantsContainer.innerHTML = ''; 
                 if (!variants || Object.keys(variants).length === 0) return;
 
                 for (const color in variants) {
-                    const stockData = variants[color]; // Ex: {P: 5, M: 3}
+                    const stockData = variants[color]; 
                     createVariantEntry(color, stockData);
                 }
             }
@@ -404,7 +396,6 @@
                         const id = doc.id;
                         const precoFormatado = (product.price || 0).toLocaleString('ja-JP');
                         
-                        // 🚨 MUDANÇA: Usa 'estoqueTotal'
                         html += `
                             <tr id="product-${id}">
                                 <td><img src="${product.imageUrl || 'https://via.placeholder.com/50'}" alt="${product.name}"></td>
@@ -440,7 +431,6 @@
                     let videoUrl = oldVideoUrl;
                     let galeriaUrls = oldGaleria;
                     
-                    // Uploads (sem mudança)
                     if (imageUrlInput.files[0]) {
                         showStatus(statusDiv, "Fazendo upload da Imagem de Capa (1/3)...", "loading");
                         const file = imageUrlInput.files[0];
@@ -453,6 +443,8 @@
                         const path = `products/${currentProductId}/video_${file.name}`;
                         videoUrl = await uploadFile(file, path);
                     }
+                    
+                    // 🚨 A LÓGICA DE UPLOAD MÚLTIPLO ESTÁ CORRETA AQUI
                     if (galeriaInput.files.length > 0) {
                         showStatus(statusDiv, `Fazendo upload de ${galeriaInput.files.length} imagens da galeria (3/3)...`, "loading");
                         galeriaUrls = []; 
@@ -463,7 +455,6 @@
                         }
                     }
                     
-                    // 🚨 MUDANÇA: Prepara os dados do produto com a nova estrutura
                     const productVariants = getVariantsFromForm();
                     const totalStock = calculateTotalStock(productVariants);
                     
@@ -471,8 +462,8 @@
                         name: nameField.value,
                         price: parseFloat(priceField.value),
                         description: descField.value,
-                        variantes: productVariants, // NOVA ESTRUTURA
-                        estoqueTotal: totalStock, // NOVO CAMPO
+                        variantes: productVariants, 
+                        estoqueTotal: totalStock, 
                         source: sourceField.value,
                         isFeatured: isFeaturedField.value,
                         imageUrl: imageUrl,
@@ -509,7 +500,7 @@
                 const id = target.dataset.id;
 
                 if (target.classList.contains('delete-btn')) {
-                    // Excluir (sem mudança)
+                    // Excluir
                     if (!confirm("Tem certeza que deseja excluir este produto?")) return;
                     try {
                         await db.collection("products").doc(id).delete();
@@ -522,7 +513,7 @@
                 }
                 
                 if (target.classList.contains('edit-btn')) {
-                    // Editar (com mudanças)
+                    // Editar
                     try {
                         const doc = await db.collection("products").doc(id).get();
                         if (!doc.exists) {
@@ -536,10 +527,7 @@
                         priceField.value = product.price || 0;
                         descField.value = product.description || '';
                         
-                        // 🚨 MUDANÇA: Carrega a nova estrutura de variantes
                         setVariantsInForm(product.variantes || {});
-                        
-                        // O 'estoqueField' não existe mais
                         
                         sourceField.value = product.source || 'pronta-entrega';
                         isFeaturedField.value = product.isFeatured || 'nenhum';
@@ -555,7 +543,7 @@
                         formTitle.textContent = "2. Editando Produto";
                         saveBtn.textContent = "Atualizar Produto";
                         cancelEditBtn.style.display = "block";
-                        window.scrollTo(0, 0); // Rola para o topo
+                        window.scrollTo(0, 0); 
                     } catch (error) {
                         showStatus(statusDiv, "Erro ao carregar para edição: " + String(error.message), "error");
                     }
@@ -567,7 +555,7 @@
             function cancelEditMode() {
                 productIdField.value = '';
                 form.reset();
-                variantsContainer.innerHTML = ''; // Limpa as variantes
+                variantsContainer.innerHTML = ''; 
                 oldImageUrl = ''; oldVideoUrl = ''; oldGaleria = [];
                 
                 formTitle.textContent = "1. Adicionar Novo Produto";
