@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Estoque (V3.6) | 3 Marias</title>
+    <title>Gestão de Estoque (V3.7) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -50,7 +50,7 @@
         }
         .filter-btn.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-        /* Estilo de Edição Rápida (V3.5) */
+        /* Estilo de Edição Rápida (Desktop) */
         .variant-stock-row {
             padding: 8px;
             border-bottom: 1px dashed #eee;
@@ -59,13 +59,13 @@
         .variant-color-label { font-weight: bold; color: #333; margin-bottom: 10px; display: block; }
         
         .size-inputs { 
-            display: flex; /* Flex no desktop */
+            display: flex; 
             gap: 15px; 
             align-items: center; 
             flex-wrap: wrap; 
         }
         .size-input-group { 
-            display: flex; /* Linha única (ex: "P: [-] 5 [+]") no desktop */
+            display: flex; 
             align-items: center;
             gap: 8px;
         }
@@ -114,16 +114,15 @@
             font-size: 1.1em; 
             font-weight: bold; 
             color: var(--primary-color);
-            text-align: center; /* 🚨 NOVO: Centraliza o número */
+            text-align: center;
         }
         
         
-        /* 🚨 OTIMIZAÇÃO MOBILE (V3.6 - Estoque Total Visível) 🚨 */
+        /* 🚨 OTIMIZAÇÃO MOBILE (V3.7 - Oculta Total) 🚨 */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 10px; }
 
-            /* Faz a tabela ser 100% da largura, sem scroll */
             #stock-table-container { 
                 overflow-x: hidden; 
             }
@@ -133,30 +132,27 @@
             }
             
             #stock-table th, #stock-table td {
-                padding: 5px; /* 🚨 MUDANÇA: Menos padding */
-                font-size: 0.85em; /* 🚨 MUDANÇA: Fonte menor */
+                padding: 8px 5px; /* Mais padding lateral */
+                font-size: 0.9em; 
                 white-space: normal; 
                 word-wrap: break-word; 
                 text-align: left;
             }
             
-            /* 🚨 MUDANÇA: Define a largura das 4 colunas */
-            #stock-table th:nth-child(1) { width: 18%; } /* Foto */
-            #stock-table th:nth-child(2) { width: 27%; } /* Produto */
-            #stock-table th:nth-child(3) { width: 40%; } /* Estoque Cor/Tamanho */
-            #stock-table th:nth-child(4) { width: 15%; } /* Estoque Total */
+            /* 🚨 MUDANÇA: Define a largura das 3 colunas visíveis */
+            #stock-table th:nth-child(1) { width: 20%; } /* Foto */
+            #stock-table th:nth-child(2) { width: 25%; } /* Produto */
+            #stock-table th:nth-child(3) { width: 55%; } /* Estoque (MAIOR) */
             
-            /* 🚨 MUDANÇA: Garante que o total esteja visível e centralizado */
+            /* 🚨 MUDANÇA: Oculta a coluna "Estoque Total" no mobile */
+            #stock-table th:nth-child(4) { display: none; }
             .total-stock-display {
-                display: table-cell; 
-                text-align: center;
-                font-size: 1em;
-                padding-top: 10px;
+                display: none;
             }
             
             /* Layout Vertical para os tamanhos */
             .size-inputs {
-                display: block; 
+                display: block; /* Um embaixo do outro */
             }
             .size-input-group {
                 display: flex; 
@@ -184,7 +180,7 @@
 <body>
 
     <div class="container">
-        <h1>Gestão de Estoque (V3.6)</h1>
+        <h1>Gestão de Estoque (V3.7)</h1>
         <h2>3 Marias - Por Cor e Tamanho</h2>
 
         <section id="login-section">
@@ -288,7 +284,7 @@
                 }
             }
             
-            // FUNÇÃO ATUALIZADA (V3.5): Gera o HTML com botões +/- e layout vertical
+            // FUNÇÃO (V3.5): Gera o HTML com botões +/- e layout vertical
             function formatVariants(productId, variants) {
                 if (!variants || Object.keys(variants).length === 0) {
                     return "Nenhuma variante cadastrada.";
