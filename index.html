@@ -109,4 +109,279 @@
             position: relative;
         }
         .product-card:hover { 
-            box-
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
+        }
+        .product-image-container {
+            width: 100%;
+            padding-top: 150%; 
+            position: relative;
+            background-color: #f0f0f0;
+        }
+        .product-image {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover; 
+        }
+        .product-info { padding: 15px; text-align: left; }
+        .product-name { font-size: 1em; font-weight: 600; margin: 0 0 5px 0; }
+        .product-price { font-size: 1.1em; font-weight: 700; color: var(--primary-color); margin: 0 0 15px 0; }
+        .details-button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            font-size: 0.9em;
+            width: 100%; 
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .details-button:hover { background-color: #a15a70; }
+        .badge {
+            position: absolute; top: 10px; left: 10px;
+            padding: 5px 10px; border-radius: 5px;
+            font-size: 0.9em; font-weight: bold;
+            color: white;
+        }
+        .badge-novo { background-color: var(--accent-color); color: #333; }
+        .badge-destaque { background-color: var(--whatsapp-green); }
+        
+        #loading-message, #error-message {
+            text-align: center; font-size: 1.2em; color: var(--light-text); padding: 40px 0;
+        }
+        footer {
+            text-align: center; padding: 20px; margin-top: 40px;
+            color: var(--light-text); font-size: 0.9em; border-top: 1px solid var(--border-color);
+        }
+
+        /* --- CSS DO CARRINHO WHATSAPP --- */
+        #cart-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--whatsapp-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.2s;
+            text-decoration: none; 
+        }
+        #cart-icon:hover {
+            transform: scale(1.1);
+        }
+        #cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 7px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid white;
+            display: none; 
+        }
+
+        @media (min-width: 768px) {
+            #products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            }
+            .section-title {
+                font-size: 1.8em;
+                text-align: center;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <header id="main-header">
+        <h1>3 MARIAS MODA FEMININA</h1> 
+        <p>A moda íntima brasileira que te entende, no Japão.</p>
+    </header>
+
+    <main>
+        <div id="controls">
+            <button class="filter-button active" data-filter="pronta-entrega">
+                Pronta Entrega
+            </button>
+            <button class="filter-button" data-filter="sob-encomenda">
+                Sob Encomenda
+            </button>
+        </div>
+
+        <h2 id="collection-title" class="section-title">Nossa Coleção</h2>
+        <div id="products-grid">
+            </div>
+        <div id="loading-message">Carregando produtos...</div>
+        <div id="error-message" style="display: none;"></div>
+    </main>
+
+    <footer>
+        <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
+    </footer>
+
+    <a id="cart-icon" href="carrinho.html">
+        <i class="fas fa-shopping-bag"></i>
+        <span id="cart-count">0</span>
+    </a>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+        // 🚨 CHAVES CORRETAS DA LOJA 3 MARIAS 🚨
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
+            authDomain: "loja3marias-50204.firebaseapp.com",
+            projectId: "loja3marias-50204",
+            storageBucket: "loja3marias-50204.firebasestorage.app",
+            messagingSenderId: "405330133487",
+            appId: "1:405330133487:web:606de41211df52245f761a",
+            measurementId: "G-TK877V6P0S"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Elementos do DOM
+        const grid = document.getElementById('products-grid');
+        const loadingMsg = document.getElementById('loading-message');
+        const errorMsg = document.getElementById('error-message');
+        const filterButtons = document.querySelectorAll('.filter-button');
+        const collectionTitle = document.getElementById('collection-title');
+        const cartCountEl = document.getElementById('cart-count'); 
+        const headerEl = document.getElementById('main-header'); // NOVO
+        let currentFilter = 'pronta-entrega';
+        
+        function getCart() {
+            return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
+        }
+
+        function updateCartIcon() {
+            const cart = getCart();
+            const count = Object.keys(cart.items).length;
+            
+            if (count > 0) {
+                cartCountEl.textContent = count;
+                cartCountEl.style.display = 'flex';
+            } else {
+                cartCountEl.style.display = 'none';
+            }
+        }
+        
+        async function fetchProducts() {
+            loadingMsg.style.display = 'block';
+            errorMsg.style.display = 'none';
+            grid.innerHTML = '';
+
+            try {
+                const snapshot = await db.collection("products")
+                                        .where("source", "==", currentFilter)
+                                        .orderBy("isFeatured", "desc") 
+                                        .orderBy("createdAt", "desc")
+                                        .get();
+
+                if (snapshot.empty) {
+                    loadingMsg.style.display = 'none';
+                    if (currentFilter === 'pronta-entrega') {
+                        grid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Nenhum produto em Pronta Entrega no momento.</p>';
+                    } else {
+                        grid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Nenhum produto Sob Encomenda no momento.</p>';
+                    }
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const product = doc.data();
+                    const id = doc.id;
+                    const precoFormatado = (product.price || 0).toLocaleString('ja-JP');
+
+                    let badge = '';
+                    if (product.isFeatured === 'novo') {
+                        badge = '<span class="badge badge-novo">✨ Novidade</span>';
+                    } else if (product.isFeatured === 'destaque') {
+                        badge = '<span class="badge badge-destaque">🔥 Destaque</span>';
+                    }
+
+                    const card = document.createElement('a');
+                    card.href = `detalhes.html?id=${id}`;
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        ${badge}
+                        <div class="product-image-container">
+                            <img src="${product.imageUrl || 'https://via.placeholder.com/400x600?text=3+Marias'}" alt="${product.name}" class="product-image">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">${product.name}</h3>
+                            <p class="product-price">¥${precoFormatado}</p>
+                            <span class="details-button">Ver Detalhes</span>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                loadingMsg.style.display = 'none';
+
+            } catch (error) {
+                console.error("Erro ao carregar produtos:", error);
+                loadingMsg.style.display = 'none';
+                errorMsg.style.display = 'block';
+                errorMsg.innerHTML = `Erro: Não foi possível carregar os produtos.<br>Verifique o painel /admin e os Índices do Firebase.`;
+            }
+        }
+        
+        // 🚨 NOVO: Carrega o Logo
+        async function fetchSiteConfig() {
+            try {
+                const doc = await db.collection("configuracoes").doc("siteInfo").get();
+                if (doc.exists && doc.data().logoUrl) {
+                    headerEl.innerHTML = `
+                        <img src="${doc.data().logoUrl}" alt="3 Marias Moda Feminina Logo" class="header-logo">
+                        <p>A moda íntima brasileira que te entende, no Japão.</p>
+                    `;
+                }
+            } catch (error) {
+                console.error("Erro ao carregar logo, usando texto padrão.", error);
+            }
+        }
+
+        // Lógica dos Filtros
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentFilter = button.dataset.filter;
+                
+                if (currentFilter === 'pronta-entrega') {
+                    collectionTitle.textContent = "Pronta Entrega";
+                } else {
+                    collectionTitle.textContent = "Catálogo Sob Encomenda";
+                }
+                
+                fetchProducts();
+            });
+        });
+
+        // Carregamento Inicial
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchProducts();
+            updateCartIcon(); 
+            fetchSiteConfig(); // 🚨 NOVO: Chama a função do logo
+        });
+    </script>
+</body>
+</html>
