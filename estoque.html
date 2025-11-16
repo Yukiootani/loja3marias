@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Estoque (V3.5) | 3 Marias</title>
+    <title>Gestão de Estoque (V3.6) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -111,11 +111,14 @@
             box-sizing: border-box;
         }
         .total-stock-display {
-            font-size: 1.1em; font-weight: bold; color: var(--primary-color);
+            font-size: 1.1em; 
+            font-weight: bold; 
+            color: var(--primary-color);
+            text-align: center; /* 🚨 NOVO: Centraliza o número */
         }
         
         
-        /* 🚨 OTIMIZAÇÃO MOBILE (V3.5 - Layout Vertical) 🚨 */
+        /* 🚨 OTIMIZAÇÃO MOBILE (V3.6 - Estoque Total Visível) 🚨 */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 10px; }
@@ -130,31 +133,36 @@
             }
             
             #stock-table th, #stock-table td {
-                padding: 8px;
-                font-size: 0.9em;
+                padding: 5px; /* 🚨 MUDANÇA: Menos padding */
+                font-size: 0.85em; /* 🚨 MUDANÇA: Fonte menor */
                 white-space: normal; 
                 word-wrap: break-word; 
+                text-align: left;
             }
             
-            /* Define a largura das colunas */
-            #stock-table th:nth-child(1) { width: 20%; } /* Foto */
-            #stock-table th:nth-child(2) { width: 30%; } /* Produto */
-            #stock-table th:nth-child(3) { width: 50%; } /* Estoque (maior) */
-            #stock-table th:nth-child(4) { display: none; } /* Oculta "Estoque Total" */
+            /* 🚨 MUDANÇA: Define a largura das 4 colunas */
+            #stock-table th:nth-child(1) { width: 18%; } /* Foto */
+            #stock-table th:nth-child(2) { width: 27%; } /* Produto */
+            #stock-table th:nth-child(3) { width: 40%; } /* Estoque Cor/Tamanho */
+            #stock-table th:nth-child(4) { width: 15%; } /* Estoque Total */
             
+            /* 🚨 MUDANÇA: Garante que o total esteja visível e centralizado */
             .total-stock-display {
-                display: none;
+                display: table-cell; 
+                text-align: center;
+                font-size: 1em;
+                padding-top: 10px;
             }
             
-            /* 🚨 MUDANÇA: Layout Vertical para os tamanhos */
+            /* Layout Vertical para os tamanhos */
             .size-inputs {
-                display: block; /* Remove o grid/flex */
+                display: block; 
             }
             .size-input-group {
-                display: flex; /* Cada grupo (P, M, G, GG) é uma linha */
-                justify-content: space-between; /* Alinha label de um lado, botões do outro */
+                display: flex; 
+                justify-content: space-between; 
                 align-items: center;
-                padding: 10px 0; /* Espaçamento vertical */
+                padding: 10px 0; 
                 border-bottom: 1px solid var(--border-color);
             }
             .size-input-group:last-child {
@@ -166,7 +174,7 @@
             }
             
             .update-btn {
-                font-size: 1em; /* Fonte maior */
+                font-size: 1em; 
                 padding: 12px;
             }
         }
@@ -176,7 +184,7 @@
 <body>
 
     <div class="container">
-        <h1>Gestão de Estoque (V3.5)</h1>
+        <h1>Gestão de Estoque (V3.6)</h1>
         <h2>3 Marias - Por Cor e Tamanho</h2>
 
         <section id="login-section">
@@ -280,7 +288,7 @@
                 }
             }
             
-            // 🚨 FUNÇÃO ATUALIZADA (V3.5): Gera o HTML com botões +/- e layout vertical
+            // FUNÇÃO ATUALIZADA (V3.5): Gera o HTML com botões +/- e layout vertical
             function formatVariants(productId, variants) {
                 if (!variants || Object.keys(variants).length === 0) {
                     return "Nenhuma variante cadastrada.";
