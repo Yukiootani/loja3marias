@@ -11,7 +11,7 @@
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
-            --silver-color: #C0C0C0; /* <-- NOVO: Cor Prata para o brilho */
+            --silver-color: #C0C0C0; /* Cor Prata para o brilho */
             --text-color: #333; 
             --light-text: #666; 
             --bg-color: #FFFFFF; 
@@ -19,7 +19,7 @@
             --whatsapp-green: #28a745; 
         }
 
-        /* <-- NOVO BLOCO DE ANIMAÇÃO DE BRILHO --> */
+        /* Animação de Brilho */
         @keyframes shimmer-glow {
             0% {
                 box-shadow: 0 0 5px var(--accent-color); /* Brilho Dourado */
@@ -50,9 +50,9 @@
             border-bottom: 1px solid var(--border-color); 
         }
         
-        /* Estilo do Logo (Agora funciona com o PNG aparado) */
+        /* Estilo do Logo */
         .header-logo {
-            max-width: 250px; /* Largura MÁXIMA. Ficará ótimo. */
+            max-width: 250px; 
             width: 100%;
             height: auto;     
             object-fit: contain; 
@@ -92,15 +92,15 @@
             text-align: center; 
             box-sizing: border-box;
             
-            /* <-- NOVO EFEITO DE BRILHO --> */
+            /* Efeito de Brilho */
             animation: shimmer-glow 3s ease-in-out infinite; 
         }
         .filter-button.active {
-            /* <-- MUDANÇA: Botão ativo agora é dourado, não rosa */
+            /* Botão ativo agora é dourado */
             background-color: var(--accent-color); 
             color: var(--text-color);
             border-color: var(--accent-color); 
-            animation: none; /* <-- NOVO: Para o brilho quando está ativo */
+            animation: none; /* Para o brilho quando está ativo */
         }
         
         .section-title {
@@ -147,7 +147,7 @@
         .product-name { font-size: 1em; font-weight: 600; margin: 0 0 5px 0; }
         .product-price { font-size: 1.1em; font-weight: 700; color: var(--primary-color); margin: 0 0 15px 0; }
         
-        /* Este é o botão de "Ver Detalhes" - ele NÃO terá o brilho */
+        /* Botão de "Ver Detalhes" */
         .details-button {
             display: inline-block;
             background-color: var(--primary-color);
@@ -256,7 +256,7 @@
     </main>
 
     <footer>
-        <p>© 2025 Sua Loja. Todos os direitos reservados.</p>
+        <p>© 2025 3Marias. Todos os direitos reservados.</p>
     </footer>
 
     <a id="cart-icon" href="carrinho.html">
@@ -368,7 +368,7 @@
             }
         }
         
-        // NOTHING_CHANGED_BELOW_THIS_LINE
+        // Carrega o Logo
         async function fetchSiteConfig() {
             try {
                 const doc = await db.collection("configuracoes").doc("siteInfo").get();
@@ -404,7 +404,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetchProducts();
             updateCartIcon(); 
-            fetchSiteConfig(); // 🚨 NOVO: Chama a função do logo
+            fetchSiteConfig(); 
         });
     </script>
 </body>
