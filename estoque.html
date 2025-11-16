@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Estoque por Tamanho | 3 Marias</title>
+    <title>Gestão de Estoque (V3.1) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -42,24 +42,39 @@
         #btnLogout { background-color: #777; margin-top: 20px; width: auto; padding: 10px 20px; }
 
         /* Filtros */
-        #filter-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        #filter-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; } /* Adicionado flex-wrap */
         .filter-btn {
             background-color: #f0f0f0; color: #555; border: 1px solid #ccc; padding: 10px 15px;
             font-size: 0.9em; border-radius: 5px; cursor: pointer;
         }
         .filter-btn.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-        /* 🚨 NOVO: Estilo de Edição Rápida por Tamanho */
+        /* Estilo de Edição Rápida por Tamanho */
         .variant-stock-row {
             padding: 8px;
             border-bottom: 1px dashed #eee;
         }
         .variant-stock-row:last-child { border-bottom: none; }
         .variant-color-label { font-weight: bold; color: #333; }
-        .size-inputs { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
-        .size-inputs label { font-size: 0.9em; font-weight: normal; margin: 0; }
+        
+        /* 🚨 MUDANÇA: Inputs de Tamanho (Layout Padrão - Desktop) */
+        .size-inputs { 
+            display: flex; /* Linha única no desktop */
+            gap: 10px; 
+            align-items: center; 
+            flex-wrap: wrap; /* Permite quebrar se necessário */
+            margin-top: 8px; 
+        }
+        .size-input-group { /* 🚨 NOVO: Grupo para Label + Input */
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .size-input-group label { font-size: 0.9em; font-weight: normal; margin: 0; }
         .stock-input {
-            width: 50px !important; padding: 5px !important; text-align: center;
+            width: 50px !important; /* Tamanho fixo no desktop */
+            padding: 5px !important; 
+            text-align: center;
         }
         .update-btn {
             background-color: var(--accent-color); color: #333; font-size: 0.8em;
@@ -68,12 +83,49 @@
         .total-stock-display {
             font-size: 1.1em; font-weight: bold; color: var(--primary-color);
         }
+        
+        
+        /* 🚨 NOVO: OTIMIZAÇÃO MOBILE 🚨 */
+        @media (max-width: 768px) {
+            /* Força a tabela a não estourar, mas permite scroll horizontal se AINDA for muito larga */
+            #stock-table-container {
+                overflow-x: auto; 
+                -webkit-overflow-scrolling: touch; 
+            }
+            
+            /* Esta é a mudança principal: */
+            .size-inputs {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+                gap: 10px;
+            }
+            .size-input-group label {
+                font-weight: bold;
+            }
+            .stock-input {
+                width: 100% !important; /* Input ocupa todo o espaço do grid */
+                box-sizing: border-box; 
+            }
+            
+            /* Ajusta o espaçamento das células */
+            #stock-table th, #stock-table td {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+            .update-btn {
+                width: 100%; /* Botão ocupa a largura toda */
+                box-sizing: border-box;
+                padding: 10px;
+                font-size: 0.9em;
+            }
+        }
+        
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Gestão de Estoque (V3)</h1>
+        <h1>Gestão de Estoque (V3.1)</h1>
         <h2>3 Marias - Por Cor e Tamanho</h2>
 
         <section id="login-section">
@@ -177,7 +229,7 @@
                 }
             }
             
-            // 🚨 NOVO: Gera o HTML para os campos de estoque
+            // 🚨 FUNÇÃO ATUALIZADA: Gera o HTML para os campos de estoque (com <div>s de grupo)
             function formatVariants(productId, variants) {
                 if (!variants || Object.keys(variants).length === 0) {
                     return "Nenhuma variante cadastrada.";
@@ -190,14 +242,24 @@
                         <div class="variant-stock-row" data-product-id="${productId}" data-color="${color}">
                             <div class="variant-color-label">${color}:</div>
                             <div class="size-inputs">
-                                <label>P:</label>
-                                <input type="number" class="stock-input" data-size="P" value="${stockData.P || 0}" min="0">
-                                <label>M:</label>
-                                <input type="number" class="stock-input" data-size="M" value="${stockData.M || 0}" min="0">
-                                <label>G:</label>
-                                <input type="number" class="stock-input" data-size="G" value="${stockData.G || 0}" min="0">
-                                <label>GG:</label>
-                                <input type="number" class="stock-input" data-size="GG" value="${stockData.GG || 0}" min="0">
+                                
+                                <div class="size-input-group">
+                                    <label>P:</label>
+                                    <input type="number" class="stock-input" data-size="P" value="${stockData.P || 0}" min="0">
+                                </div>
+                                <div class="size-input-group">
+                                    <label>M:</label>
+                                    <input type="number" class="stock-input" data-size="M" value="${stockData.M || 0}" min="0">
+                                </div>
+                                <div class="size-input-group">
+                                    <label>G:</label>
+                                    <input type="number" class="stock-input" data-size="G" value="${stockData.G || 0}" min="0">
+                                </div>
+                                <div class="size-input-group">
+                                    <label>GG:</label>
+                                    <input type="number" class="stock-input" data-size="GG" value="${stockData.GG || 0}" min="0">
+                                </div>
+
                             </div>
                             <button class="update-btn" data-product-id="${productId}" data-color="${color}">Atualizar ${color}</button>
                         </div>
@@ -219,6 +281,8 @@
                         query = query.where("source", "==", "sob-encomenda");
                     }
 
+                    // 🚨 MUDANÇA: A consulta com filtro (where) em 'source' e ordenação (orderBy) em 'name'
+                    // requer o ÍNDICE COMPOSTO que você criou no Firebase.
                     const snapshot = await query.orderBy("name", "asc").get();
 
                     if (snapshot.empty) {
@@ -254,7 +318,15 @@
                     stockList.innerHTML = html;
                 } catch (error) {
                     console.error("Erro ao carregar estoque:", error);
-                    stockList.innerHTML = `<tr><td colspan="4" style="color:red;">Erro ao carregar estoque: ${error.message}</td></tr>`;
+                    // 🚨 VERIFICAÇÃO: Se o erro for sobre "índice", avisa o usuário
+                    if (error.code === 'failed-precondition') {
+                         stockList.innerHTML = `<tr><td colspan="4" style="color:red; padding: 20px;">
+                            <strong>ERRO DE FIREBASE:</strong> O índice composto não foi encontrado ou não está ativo.<br>
+                            Tente clicar nos filtros "Pronta Entrega" ou "Sob Encomenda" novamente, e clique no link de erro que o Firebase gerar (como fizemos antes).
+                         </td></tr>`;
+                    } else {
+                        stockList.innerHTML = `<tr><td colspan="4" style="color:red;">Erro ao carregar estoque: ${error.message}</td></tr>`;
+                    }
                 }
             }
             
@@ -268,7 +340,7 @@
                 }
             });
             
-            // 3. 🚨 LÓGICA DE ATUALIZAÇÃO (POR COR/TAMANHO)
+            // 3. LÓGICA DE ATUALIZAÇÃO (POR COR/TAMANHO)
             stockList.addEventListener('click', async (e) => {
                 if (e.target.classList.contains('update-btn')) {
                     const productId = e.target.dataset.productId;
@@ -280,16 +352,21 @@
                     const newStockData = {};
                     let newTotalStockForVariant = 0;
                     
+                    let hasError = false;
                     inputs.forEach(input => {
                         const size = input.dataset.size;
-                        const stock = parseInt(input.value) || 0;
-                        if (stock < 0) {
-                            showStatus("Erro: O estoque não pode ser negativo.", "error");
-                            return; // Para a execução
+                        const stock = parseInt(input.value);
+                        
+                        if (isNaN(stock) || stock < 0) {
+                            showStatus(`Erro: O estoque para ${color}/${size} deve ser um número positivo (0 ou mais).`, "error");
+                            hasError = true;
+                            return;
                         }
                         newStockData[size] = stock;
                         newTotalStockForVariant += stock;
                     });
+                    
+                    if (hasError) return; // Para a execução se houver erro
 
                     e.target.disabled = true;
                     e.target.textContent = "Salvando...";
@@ -298,14 +375,12 @@
                     try {
                         const docRef = db.collection("products").doc(productId);
                         
-                        // 1. Atualiza o objeto da variante específica
-                        // A notação 'variantes.Cor' permite atualizar um campo dentro de um objeto
                         const updatePayload = {};
                         updatePayload[`variantes.${color}`] = newStockData; 
                         
                         await docRef.update(updatePayload);
 
-                        // 2. Recalcula o Estoque Total do Produto (lendo todos os 'variantes')
+                        // Recalcula o Estoque Total do Produto
                         const doc = await docRef.get();
                         const allVariants = doc.data().variantes;
                         let newEstoqueTotal = 0;
@@ -315,19 +390,19 @@
                             }
                         }
                         
-                        // 3. Salva o novo Estoque Total
+                        // Salva o novo Estoque Total
                         await docRef.update({
                             estoqueTotal: newEstoqueTotal
                         });
 
-                        // 4. Atualiza o total na tela
+                        // Atualiza o total na tela
                         document.getElementById(`total-${productId}`).textContent = newEstoqueTotal;
 
                         showStatus(`Estoque do ${color} atualizado com sucesso!`, "success");
                         
                     } catch (error) {
                         console.error("Erro ao atualizar estoque:", error);
-                        showStatus(`Erro: ${error.message}`, "error", true); // Deixa o erro visível
+                        showStatus(`Erro: ${error.message}`, "error", true); 
                     } finally {
                         e.target.disabled = false;
                         e.target.textContent = `Atualizar ${color}`;
