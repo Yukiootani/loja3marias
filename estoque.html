@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Estoque (V3.4) | 3 Marias</title>
+    <title>Gestão de Estoque (V3.5) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -50,7 +50,7 @@
         }
         .filter-btn.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-        /* Estilo de Edição Rápida (V3.4 com botões) */
+        /* Estilo de Edição Rápida (V3.5) */
         .variant-stock-row {
             padding: 8px;
             border-bottom: 1px dashed #eee;
@@ -59,19 +59,22 @@
         .variant-color-label { font-weight: bold; color: #333; margin-bottom: 10px; display: block; }
         
         .size-inputs { 
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+            display: flex; /* Flex no desktop */
             gap: 15px; 
+            align-items: center; 
+            flex-wrap: wrap; 
         }
         .size-input-group { 
-            display: block;
+            display: flex; /* Linha única (ex: "P: [-] 5 [+]") no desktop */
+            align-items: center;
+            gap: 8px;
         }
         .size-input-group label {
             font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
+            margin-bottom: 0;
         }
         
+        /* Botões de Quantidade */
         .quantity-control {
             display: flex;
             align-items: center;
@@ -82,12 +85,12 @@
             color: #333;
             border: 1px solid #ccc;
             border-radius: 50%;
-            width: 40px; /* 🚨 MUDANÇA: Botão maior */
+            width: 40px; 
             height: 40px;
-            font-size: 1.6em; /* 🚨 MUDANÇA: Fonte maior */
+            font-size: 1.6em; 
             font-weight: bold;
             cursor: pointer;
-            line-height: 1.2; /* 🚨 MUDANÇA: Alinhamento vertical */
+            line-height: 1.2; 
         }
         .qty-btn:disabled {
             background-color: #f9f9f9;
@@ -95,7 +98,7 @@
             cursor: not-allowed;
         }
         .qty-display {
-            font-size: 1.4em; /* 🚨 MUDANÇA: Fonte maior */
+            font-size: 1.4em; 
             font-weight: bold;
             padding: 0 5px;
             min-width: 25px;
@@ -112,38 +115,56 @@
         }
         
         
-        /* 🚨 OTIMIZAÇÃO MOBILE (V3.4 - CORRIGIDA) 🚨 */
+        /* 🚨 OTIMIZAÇÃO MOBILE (V3.5 - Layout Vertical) 🚨 */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 10px; }
 
             /* Faz a tabela ser 100% da largura, sem scroll */
             #stock-table-container { 
-                overflow-x: hidden; /* 🚨 MUDANÇA: Remove o scroll horizontal */
+                overflow-x: hidden; 
             }
             #stock-table {
-                table-layout: fixed; /* Força a tabela a obedecer a largura */
+                table-layout: fixed; 
                 width: 100%;
             }
             
             #stock-table th, #stock-table td {
                 padding: 8px;
                 font-size: 0.9em;
-                white-space: normal; /* 🚨 MUDANÇA: Permite quebra de linha */
-                word-wrap: break-word; /* 🚨 NOVO: Quebra palavras longas */
+                white-space: normal; 
+                word-wrap: break-word; 
             }
             
             /* Define a largura das colunas */
             #stock-table th:nth-child(1) { width: 20%; } /* Foto */
             #stock-table th:nth-child(2) { width: 30%; } /* Produto */
             #stock-table th:nth-child(3) { width: 50%; } /* Estoque (maior) */
-            #stock-table th:nth-child(4) { display: none; } /* 🚨 NOVO: Oculta "Estoque Total" no mobile */
+            #stock-table th:nth-child(4) { display: none; } /* Oculta "Estoque Total" */
             
-            /* Oculta a célula de Estoque Total no mobile (redundante) */
             .total-stock-display {
                 display: none;
             }
-
+            
+            /* 🚨 MUDANÇA: Layout Vertical para os tamanhos */
+            .size-inputs {
+                display: block; /* Remove o grid/flex */
+            }
+            .size-input-group {
+                display: flex; /* Cada grupo (P, M, G, GG) é uma linha */
+                justify-content: space-between; /* Alinha label de um lado, botões do outro */
+                align-items: center;
+                padding: 10px 0; /* Espaçamento vertical */
+                border-bottom: 1px solid var(--border-color);
+            }
+            .size-input-group:last-child {
+                border-bottom: none;
+            }
+            .size-input-group label {
+                font-size: 1.2em;
+                font-weight: bold;
+            }
+            
             .update-btn {
                 font-size: 1em; /* Fonte maior */
                 padding: 12px;
@@ -155,7 +176,7 @@
 <body>
 
     <div class="container">
-        <h1>Gestão de Estoque (V3.4)</h1>
+        <h1>Gestão de Estoque (V3.5)</h1>
         <h2>3 Marias - Por Cor e Tamanho</h2>
 
         <section id="login-section">
@@ -259,7 +280,7 @@
                 }
             }
             
-            // FUNÇÃO ATUALIZADA (V3.3): Gera o HTML com botões +/-
+            // 🚨 FUNÇÃO ATUALIZADA (V3.5): Gera o HTML com botões +/- e layout vertical
             function formatVariants(productId, variants) {
                 if (!variants || Object.keys(variants).length === 0) {
                     return "Nenhuma variante cadastrada.";
