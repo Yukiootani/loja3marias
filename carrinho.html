@@ -6,15 +6,15 @@
     <title>Meu Carrinho | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* --- CSS Minimalista --- */
+        /* --- CSS Minimalista (Victoria's Secret Style) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
             --whatsapp-green: #28a745; 
             --text-color: #333; 
             --light-text: #666; 
-            --bg-color: #FFFFFF; 
-            --border-color: #f0f0f0; 
+            --bg-color: #FFFFFF; /* Fundo principal Branco */
+            --border-color: #f0f0f0; /* Bordas bem claras */
             --error-color: #dc3545;
         }
         body {
@@ -23,16 +23,13 @@
             background-color: var(--bg-color);
             color: var(--text-color);
         }
-        /* 🚨 CABEÇALHO ATUALIZADO PARA LOGO */
+        /* Cabeçalho Minimalista */
         header {
             background-color: white; 
             color: var(--text-color); 
             padding: 1rem 1rem;
-            text-align: center; /* Centralizado */
+            text-align: left; /* Alinhado à esquerda */
             border-bottom: 1px solid var(--border-color); 
-            display: flex; /* Para alinhar logo e link */
-            justify-content: space-between;
-            align-items: center;
         }
         header a {
             color: var(--text-color); 
@@ -40,18 +37,6 @@
             font-size: 1em;
             font-weight: 500;
         }
-        .header-logo-container {
-            flex: 1; /* Ocupa o espaço central */
-            text-align: center; /* Centraliza o logo */
-        }
-        .header-logo {
-            max-width: 180px; /* Logo menor nas páginas internas */
-            height: 60px; 
-            object-fit: contain; 
-            display: block;
-            margin: 0 auto;
-        }
-        
         main {
             max-width: 800px;
             margin: 30px auto;
@@ -69,7 +54,7 @@
         /* Estilo do Carrinho */
         #cart-items-container {
             background-color: white;
-            padding: 0; 
+            padding: 0; /* Remove padding */
             border-radius: 0;
             box-shadow: none;
         }
@@ -109,6 +94,7 @@
             font-weight: bold;
             color: var(--primary-color);
             text-align: right;
+            min-width: 80px;
         }
         .cart-item-remove {
             color: var(--error-color);
@@ -118,6 +104,42 @@
             margin-top: 5px;
             display: inline-block;
         }
+        
+        /* 🚨 NOVO: Controle de Quantidade */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .qty-btn {
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .qty-btn:disabled {
+            background-color: #f9f9f9;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        .qty-display {
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 0 5px;
+        }
+        .stock-info {
+            font-size: 0.9em;
+            color: var(--light-text);
+            margin-top: 5px;
+        }
+        .stock-pronta-entrega { color: var(--whatsapp-green); font-weight: bold; }
+        .stock-sob-encomenda { color: var(--accent-color); font-weight: bold; }
+
 
         #cart-summary {
             margin-top: 30px;
@@ -160,17 +182,16 @@
 </head>
 <body>
 
-    <header id="main-header">
+    <header>
         <a href="index.html" style="color: var(--text-color);">&larr; Voltar para a Loja</a>
-        <div class="header-logo-container">
-            </div>
-        <div style="width: 80px;"></div> </header>
+    </header>
 
     <main>
         <h1>Meu Carrinho WhatsApp</h1>
 
         <div id="cart-items-container">
-            </div>
+            <p id="empty-cart-message">Carregando itens...</p>
+        </div>
 
         <div id="cart-summary" style="display: none;">
             <div class="summary-total">
@@ -183,7 +204,7 @@
         </div>
         
     </main>
-
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
@@ -197,31 +218,18 @@
             appId: "1:405330133487:web:606de41211df52245f761a",
             measurementId: "G-TK877V6P0S"
         };
-        
+
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(); 
+        const db = firebase.firestore();
 
         const WHATSAPP_NUMBER = "818074558624"; 
         const cartItemsContainer = document.getElementById('cart-items-container');
         const cartSummary = document.getElementById('cart-summary');
         const cartTotalEl = document.getElementById('cart-total');
         const checkoutBtn = document.getElementById('whatsapp-checkout-btn');
-        const headerEl = document.getElementById('main-header'); // NOVO
-
-        // 🚨 NOVO: Carrega o Logo
-        async function fetchSiteConfig() {
-            try {
-                const doc = await db.collection("configuracoes").doc("siteInfo").get();
-                if (doc.exists && doc.data().logoUrl) {
-                    const logoContainer = headerEl.querySelector('.header-logo-container');
-                    if (logoContainer) {
-                        logoContainer.innerHTML = `<img src="${doc.data().logoUrl}" alt="3 Marias Logo" class="header-logo">`;
-                    }
-                }
-            } catch (error) {
-                console.error("Erro ao carregar logo.", error);
-            }
-        }
+        
+        // 🚨 NOVO: Cache de produtos para evitar buscas repetidas
+        let productCache = {};
         
         function getCart() {
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
@@ -229,14 +237,48 @@
 
         function saveCart(cart) {
             localStorage.setItem('whatsappCart', JSON.stringify(cart));
+            // 🚨 NOVO: Atualiza a contagem do ícone
+            updateCartIcon();
+        }
+        
+        // 🚨 NOVO: Atualiza o ícone do carrinho (baseado no total de QTD)
+        function updateCartIcon() {
+            const cart = getCart();
+            let count = 0;
+            Object.values(cart.items).forEach(item => {
+                count += item.quantity;
+            });
+            // Esta função só existe no 'detalhes.html' e 'index.html',
+            // então não vai dar erro, mas também não vai atualizar aqui.
+            // A lógica principal é no getCart/saveCart.
         }
 
-        function renderCart() {
+        // 🚨 NOVO: Busca o produto no Firebase (ou cache)
+        async function getProductData(productId) {
+            if (productCache[productId]) {
+                return productCache[productId];
+            }
+            try {
+                const doc = await db.collection("products").doc(productId).get();
+                if (doc.exists) {
+                    productCache[productId] = doc.data();
+                    return productCache[productId];
+                }
+                return null;
+            } catch (e) {
+                console.error("Erro ao buscar produto:", e);
+                return null;
+            }
+        }
+        
+        // 🚨 FUNÇÃO renderCart (TOTALMENTE REESCRITA) 🚨
+        async function renderCart() {
             const cart = getCart();
             const items = cart.items;
             
             cartItemsContainer.innerHTML = ''; // Limpa o carrinho
             let total = 0;
+            let whatsappMessage = "Olá, Harumi! Gostaria de fazer o seguinte pedido:\n\n";
 
             if (Object.keys(items).length === 0) {
                 cartItemsContainer.innerHTML = '<p id="empty-cart-message">Seu carrinho está vazio.</p>';
@@ -245,10 +287,60 @@
             }
 
             cartSummary.style.display = 'block';
-            let whatsappMessage = "Olá, Harumi! Gostaria de fazer o seguinte pedido:\n\n";
+            
+            // Usa Promise.all para buscar todos os produtos em paralelo
+            const itemIds = Object.keys(items);
+            const productPromises = Object.values(items).map(item => getProductData(item.id));
+            const productSnapshots = await Promise.all(productPromises);
 
-            for (const itemId in items) {
+            for (let i = 0; i < itemIds.length; i++) {
+                const itemId = itemIds[i];
                 const item = items[itemId];
+                const product = productSnapshots[i];
+                
+                let maxStock = 999;
+                let stockStatus = "Sob Encomenda";
+                let stockStatusClass = "stock-sob-encomenda";
+                let stockCount = 0;
+                
+                if (product) {
+                    // Define o status (Pronta Entrega / Encomenda)
+                    if(product.source === 'pronta-entrega') {
+                        stockStatus = "Pronta Entrega";
+                        stockStatusClass = "stock-pronta-entrega";
+                    }
+                    
+                    // Pega o estoque da variante específica
+                    if (item.color && item.size && product.variantes && product.variantes[item.color]) {
+                        maxStock = product.variantes[item.color][item.size] || 0;
+                        stockCount = maxStock;
+                    } else if (!item.color && product.estoqueTotal) {
+                        // (Caso de produto sem variante, usa estoque total)
+                        maxStock = product.estoqueTotal;
+                        stockCount = maxStock;
+                    }
+                    
+                    // Se o item for de encomenda, o estoque não limita
+                    if (product.source === 'sob-encomenda') {
+                        maxStock = 999; 
+                    }
+                    
+                } else {
+                    // Produto não encontrado no Firebase (pode ter sido excluído)
+                    cartItemsContainer.innerHTML += `<div class="cart-item"><p>Erro: O produto "${item.name}" não está mais disponível e não pode ser pedido.</p></div>`;
+                    continue; // Pula para o próximo item
+                }
+                
+                // Validação: Se a quantidade no carrinho for maior que o estoque, ajusta
+                if (item.quantity > maxStock) {
+                    item.quantity = maxStock;
+                }
+                // Se o estoque for 0, remove o item
+                if (maxStock === 0) {
+                    delete cart.items[itemId];
+                    continue; // Pula para o próximo item
+                }
+                
                 const itemPrice = parseFloat(item.price);
                 const itemTotal = itemPrice * item.quantity;
                 total += itemTotal;
@@ -261,12 +353,23 @@
 
                 // Adiciona ao HTML
                 cartItemsContainer.innerHTML += `
-                    <div class="cart-item" id="item-${itemId}">
+                    <div class="cart-item" id="item-${itemId}" data-max-stock="${maxStock}">
                         <img src="${item.image}" alt="${item.name}" class="cart-item-image">
                         <div class="cart-item-info">
                             <h3>${item.name}</h3>
                             <p>${variantText}</p>
-                            <p>Qtd: ${item.quantity}</p>
+                            
+                            <div class="quantity-control">
+                                <button class="qty-btn qty-decrease" data-id="${itemId}" ${item.quantity <= 1 ? 'disabled' : ''}>-</button>
+                                <span class="qty-display">${item.quantity}</span>
+                                <button class="qty-btn qty-increase" data-id="${itemId}" ${item.quantity >= maxStock ? 'disabled' : ''}>+</button>
+                            </div>
+                            
+                            <div class="stock-info">
+                                <span class="${stockStatusClass}">${stockStatus}</span>
+                                ${stockStatus === 'Pronta Entrega' ? `(${stockCount} em estoque)` : ''}
+                            </div>
+                            
                             <span class="cart-item-remove" data-id="${itemId}">Remover</span>
                         </div>
                         <div class="cart-item-price">
@@ -280,7 +383,9 @@
                 if (variantText) {
                     whatsappMessage += `  (${variantText})\n`;
                 }
-                whatsappMessage += `  (Preço: ¥${precoFormatado})\n\n`;
+                whatsappMessage += `  (Preço: ¥${precoFormatado})\n`;
+                // 🚨 NOVO: Adiciona status de estoque na mensagem
+                whatsappMessage += `  *(Status: ${stockStatus} - ${stockCount} em estoque)*\n\n`;
             }
 
             // Atualiza o total
@@ -290,27 +395,55 @@
             whatsappMessage += `*Total do Pedido: ¥${total.toLocaleString('ja-JP')}*`;
             whatsappMessage += `\n\nAguardo as instruções para pagamento.`;
             checkoutBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+            
+            // Salva o carrinho (caso tenha sido feita alguma correção de estoque)
+            saveCart(cart);
         }
 
-        // Lógica para remover item
+        // 🚨 NOVO: Lógica de Quantidade [ - ] e [ + ]
         cartItemsContainer.addEventListener('click', (e) => {
+            const cart = getCart();
+            
+            // Botão Remover
             if (e.target.classList.contains('cart-item-remove')) {
                 const itemId = e.target.dataset.id;
-                
                 if (confirm("Tem certeza que deseja remover este item do carrinho?")) {
-                    const cart = getCart();
                     delete cart.items[itemId];
                     saveCart(cart);
                     renderCart(); // Re-renderiza o carrinho
                 }
+                return;
+            }
+
+            // Botão Aumentar [+]
+            if (e.target.classList.contains('qty-increase')) {
+                const itemId = e.target.dataset.id;
+                const itemRow = e.target.closest('.cart-item');
+                const maxStock = parseInt(itemRow.dataset.maxStock);
+                
+                if (cart.items[itemId].quantity < maxStock) {
+                    cart.items[itemId].quantity += 1;
+                    saveCart(cart);
+                    renderCart(); // Re-renderiza para atualizar totais e botões
+                }
+                return;
+            }
+            
+            // Botão Diminuir [-]
+            if (e.target.classList.contains('qty-decrease')) {
+                const itemId = e.target.dataset.id;
+                
+                if (cart.items[itemId].quantity > 1) {
+                    cart.items[itemId].quantity -= 1;
+                    saveCart(cart);
+                    renderCart(); // Re-renderiza para atualizar totais e botões
+                }
+                return;
             }
         });
 
         // Carregamento Inicial
-        document.addEventListener('DOMContentLoaded', () => {
-            renderCart();
-            fetchSiteConfig(); // 🚨 NOVO: Chama a função do logo
-        });
+        document.addEventListener('DOMContentLoaded', renderCart);
 
     </script>
 </body>
