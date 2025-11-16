@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Estoque (V3.7) | 3 Marias</title>
+    <title>Gestão de Estoque (V3.8) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -118,7 +118,7 @@
         }
         
         
-        /* 🚨 OTIMIZAÇÃO MOBILE (V3.7 - Oculta Total) 🚨 */
+        /* 🚨 OTIMIZAÇÃO MOBILE (V3.8 - 4 Colunas) 🚨 */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 10px; }
@@ -131,47 +131,63 @@
                 width: 100%;
             }
             
+            /* 🚨 MUDANÇA: Fonte BEM pequena para caber tudo */
             #stock-table th, #stock-table td {
-                padding: 8px 5px; /* Mais padding lateral */
-                font-size: 0.9em; 
+                padding: 4px; 
+                font-size: 0.75em; /* Fonte bem pequena */
                 white-space: normal; 
                 word-wrap: break-word; 
                 text-align: left;
             }
             
-            /* 🚨 MUDANÇA: Define a largura das 3 colunas visíveis */
-            #stock-table th:nth-child(1) { width: 20%; } /* Foto */
+            /* 🚨 MUDANÇA: Largura das 4 colunas */
+            #stock-table th:nth-child(1) { width: 15%; } /* Foto */
             #stock-table th:nth-child(2) { width: 25%; } /* Produto */
-            #stock-table th:nth-child(3) { width: 55%; } /* Estoque (MAIOR) */
+            #stock-table th:nth-child(3) { width: 45%; } /* Estoque Cor/Tamanho */
+            #stock-table th:nth-child(4) { width: 15%; } /* Estoque Total */
             
-            /* 🚨 MUDANÇA: Oculta a coluna "Estoque Total" no mobile */
-            #stock-table th:nth-child(4) { display: none; }
+            /* 🚨 MUDANÇA: "Estoque Total" volta a ser visível */
             .total-stock-display {
-                display: none;
+                display: table-cell; 
+                text-align: center;
+                font-size: 1em; /* Fonte pequena */
+                font-weight: bold;
+                padding-top: 10px;
             }
             
             /* Layout Vertical para os tamanhos */
             .size-inputs {
-                display: block; /* Um embaixo do outro */
+                display: block; 
             }
             .size-input-group {
                 display: flex; 
                 justify-content: space-between; 
                 align-items: center;
-                padding: 10px 0; 
+                padding: 8px 0; /* Menos padding */
                 border-bottom: 1px solid var(--border-color);
             }
             .size-input-group:last-child {
                 border-bottom: none;
             }
             .size-input-group label {
-                font-size: 1.2em;
+                font-size: 1.1em; /* Fonte menor */
                 font-weight: bold;
             }
             
+            /* 🚨 MUDANÇA: Botões e números menores */
+            .qty-btn {
+                width: 30px; 
+                height: 30px;
+                font-size: 1.2em; 
+            }
+             .qty-display {
+                font-size: 1.1em; 
+                min-width: 20px;
+            }
+            
             .update-btn {
-                font-size: 1em; 
-                padding: 12px;
+                font-size: 0.9em; 
+                padding: 10px;
             }
         }
         
@@ -180,7 +196,7 @@
 <body>
 
     <div class="container">
-        <h1>Gestão de Estoque (V3.7)</h1>
+        <h1>Gestão de Estoque (V3.8)</h1>
         <h2>3 Marias - Por Cor e Tamanho</h2>
 
         <section id="login-section">
