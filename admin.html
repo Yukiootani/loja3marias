@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | 3 Marias Moda Feminina</title>
+    <title>Admin V3 (Stock por Tamanho) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -40,16 +40,22 @@
         .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
         .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; }
         
-        /* Estilo das Variantes */
+        /* 🚨 NOVO Estilo das Variantes (com Stock) */
         #variants-container { border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: #fff; }
         .variant-entry { border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
         .variant-entry:last-child { border-bottom: none; }
         .variant-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .variant-row label { font-weight: normal; margin: 0; }
         .variant-row select, .variant-row input[type="text"] { width: auto; min-width: 150px; }
-        .size-checkboxes { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
         .remove-variant-btn { background: var(--error-color); width: auto; padding: 5px 8px; font-size: 0.8em; }
         #add-variant-btn { background: var(--accent-color); color: #333; width: auto; padding: 8px 12px; margin-top: 10px; }
+        
+        .variant-size-stock-group {
+            display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px;
+        }
+        .variant-size-stock-group label { font-weight: normal; margin: 0; }
+        .variant-size-stock-group input[type="number"] {
+            width: 60px; padding: 5px; text-align: center;
+        }
         
         /* Estilo de Login */
         #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
@@ -64,8 +70,8 @@
 <body>
 
     <div class="container">
-        <h1>Painel de Administração</h1>
-        <h2>3 Marias Moda Feminina</h2>
+        <h1>Painel de Administração (V3)</h1>
+        <h2>3 Marias - Stock por Tamanho</h2>
 
         <section id="login-section">
             <h3>Login de Admin</h3>
@@ -93,13 +99,10 @@
                 <label for="description">Descrição:</label>
                 <textarea id="description" rows="4"></textarea>
 
-                <label>Variantes (Cores e Tamanhos):</label>
+                <label>Variantes (Cores e Stock por Tamanho):</label>
                 <div id="variants-container">
                     </div>
                 <button type="button" id="add-variant-btn">+ Adicionar Cor</button>
-
-                <label for="estoque">Estoque (Total de Peças):</label>
-                <input type="number" id="estoque" value="0" required>
 
                 <label for="source">Disponibilidade:</label>
                 <select id="source" required>
@@ -150,8 +153,7 @@
                             <th>Foto</th>
                             <th>Nome</th>
                             <th>Preço (¥)</th>
-                            <th>Estoque</th>
-                            <th>Disponibilidade</th>
+                            <th>Estoque (Total)</th> <th>Disponibilidade</th>
                             <th>Selo</th>
                             <th>Ações</th>
                         </tr>
@@ -211,7 +213,7 @@
             const nameField = document.getElementById('name');
             const priceField = document.getElementById('price');
             const descField = document.getElementById('description');
-            const estoqueField = document.getElementById('estoque');
+            // O 'estoqueField' foi REMOVIDO
             const sourceField = document.getElementById('source');
             const isFeaturedField = document.getElementById('isFeatured');
             const imageUrlInput = document.getElementById('imageUrl');
@@ -229,7 +231,7 @@
             
             let statusTimeout; 
 
-            // Função de Status para o Painel Principal
+            // Função de Status (sem mudanças)
             function showStatus(div, message, type) {
                 clearTimeout(statusTimeout); 
                 div.textContent = String(message); 
@@ -244,9 +246,7 @@
                     }, 4000);
                 }
             }
-            
-             // Função de Status para o Login
-             function showLoginStatus(message, type) {
+            function showLoginStatus(message, type) {
                 clearTimeout(statusTimeout); 
                 loginStatusDiv.textContent = String(message); 
                 loginStatusDiv.className = 'status ' + type;
@@ -261,15 +261,14 @@
                 }
             }
 
-
-            // --- LÓGICA DE UPLOAD ---
+            // --- LÓGICA DE UPLOAD (sem mudanças) ---
             async function uploadFile(file, path) {
                 const storageRef = storage.ref(path);
                 const uploadTask = await storageRef.put(file);
                 return await uploadTask.ref.getDownloadURL();
             }
 
-            // --- LÓGICA DE VARIANTES ---
+            // --- 🚨 LÓGICA DE VARIANTES (TOTALMENTE REESCRITA) ---
             const predefinedColors = [
                 { name: "Preto", value: "black" },
                 { name: "Branco", value: "white" },
@@ -286,13 +285,23 @@
             ];
 
             addVariantBtn.addEventListener('click', () => {
-                const entryId = Date.now();
+                // Adiciona uma nova linha de variante (com campos de stock)
+                createVariantEntry(); 
+            });
+            
+            function createVariantEntry(color = '', stockData = { P: 0, M: 0, G: 0, GG: 0 }) {
+                const entryId = Date.now() + Math.random(); // ID único para a linha
                 const variantEntry = document.createElement('div');
                 variantEntry.className = 'variant-entry';
                 variantEntry.id = `variant-${entryId}`;
                 
                 let colorOptions = predefinedColors.map(c => `<option value="${c.name}" style="background-color:${c.value}; color:${c.value === 'black' ? 'white' : 'black'};">${c.name}</option>`).join('');
-
+                
+                // Verifica se a cor vindo do BD é personalizada
+                let isCustom = color && !predefinedColors.find(c => c.name === color);
+                let customValue = isCustom ? color : '';
+                let selectValue = isCustom ? 'custom' : color;
+                
                 variantEntry.innerHTML = `
                     <div class="variant-row">
                         <select class="variant-color-select">
@@ -300,17 +309,27 @@
                             ${colorOptions}
                             <option value="custom">Outra (Personalizada)</option>
                         </select>
-                        <input type="text" class="variant-color-custom" placeholder="Cor Personalizada" style="display:none;">
+                        <input type="text" class="variant-color-custom" placeholder="Cor Personalizada" style="display:${isCustom ? 'block' : 'none'};" value="${customValue}">
                     </div>
-                    <div class="size-checkboxes">
-                        <input type="checkbox" id="p-${entryId}" data-size="P"><label for="p-${entryId}">P</label>
-                        <input type="checkbox" id="m-${entryId}" data-size="M"><label for="m-${entryId}">M</label>
-                        <input type="checkbox" id="g-${entryId}" data-size="G"><label for="g-${entryId}">G</label>
-                        <input type="checkbox" id="gg-${entryId}" data-size="GG"><label for="gg-${entryId}">GG</label>
+                    <div class="variant-size-stock-group">
+                        <label for="p-${entryId}">P:</label>
+                        <input type="number" id="p-${entryId}" class="variant-size-stock" data-size="P" value="${stockData.P || 0}" min="0">
+                        
+                        <label for="m-${entryId}">M:</label>
+                        <input type="number" id="m-${entryId}" class="variant-size-stock" data-size="M" value="${stockData.M || 0}" min="0">
+                        
+                        <label for="g-${entryId}">G:</label>
+                        <input type="number" id="g-${entryId}" class="variant-size-stock" data-size="G" value="${stockData.G || 0}" min="0">
+                        
+                        <label for="gg-${entryId}">GG:</label>
+                        <input type="number" id="gg-${entryId}" class="variant-size-stock" data-size="GG" value="${stockData.GG || 0}" min="0">
                     </div>
                     <button type="button" class="remove-variant-btn" data-id="${entryId}">X</button>
                 `;
                 variantsContainer.appendChild(variantEntry);
+                
+                // Define a cor selecionada (se estiver editando)
+                variantEntry.querySelector('.variant-color-select').value = selectValue;
                 
                 // Evento para mostrar/esconder o campo "Outra Cor"
                 variantEntry.querySelector('.variant-color-select').addEventListener('change', function() {
@@ -322,8 +341,9 @@
                 variantEntry.querySelector('.remove-variant-btn').addEventListener('click', function() {
                     document.getElementById(`variant-${this.dataset.id}`).remove();
                 });
-            });
+            }
 
+            // Pega as variantes e seus estoques do formulário
             function getVariantsFromForm() {
                 const variants = {};
                 const entries = variantsContainer.querySelectorAll('.variant-entry');
@@ -334,67 +354,35 @@
                     let color = (select.value === 'custom') ? custom.value : select.value;
                     
                     if (color) {
-                        const sizes = [];
-                        entry.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
-                            sizes.push(cb.dataset.size);
+                        const stocks = {};
+                        entry.querySelectorAll('.variant-size-stock').forEach(input => {
+                            stocks[input.dataset.size] = parseInt(input.value) || 0;
                         });
-                        variants[color] = sizes;
+                        variants[color] = stocks;
                     }
                 });
                 return variants;
             }
+            
+            // 🚨 NOVO: Calcula o estoque total somando todas as variantes
+            function calculateTotalStock(variants) {
+                let total = 0;
+                for (const color in variants) {
+                    for (const size in variants[color]) {
+                        total += (parseInt(variants[color][size]) || 0);
+                    }
+                }
+                return total;
+            }
 
+            // Preenche o formulário quando clicamos em "Editar"
             function setVariantsInForm(variants) {
                 variantsContainer.innerHTML = ''; // Limpa
                 if (!variants || Object.keys(variants).length === 0) return;
 
                 for (const color in variants) {
-                    const sizes = variants[color];
-                    const entryId = Date.now() + Math.random();
-                    const variantEntry = document.createElement('div');
-                    variantEntry.className = 'variant-entry';
-                    variantEntry.id = `variant-${entryId}`;
-                    
-                    let colorOptions = predefinedColors.map(c => `<option value="${c.name}" style="background-color:${c.value}; color:${c.value === 'black' ? 'white' : 'black'};">${c.name}</option>`).join('');
-                    let isCustom = !predefinedColors.find(c => c.name === color);
-                    let customValue = isCustom ? color : '';
-                    let selectValue = isCustom ? 'custom' : color;
-                    
-                    const checkedP = sizes.includes('P') ? 'checked' : '';
-                    const checkedM = sizes.includes('M') ? 'checked' : '';
-                    const checkedG = sizes.includes('G') ? 'checked' : '';
-                    const checkedGG = sizes.includes('GG') ? 'checked' : '';
-
-                    variantEntry.innerHTML = `
-                        <div class="variant-row">
-                             <select class="variant-color-select">
-                                <option value="">Escolha uma cor...</option>
-                                ${colorOptions}
-                                <option value="custom">Outra (Personalizada)</option>
-                            </select>
-                            <input type="text" class="variant-color-custom" value="${customValue}" style="display:${isCustom ? 'block' : 'none'};">
-                        </div>
-                        <div class="size-checkboxes">
-                            <input type="checkbox" id="p-${entryId}" data-size="P" ${checkedP}><label for="p-${entryId}">P</label>
-                            <input type="checkbox" id="m-${entryId}" data-size="M" ${checkedM}><label for="m-${entryId}">M</label>
-                            <input type="checkbox" id="g-${entryId}" data-size="G" ${checkedG}><label for="g-${entryId}">G</label>
-                            <input type="checkbox" id="gg-${entryId}" data-size="GG" ${checkedGG}><label for="gg-${entryId}">GG</label>
-                        </div>
-                        <button type="button" class="remove-variant-btn" data-id="${entryId}">X</button>
-                    `;
-                    variantsContainer.appendChild(variantEntry);
-                    
-                    // Define o valor selecionado
-                    variantEntry.querySelector('.variant-color-select').value = selectValue;
-                    
-                    // Adiciona os eventos novamente
-                    variantEntry.querySelector('.variant-color-select').addEventListener('change', function() {
-                        const customInput = variantEntry.querySelector('.variant-color-custom');
-                        customInput.style.display = (this.value === 'custom') ? 'block' : 'none';
-                    });
-                    variantEntry.querySelector('.remove-variant-btn').addEventListener('click', function() {
-                        document.getElementById(`variant-${this.dataset.id}`).remove();
-                    });
+                    const stockData = variants[color]; // Ex: {P: 5, M: 3}
+                    createVariantEntry(color, stockData);
                 }
             }
 
@@ -416,12 +404,13 @@
                         const id = doc.id;
                         const precoFormatado = (product.price || 0).toLocaleString('ja-JP');
                         
+                        // 🚨 MUDANÇA: Usa 'estoqueTotal'
                         html += `
                             <tr id="product-${id}">
                                 <td><img src="${product.imageUrl || 'https://via.placeholder.com/50'}" alt="${product.name}"></td>
                                 <td>${product.name || 'Sem nome'}</td>
                                 <td>¥${precoFormatado}</td>
-                                <td>${product.estoque || 0}</td>
+                                <td>${product.estoqueTotal || 0}</td> 
                                 <td>${product.source === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda'}</td>
                                 <td>${product.isFeatured || 'nenhum'}</td>
                                 <td>
@@ -451,26 +440,22 @@
                     let videoUrl = oldVideoUrl;
                     let galeriaUrls = oldGaleria;
                     
-                    // UPLOAD IMAGEM DE CAPA
+                    // Uploads (sem mudança)
                     if (imageUrlInput.files[0]) {
                         showStatus(statusDiv, "Fazendo upload da Imagem de Capa (1/3)...", "loading");
                         const file = imageUrlInput.files[0];
                         const path = `products/${currentProductId}/capa_${file.name}`;
                         imageUrl = await uploadFile(file, path);
                     }
-
-                    // UPLOAD VÍDEO
                     if (videoUrlInput.files[0]) {
                         showStatus(statusDiv, "Fazendo upload do Vídeo (2/3)...", "loading");
                         const file = videoUrlInput.files[0];
                         const path = `products/${currentProductId}/video_${file.name}`;
                         videoUrl = await uploadFile(file, path);
                     }
-                    
-                    // UPLOAD GALERIA (Múltiplos)
                     if (galeriaInput.files.length > 0) {
                         showStatus(statusDiv, `Fazendo upload de ${galeriaInput.files.length} imagens da galeria (3/3)...`, "loading");
-                        galeriaUrls = []; // Reseta a galeria se novos arquivos forem enviados
+                        galeriaUrls = []; 
                         for (const file of galeriaInput.files) {
                             const path = `products/${currentProductId}/galeria_${file.name}`;
                             const url = await uploadFile(file, path);
@@ -478,12 +463,16 @@
                         }
                     }
                     
+                    // 🚨 MUDANÇA: Prepara os dados do produto com a nova estrutura
+                    const productVariants = getVariantsFromForm();
+                    const totalStock = calculateTotalStock(productVariants);
+                    
                     const productData = {
                         name: nameField.value,
                         price: parseFloat(priceField.value),
                         description: descField.value,
-                        variantes: getVariantsFromForm(), // NOVO
-                        estoque: parseInt(estoqueField.value),
+                        variantes: productVariants, // NOVA ESTRUTURA
+                        estoqueTotal: totalStock, // NOVO CAMPO
                         source: sourceField.value,
                         isFeatured: isFeaturedField.value,
                         imageUrl: imageUrl,
@@ -520,7 +509,7 @@
                 const id = target.dataset.id;
 
                 if (target.classList.contains('delete-btn')) {
-                    // Excluir
+                    // Excluir (sem mudança)
                     if (!confirm("Tem certeza que deseja excluir este produto?")) return;
                     try {
                         await db.collection("products").doc(id).delete();
@@ -533,7 +522,7 @@
                 }
                 
                 if (target.classList.contains('edit-btn')) {
-                    // Editar
+                    // Editar (com mudanças)
                     try {
                         const doc = await db.collection("products").doc(id).get();
                         if (!doc.exists) {
@@ -547,9 +536,11 @@
                         priceField.value = product.price || 0;
                         descField.value = product.description || '';
                         
+                        // 🚨 MUDANÇA: Carrega a nova estrutura de variantes
                         setVariantsInForm(product.variantes || {});
                         
-                        estoqueField.value = product.estoque || 0;
+                        // O 'estoqueField' não existe mais
+                        
                         sourceField.value = product.source || 'pronta-entrega';
                         isFeaturedField.value = product.isFeatured || 'nenhum';
                         
@@ -584,9 +575,7 @@
                 cancelEditBtn.style.display = "none";
             }
 
-            // 🚨 NOVO: LÓGICA DO LOGO
-            
-            // Carrega o logo atual
+            // LÓGICA DO LOGO (sem mudança)
             async function loadSiteConfig() {
                 try {
                     const doc = await db.collection("configuracoes").doc("siteInfo").get();
@@ -600,8 +589,6 @@
                     logoPreview.src = "https://via.placeholder.com/250x100?text=Erro+ao+carregar";
                 }
             }
-            
-            // Salva o novo logo
             logoForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const file = logoUploadInput.files[0];
@@ -613,18 +600,16 @@
                 showStatus(statusDiv, "Fazendo upload do novo logo...", "loading");
                 
                 try {
-                    // Usamos um caminho fixo para substituir o logo antigo
                     const path = "configuracoes/logo_principal";
                     const logoUrl = await uploadFile(file, path);
                     
-                    // Salva o link no Firestore
                     await db.collection("configuracoes").doc("siteInfo").set({
                         logoUrl: logoUrl
                     }, { merge: true });
                     
                     showStatus(statusDiv, "Novo logo salvo com sucesso!", "success");
-                    logoPreview.src = logoUrl; // Atualiza a pré-visualização
-                    logoUploadInput.value = ''; // Limpa o input
+                    logoPreview.src = logoUrl;
+                    logoUploadInput.value = '';
                     
                 } catch (error) {
                     console.error("Erro ao salvar logo:", error);
@@ -632,7 +617,7 @@
                 }
             });
 
-            // --- LÓGICA DE LOGIN ---
+            // --- LÓGICA DE LOGIN (sem mudança) ---
             
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -641,7 +626,6 @@
                 showLoginStatus('Tentando entrar...', 'loading');
                 try {
                     await auth.signInWithEmailAndPassword(email, password);
-                    // O onAuthStateChanged vai tratar de mostrar o painel
                 } catch (error) {
                     showLoginStatus(`Erro de Acesso: ${error.message}`, 'error');
                 }
@@ -651,16 +635,13 @@
                 await auth.signOut();
             });
 
-            // Verificação de Estado de Autenticação
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // Usuário LOGADO
                     loginSection.style.display = 'none';
                     adminPanel.style.display = 'block';
-                    fetchProducts(); // Carrega os produtos
-                    loadSiteConfig(); // 🚨 NOVO: Carrega o logo
+                    fetchProducts(); 
+                    loadSiteConfig();
                 } else {
-                    // Usuário DESLOGADO
                     loginSection.style.display = 'block';
                     adminPanel.style.display = 'none';
                 }
