@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Estoque (V3.3) | 3 Marias</title>
+    <title>Gestão de Estoque (V3.4) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -50,7 +50,7 @@
         }
         .filter-btn.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-        /* 🚨 NOVO: Estilo de Edição Rápida (V3.3 com botões) */
+        /* Estilo de Edição Rápida (V3.4 com botões) */
         .variant-stock-row {
             padding: 8px;
             border-bottom: 1px dashed #eee;
@@ -59,9 +59,9 @@
         .variant-color-label { font-weight: bold; color: #333; margin-bottom: 10px; display: block; }
         
         .size-inputs { 
-            display: grid; /* Layout em grid */
+            display: grid;
             grid-template-columns: repeat(2, 1fr); /* 2 colunas */
-            gap: 15px; /* Espaço entre os itens */
+            gap: 15px; 
         }
         .size-input-group { 
             display: block;
@@ -72,23 +72,22 @@
             margin-bottom: 5px;
         }
         
-        /* 🚨 NOVO: Botões de Quantidade (copiado do carrinho) */
         .quantity-control {
             display: flex;
             align-items: center;
-            gap: 10px; /* Aumentado para mais espaço de toque */
+            gap: 10px; 
         }
         .qty-btn {
             background-color: #eee;
             color: #333;
             border: 1px solid #ccc;
             border-radius: 50%;
-            width: 32px; /* Maior para toque */
-            height: 32px;
-            font-size: 1.4em;
+            width: 40px; /* 🚨 MUDANÇA: Botão maior */
+            height: 40px;
+            font-size: 1.6em; /* 🚨 MUDANÇA: Fonte maior */
             font-weight: bold;
             cursor: pointer;
-            line-height: 1; /* Alinha o '-' e '+' */
+            line-height: 1.2; /* 🚨 MUDANÇA: Alinhamento vertical */
         }
         .qty-btn:disabled {
             background-color: #f9f9f9;
@@ -96,10 +95,10 @@
             cursor: not-allowed;
         }
         .qty-display {
-            font-size: 1.2em;
+            font-size: 1.4em; /* 🚨 MUDANÇA: Fonte maior */
             font-weight: bold;
             padding: 0 5px;
-            min-width: 20px;
+            min-width: 25px;
             text-align: center;
         }
 
@@ -113,21 +112,41 @@
         }
         
         
-        /* Otimização Mobile (só para a tabela) */
+        /* 🚨 OTIMIZAÇÃO MOBILE (V3.4 - CORRIGIDA) 🚨 */
         @media (max-width: 768px) {
-            #stock-table-container {
-                overflow-x: auto; 
-                -webkit-overflow-scrolling: touch; 
+            body { padding: 10px; }
+            .container { padding: 10px; }
+
+            /* Faz a tabela ser 100% da largura, sem scroll */
+            #stock-table-container { 
+                overflow-x: hidden; /* 🚨 MUDANÇA: Remove o scroll horizontal */
             }
+            #stock-table {
+                table-layout: fixed; /* Força a tabela a obedecer a largura */
+                width: 100%;
+            }
+            
             #stock-table th, #stock-table td {
                 padding: 8px;
                 font-size: 0.9em;
-                white-space: nowrap;
+                white-space: normal; /* 🚨 MUDANÇA: Permite quebra de linha */
+                word-wrap: break-word; /* 🚨 NOVO: Quebra palavras longas */
             }
-            /* Permite que a célula de estoque quebre */
-            #stock-table td:nth-child(3) {
-                white-space: normal;
-                min-width: 280px; /* Força um tamanho mínimo para a célula de edição */
+            
+            /* Define a largura das colunas */
+            #stock-table th:nth-child(1) { width: 20%; } /* Foto */
+            #stock-table th:nth-child(2) { width: 30%; } /* Produto */
+            #stock-table th:nth-child(3) { width: 50%; } /* Estoque (maior) */
+            #stock-table th:nth-child(4) { display: none; } /* 🚨 NOVO: Oculta "Estoque Total" no mobile */
+            
+            /* Oculta a célula de Estoque Total no mobile (redundante) */
+            .total-stock-display {
+                display: none;
+            }
+
+            .update-btn {
+                font-size: 1em; /* Fonte maior */
+                padding: 12px;
             }
         }
         
@@ -136,7 +155,7 @@
 <body>
 
     <div class="container">
-        <h1>Gestão de Estoque (V3.3)</h1>
+        <h1>Gestão de Estoque (V3.4)</h1>
         <h2>3 Marias - Por Cor e Tamanho</h2>
 
         <section id="login-section">
@@ -240,7 +259,7 @@
                 }
             }
             
-            // 🚨 FUNÇÃO ATUALIZADA (V3.3): Gera o HTML com botões +/-
+            // FUNÇÃO ATUALIZADA (V3.3): Gera o HTML com botões +/-
             function formatVariants(productId, variants) {
                 if (!variants || Object.keys(variants).length === 0) {
                     return "Nenhuma variante cadastrada.";
@@ -249,6 +268,11 @@
                 let html = '';
                 for (const color in variants) {
                     const stockData = variants[color]; // {P: 5, M: 3, ...}
+                    const stockP = stockData.P || 0;
+                    const stockM = stockData.M || 0;
+                    const stockG = stockData.G || 0;
+                    const stockGG = stockData.GG || 0;
+
                     html += `
                         <div class="variant-stock-row" data-product-id="${productId}" data-color="${color}">
                             <div class="variant-color-label">${color}:</div>
@@ -257,32 +281,32 @@
                                 <div class="size-input-group" data-size="P">
                                     <label>P:</label>
                                     <div class="quantity-control">
-                                        <button class="qty-btn qty-decrease" ${stockData.P <= 0 ? 'disabled' : ''}>-</button>
-                                        <span class="qty-display">${stockData.P || 0}</span>
+                                        <button class="qty-btn qty-decrease" ${stockP <= 0 ? 'disabled' : ''}>-</button>
+                                        <span class="qty-display">${stockP}</span>
                                         <button class="qty-btn qty-increase">+</button>
                                     </div>
                                 </div>
                                 <div class="size-input-group" data-size="M">
                                     <label>M:</label>
                                     <div class="quantity-control">
-                                        <button class="qty-btn qty-decrease" ${stockData.M <= 0 ? 'disabled' : ''}>-</button>
-                                        <span class="qty-display">${stockData.M || 0}</span>
+                                        <button class="qty-btn qty-decrease" ${stockM <= 0 ? 'disabled' : ''}>-</button>
+                                        <span class="qty-display">${stockM}</span>
                                         <button class="qty-btn qty-increase">+</button>
                                     </div>
                                 </div>
                                 <div class="size-input-group" data-size="G">
                                     <label>G:</label>
                                     <div class="quantity-control">
-                                        <button class="qty-btn qty-decrease" ${stockData.G <= 0 ? 'disabled' : ''}>-</button>
-                                        <span class="qty-display">${stockData.G || 0}</span>
+                                        <button class="qty-btn qty-decrease" ${stockG <= 0 ? 'disabled' : ''}>-</button>
+                                        <span class="qty-display">${stockG}</span>
                                         <button class="qty-btn qty-increase">+</button>
                                     </div>
                                 </div>
                                 <div class="size-input-group" data-size="GG">
                                     <label>GG:</label>
                                     <div class="quantity-control">
-                                        <button class="qty-btn qty-decrease" ${stockData.GG <= 0 ? 'disabled' : ''}>-</button>
-                                        <span class="qty-display">${stockData.GG || 0}</span>
+                                        <button class="qty-btn qty-decrease" ${stockGG <= 0 ? 'disabled' : ''}>-</button>
+                                        <span class="qty-display">${stockGG}</span>
                                         <button class="qty-btn qty-increase">+</button>
                                     </div>
                                 </div>
@@ -361,7 +385,7 @@
                 }
             });
             
-            // 3. 🚨 LÓGICA DE ATUALIZAÇÃO (TODA REESCRITA)
+            // 3. LÓGICA DE ATUALIZAÇÃO (sem mudança)
             stockList.addEventListener('click', async (e) => {
                 const target = e.target;
                 
@@ -383,12 +407,10 @@
                         currentValue = 0;
                     }
                     
-                    // Atualiza o número na tela
                     displaySpan.textContent = currentValue;
-                    // Habilita/desabilita o botão de diminuir
                     decreaseBtn.disabled = (currentValue <= 0);
                     
-                    return; // Não salva ainda, só atualiza a tela
+                    return; 
                 }
                 
                 // 3.2: Clique no botão "Atualizar [Cor]" (amarelo)
