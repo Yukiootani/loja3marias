@@ -11,12 +11,28 @@
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
+            --silver-color: #C0C0C0; /* <-- NOVO: Cor Prata para o brilho */
             --text-color: #333; 
             --light-text: #666; 
             --bg-color: #FFFFFF; 
             --border-color: #f0f0f0; 
             --whatsapp-green: #28a745; 
         }
+
+        /* <-- NOVO BLOCO DE ANIMAÇÃO DE BRILHO --> */
+        @keyframes shimmer-glow {
+            0% {
+                box-shadow: 0 0 5px var(--accent-color); /* Brilho Dourado */
+            }
+            50% {
+                box-shadow: 0 0 10px var(--silver-color); /* Brilho Prata */
+            }
+            100% {
+                box-shadow: 0 0 5px var(--accent-color); /* Brilho Dourado */
+            }
+        }
+
+
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
             margin: 0; 
@@ -29,25 +45,25 @@
         header { 
             background-color: var(--bg-color); 
             color: var(--text-color); 
-            padding: 0.5rem 1rem; /* Espaçamento interno */
+            padding: 0.5rem 1rem; /* Cabeçalho fino */
             text-align: center; 
             border-bottom: 1px solid var(--border-color); 
         }
         
-        /* Estilo do Logo */
+        /* Estilo do Logo (Agora funciona com o PNG aparado) */
         .header-logo {
-            max-width: 250px; /* Largura MÁXIMA (em telas grandes) */
+            max-width: 250px; /* Largura MÁXIMA. Ficará ótimo. */
             width: 100%;
             height: auto;     
             object-fit: contain; 
-            margin: 0 auto; /* Centraliza sem margem vertical */
+            margin: 0 auto; /* Centraliza */
             display: block; 
         }
         
         header p { 
             font-size: 1em; 
             color: var(--light-text);
-            margin: 2px 0 0 0; /* <-- NOVO AJUSTE: Menos espaço entre logo e slogan */
+            margin: 2px 0 0 0; /* Margem pequena acima do slogan */
         }
         
         main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
@@ -75,11 +91,16 @@
             transition: all 0.3s;
             text-align: center; 
             box-sizing: border-box;
+            
+            /* <-- NOVO EFEITO DE BRILHO --> */
+            animation: shimmer-glow 3s ease-in-out infinite; 
         }
         .filter-button.active {
-            background-color: var(--primary-color); 
-            color: white;
-            border-color: var(--primary-color); 
+            /* <-- MUDANÇA: Botão ativo agora é dourado, não rosa */
+            background-color: var(--accent-color); 
+            color: var(--text-color);
+            border-color: var(--accent-color); 
+            animation: none; /* <-- NOVO: Para o brilho quando está ativo */
         }
         
         .section-title {
@@ -125,6 +146,8 @@
         .product-info { padding: 15px; text-align: left; }
         .product-name { font-size: 1em; font-weight: 600; margin: 0 0 5px 0; }
         .product-price { font-size: 1.1em; font-weight: 700; color: var(--primary-color); margin: 0 0 15px 0; }
+        
+        /* Este é o botão de "Ver Detalhes" - ele NÃO terá o brilho */
         .details-button {
             display: inline-block;
             background-color: var(--primary-color);
@@ -140,6 +163,7 @@
             text-align: center;
         }
         .details-button:hover { background-color: #a15a70; }
+        
         .badge {
             position: absolute; top: 10px; left: 10px;
             padding: 5px 10px; border-radius: 5px;
@@ -193,17 +217,6 @@
             border: 2px solid white;
             display: none; 
         }
-
-        /* <-- 🚨 NOVO AJUSTE: REGRAS PARA MOBILE 🚨 --> */
-        @media (max-width: 600px) {
-            .header-logo {
-                max-width: 180px; /* Logo menor no mobile */
-            }
-            header p {
-                font-size: 0.85em; /* Slogan menor no mobile */
-            }
-        }
-
 
         @media (min-width: 768px) {
             #products-grid {
@@ -355,7 +368,7 @@
             }
         }
         
-        // 🚨 NOVO: Carrega o Logo
+        // NOTHING_CHANGED_BELOW_THIS_LINE
         async function fetchSiteConfig() {
             try {
                 const doc = await db.collection("configuracoes").doc("siteInfo").get();
