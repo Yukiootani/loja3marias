@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Estoque (V3.2) | 3 Marias</title>
+    <title>Gestão de Estoque (V3.3) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -20,7 +20,7 @@
         label { font-weight: bold; margin-bottom: -10px; }
         input[type="text"], input[type="number"], input[type="password"], input[type="email"] {
             width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;
-            color: var(--text-color); /* 🚨 Garante que o texto do input seja visível */
+            color: var(--text-color);
         }
         button {
             background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer;
@@ -39,7 +39,7 @@
         
         /* Estilo de Login */
         #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
-        #stock-panel { display: none; } /* Oculto por padrão */
+        #stock-panel { display: none; }
         #btnLogout { background-color: #777; margin-top: 20px; width: auto; padding: 10px 20px; }
 
         /* Filtros */
@@ -50,7 +50,7 @@
         }
         .filter-btn.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-        /* Estilo de Edição Rápida por Tamanho */
+        /* 🚨 NOVO: Estilo de Edição Rápida (V3.3 com botões) */
         .variant-stock-row {
             padding: 8px;
             border-bottom: 1px dashed #eee;
@@ -59,79 +59,75 @@
         .variant-color-label { font-weight: bold; color: #333; margin-bottom: 10px; display: block; }
         
         .size-inputs { 
-            display: flex; 
-            gap: 10px; 
-            align-items: center; 
-            flex-wrap: wrap; 
+            display: grid; /* Layout em grid */
+            grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+            gap: 15px; /* Espaço entre os itens */
         }
         .size-input-group { 
+            display: block;
+        }
+        .size-input-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        /* 🚨 NOVO: Botões de Quantidade (copiado do carrinho) */
+        .quantity-control {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 10px; /* Aumentado para mais espaço de toque */
         }
-        .size-input-group label { font-size: 0.9em; font-weight: normal; margin: 0; }
-        .stock-input {
-            width: 50px !important; 
-            padding: 5px !important; 
+        .qty-btn {
+            background-color: #eee;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 32px; /* Maior para toque */
+            height: 32px;
+            font-size: 1.4em;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1; /* Alinha o '-' e '+' */
+        }
+        .qty-btn:disabled {
+            background-color: #f9f9f9;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        .qty-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 0 5px;
+            min-width: 20px;
             text-align: center;
-            font-size: 1em; /* 🚨 Garante tamanho da fonte */
-            color: var(--text-color); /* 🚨 Garante cor da fonte */
         }
+
         .update-btn {
-            background-color: var(--accent-color); color: #333; font-size: 0.8em;
-            padding: 8px 12px; width: auto; font-weight: bold; margin-top: 10px;
+            background-color: var(--accent-color); color: #333; font-size: 0.9em;
+            padding: 10px; width: 100%; font-weight: bold; margin-top: 15px;
+            box-sizing: border-box;
         }
         .total-stock-display {
             font-size: 1.1em; font-weight: bold; color: var(--primary-color);
         }
         
         
-        /* 🚨 OTIMIZAÇÃO MOBILE (V3.2) 🚨 */
+        /* Otimização Mobile (só para a tabela) */
         @media (max-width: 768px) {
             #stock-table-container {
                 overflow-x: auto; 
                 -webkit-overflow-scrolling: touch; 
             }
-            
-            /* Esta é a mudança principal: */
-            .size-inputs {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr); /* 2 colunas */
-                gap: 15px; /* Mais espaço entre os blocos */
-            }
-            .size-input-group { 
-                display: block; /* Remove o 'flex' */
-            }
-            .size-input-group label {
-                font-weight: bold;
-                display: block; /* Label fica em linha própria */
-                margin-bottom: 5px; /* Espaço entre label e input */
-            }
-            .stock-input {
-                width: 100% !important; /* Input ocupa 100% do grid */
-                box-sizing: border-box; 
-                padding: 10px !important; /* Input maior para toque */
-                font-size: 1.1em; /* Números maiores e mais fáceis de ver */
-                font-weight: bold;
-                color: var(--text-color);
-            }
-            
             #stock-table th, #stock-table td {
                 padding: 8px;
                 font-size: 0.9em;
-                /* Impede que o nome do produto quebre no meio */
                 white-space: nowrap;
             }
             /* Permite que a célula de estoque quebre */
             #stock-table td:nth-child(3) {
                 white-space: normal;
-            }
-            
-            .update-btn {
-                width: 100%; 
-                box-sizing: border-box;
-                padding: 10px;
-                font-size: 0.9em;
+                min-width: 280px; /* Força um tamanho mínimo para a célula de edição */
             }
         }
         
@@ -140,7 +136,7 @@
 <body>
 
     <div class="container">
-        <h1>Gestão de Estoque (V3.2)</h1>
+        <h1>Gestão de Estoque (V3.3)</h1>
         <h2>3 Marias - Por Cor e Tamanho</h2>
 
         <section id="login-section">
@@ -217,7 +213,7 @@
             let statusTimeout;
             let currentFilter = 'todos'; 
 
-            // --- Funções de Status ---
+            // --- Funções de Status (sem mudança) ---
             function showStatus(message, type, sticky = false) {
                 clearTimeout(statusTimeout);
                 statusDiv.textContent = String(message);
@@ -244,7 +240,7 @@
                 }
             }
             
-            // 🚨 FUNÇÃO ATUALIZADA (V3.2): Gera o HTML para os campos de estoque (com <div>s de grupo)
+            // 🚨 FUNÇÃO ATUALIZADA (V3.3): Gera o HTML com botões +/-
             function formatVariants(productId, variants) {
                 if (!variants || Object.keys(variants).length === 0) {
                     return "Nenhuma variante cadastrada.";
@@ -258,21 +254,37 @@
                             <div class="variant-color-label">${color}:</div>
                             <div class="size-inputs">
                                 
-                                <div class="size-input-group">
+                                <div class="size-input-group" data-size="P">
                                     <label>P:</label>
-                                    <input type="number" class="stock-input" data-size="P" value="${stockData.P || 0}" min="0">
+                                    <div class="quantity-control">
+                                        <button class="qty-btn qty-decrease" ${stockData.P <= 0 ? 'disabled' : ''}>-</button>
+                                        <span class="qty-display">${stockData.P || 0}</span>
+                                        <button class="qty-btn qty-increase">+</button>
+                                    </div>
                                 </div>
-                                <div class="size-input-group">
+                                <div class="size-input-group" data-size="M">
                                     <label>M:</label>
-                                    <input type="number" class="stock-input" data-size="M" value="${stockData.M || 0}" min="0">
+                                    <div class="quantity-control">
+                                        <button class="qty-btn qty-decrease" ${stockData.M <= 0 ? 'disabled' : ''}>-</button>
+                                        <span class="qty-display">${stockData.M || 0}</span>
+                                        <button class="qty-btn qty-increase">+</button>
+                                    </div>
                                 </div>
-                                <div class="size-input-group">
+                                <div class="size-input-group" data-size="G">
                                     <label>G:</label>
-                                    <input type="number" class="stock-input" data-size="G" value="${stockData.G || 0}" min="0">
+                                    <div class="quantity-control">
+                                        <button class="qty-btn qty-decrease" ${stockData.G <= 0 ? 'disabled' : ''}>-</button>
+                                        <span class="qty-display">${stockData.G || 0}</span>
+                                        <button class="qty-btn qty-increase">+</button>
+                                    </div>
                                 </div>
-                                <div class="size-input-group">
+                                <div class="size-input-group" data-size="GG">
                                     <label>GG:</label>
-                                    <input type="number" class="stock-input" data-size="GG" value="${stockData.GG || 0}" min="0">
+                                    <div class="quantity-control">
+                                        <button class="qty-btn qty-decrease" ${stockData.GG <= 0 ? 'disabled' : ''}>-</button>
+                                        <span class="qty-display">${stockData.GG || 0}</span>
+                                        <button class="qty-btn qty-increase">+</button>
+                                    </div>
                                 </div>
 
                             </div>
@@ -283,11 +295,10 @@
                 return html;
             }
 
-            // 1. CARREGAR ESTOQUE (COM FILTRO)
+            // 1. CARREGAR ESTOQUE (sem mudança)
             async function fetchStock() {
                 try {
                     stockList.innerHTML = '<tr><td colspan="4">Carregando estoque...</td></tr>';
-                    
                     let query = db.collection("products");
 
                     if (currentFilter === 'pronta-entrega') {
@@ -295,7 +306,6 @@
                     } else if (currentFilter === 'sob-encomenda') {
                         query = query.where("source", "==", "sob-encomenda");
                     }
-
                     const snapshot = await query.orderBy("name", "asc").get();
 
                     if (snapshot.empty) {
@@ -333,16 +343,15 @@
                     console.error("Erro ao carregar estoque:", error);
                     if (error.code === 'failed-precondition') {
                          stockList.innerHTML = `<tr><td colspan="4" style="color:red; padding: 20px;">
-                            <strong>ERRO DE FIREBASE:</strong> O índice composto não foi encontrado ou não está ativo.<br>
-                            Tente clicar nos filtros "Pronta Entrega" ou "Sob Encomenda" novamente, e clique no link de erro que o Firebase gerar (como fizemos antes).
+                            <strong>ERRO DE FIREBASE:</strong> O índice composto não foi encontrado.
                          </td></tr>`;
                     } else {
-                        stockList.innerHTML = `<tr><td colspan="4" style="color:red;">Erro ao carregar estoque: ${error.message}</td></tr>`;
+                        stockList.innerHTML = `<tr><td colspan="4" style="color:red;">Erro: ${error.message}</td></tr>`;
                     }
                 }
             }
             
-            // 2. LÓGICA DOS FILTROS
+            // 2. LÓGICA DOS FILTROS (sem mudança)
             filterControls.addEventListener('click', (e) => {
                 if (e.target.tagName === 'BUTTON') {
                     currentFilter = e.target.dataset.filter;
@@ -352,36 +361,54 @@
                 }
             });
             
-            // 3. LÓGICA DE ATUALIZAÇÃO (POR COR/TAMANHO)
+            // 3. 🚨 LÓGICA DE ATUALIZAÇÃO (TODA REESCRITA)
             stockList.addEventListener('click', async (e) => {
-                if (e.target.classList.contains('update-btn')) {
-                    const productId = e.target.dataset.productId;
-                    const color = e.target.dataset.color;
+                const target = e.target;
+                
+                // 3.1: Clique nos botões [ - ] ou [ + ]
+                if (target.classList.contains('qty-btn')) {
+                    const controlDiv = target.closest('.quantity-control');
+                    const displaySpan = controlDiv.querySelector('.qty-display');
+                    const decreaseBtn = controlDiv.querySelector('.qty-decrease');
+                    
+                    let currentValue = parseInt(displaySpan.textContent);
+
+                    if (target.classList.contains('qty-increase')) {
+                        currentValue++;
+                    } else if (target.classList.contains('qty-decrease')) {
+                        currentValue--;
+                    }
+                    
+                    if (currentValue < 0) {
+                        currentValue = 0;
+                    }
+                    
+                    // Atualiza o número na tela
+                    displaySpan.textContent = currentValue;
+                    // Habilita/desabilita o botão de diminuir
+                    decreaseBtn.disabled = (currentValue <= 0);
+                    
+                    return; // Não salva ainda, só atualiza a tela
+                }
+                
+                // 3.2: Clique no botão "Atualizar [Cor]" (amarelo)
+                if (target.classList.contains('update-btn')) {
+                    const productId = target.dataset.productId;
+                    const color = target.dataset.color;
                     
                     const row = stockList.querySelector(`.variant-stock-row[data-product-id="${productId}"][data-color="${color}"]`);
-                    const inputs = row.querySelectorAll('.stock-input');
+                    const sizeGroups = row.querySelectorAll('.size-input-group');
                     
                     const newStockData = {};
-                    let newTotalStockForVariant = 0;
                     
-                    let hasError = false;
-                    inputs.forEach(input => {
-                        const size = input.dataset.size;
-                        const stock = parseInt(input.value);
-                        
-                        if (isNaN(stock) || stock < 0) {
-                            showStatus(`Erro: O estoque para ${color}/${size} deve ser um número positivo (0 ou mais).`, "error");
-                            hasError = true;
-                            return;
-                        }
-                        newStockData[size] = stock;
-                        newTotalStockForVariant += stock;
+                    sizeGroups.forEach(group => {
+                        const size = group.dataset.size;
+                        const value = parseInt(group.querySelector('.qty-display').textContent);
+                        newStockData[size] = value;
                     });
-                    
-                    if (hasError) return; 
 
-                    e.target.disabled = true;
-                    e.target.textContent = "Salvando...";
+                    target.disabled = true;
+                    target.textContent = "Salvando...";
                     showStatus("Atualizando estoque...", "loading");
 
                     try {
@@ -402,27 +429,24 @@
                             }
                         }
                         
-                        // Salva o novo Estoque Total
                         await docRef.update({
                             estoqueTotal: newEstoqueTotal
                         });
 
-                        // Atualiza o total na tela
                         document.getElementById(`total-${productId}`).textContent = newEstoqueTotal;
-
                         showStatus(`Estoque do ${color} atualizado com sucesso!`, "success");
                         
                     } catch (error) {
                         console.error("Erro ao atualizar estoque:", error);
                         showStatus(`Erro: ${error.message}`, "error", true); 
                     } finally {
-                        e.target.disabled = false;
-                        e.target.textContent = `Atualizar ${color}`;
+                        target.disabled = false;
+                        target.textContent = `Atualizar ${color}`;
                     }
                 }
             });
 
-            // --- LÓGICA DE LOGIN ---
+            // --- LÓGICA DE LOGIN (sem mudança) ---
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('login-email').value;
