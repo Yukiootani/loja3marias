@@ -34,10 +34,11 @@
             border-bottom: 1px solid var(--border-color); 
         }
         
-        /* 🚨 NOVO: Estilo do Logo */
+        /* 🚨 CORREÇÃO DO LOGO 🚨 */
         .header-logo {
             max-width: 250px; /* Largura máxima para o logo */
-            height: 80px; /* Altura fixa para consistência */
+            width: 100%;      /* Tenta usar 100% (respeitando o max-width) */
+            height: auto;     /* <-- MUDANÇA AQUI: Altura automática para manter proporção */
             object-fit: contain; /* Garante que o logo caiba sem distorcer */
             margin: 0 auto 5px auto; /* Centraliza */
             display: block; 
@@ -289,10 +290,10 @@
 
             try {
                 const snapshot = await db.collection("products")
-                                    .where("source", "==", currentFilter)
-                                    .orderBy("isFeatured", "desc") 
-                                    .orderBy("createdAt", "desc")
-                                    .get();
+                                        .where("source", "==", currentFilter)
+                                        .orderBy("isFeatured", "desc") 
+                                        .orderBy("createdAt", "desc")
+                                        .get();
 
                 if (snapshot.empty) {
                     loadingMsg.style.display = 'none';
