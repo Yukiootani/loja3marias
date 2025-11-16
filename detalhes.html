@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* --- CSS Minimalista (Sem Alterações) --- */
+        /* --- CSS (sem mudanças) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
@@ -430,11 +430,18 @@
                 setupMediaThumbnails();
                 if (colors.length > 0) {
                     setupVariantSelectors();
+                    
+                    // 🚨 NOVO (V3.2): Seleciona a primeira cor automaticamente
+                    const firstColorSwatch = document.querySelector('.color-swatch');
+                    if (firstColorSwatch) {
+                        firstColorSwatch.click(); // Simula o clique na primeira cor
+                    }
+                    
                 } else {
-                    // 🚨 CORREÇÃO: Habilita botão se não houver variantes
+                    // Se não há variantes, habilita o botão de compra
                     document.getElementById('add-to-cart-btn').textContent = "Adicionar ao Carrinho";
                     document.getElementById('add-to-cart-btn').disabled = false;
-                    checkButtonState(); // Verifica o estoque de produtos sem variantes (se tivéssemos essa lógica)
+                    checkButtonState(); 
                 }
                 
                 document.getElementById('add-to-cart-btn').addEventListener('click', handleAddToCart);
@@ -445,17 +452,17 @@
             }
         }
 
-        // --- LÓGICA DO CARRINHO ---
+        // --- LÓGICA DO CARRINHO (V3.1 - com verificação de estoque) ---
         
         function getCart() {
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
         }
         function saveCart(cart) {
             localStorage.setItem('whatsappCart', JSON.stringify(cart));
+            updateCartIcon(); // 🚨 NOVO: Atualiza o ícone sempre que salvar
         }
         function updateCartIcon() {
             const cart = getCart();
-            // Calcula a contagem total de itens (soma das quantidades)
             let count = 0;
             Object.values(cart.items).forEach(item => {
                 count += item.quantity;
@@ -469,14 +476,13 @@
             }
         }
         
-        // 🚨 FUNÇÃO handleAddToCart (TOTALMENTE REESCRITA) 🚨
         function handleAddToCart() {
             const btn = document.getElementById('add-to-cart-btn');
             const colorsAvailable = Object.keys(parsedVariants).length > 0;
             
             // 1. Define o ID e o Estoque Máximo
             let itemId;
-            let maxStock = 999; // Estoque padrão para itens sem variantes
+            let maxStock = 999; 
             
             if (colorsAvailable) {
                 // Se tem variantes
@@ -489,7 +495,6 @@
             } else {
                 // Se NÃO tem variantes
                 itemId = `${currentProductId}_padrao_padrao`;
-                // (Aqui poderíamos buscar um 'estoqueTotal' se produtos sem variantes tivessem)
             }
 
             // 2. Verifica o estoque vs. carrinho
@@ -518,8 +523,7 @@
                 };
             }
 
-            saveCart(cart);
-            updateCartIcon();
+            saveCart(cart); // Isso vai chamar o updateCartIcon()
             
             // 4. Atualiza o estado do botão
             const newQuantityInCart = cart.items[itemId].quantity;
@@ -536,7 +540,7 @@
         }
 
 
-        // --- LÓGICA DAS VARIANTES (COM CORREÇÕES) ---
+        // --- LÓGICA DAS VARIANTES (V3.1 - com verificação de estoque) ---
 
         function setupVariantSelectors() {
             const colorContainer = document.getElementById('color-selector');
@@ -588,19 +592,16 @@
             });
         }
         
-        // 🚨 checkButtonState (TOTALMENTE REESCRITA) 🚨
         function checkButtonState() {
              const btn = document.getElementById('add-to-cart-btn');
              const colorsAvailable = Object.keys(parsedVariants).length > 0;
              
-             // Se não houver variantes, verifica o estoque "geral" (que no nosso caso, é só habilitar)
              if (!colorsAvailable) {
                  btn.textContent = "Adicionar ao Carrinho";
                  btn.disabled = false;
                  return;
              }
              
-             // Se houver variantes...
              if (!selectedColor) {
                  btn.textContent = "Selecione uma Cor";
                  btn.disabled = true;
@@ -608,7 +609,6 @@
                  btn.textContent = "Selecione um Tamanho";
                  btn.disabled = true;
              } else {
-                 // Cor e Tamanho estão selecionados
                  const maxStock = parsedVariants[selectedColor][selectedSize];
                  const cart = getCart();
                  const itemId = `${currentProductId}_${selectedColor}_${selectedSize}`;
