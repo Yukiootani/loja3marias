@@ -58,6 +58,7 @@
             object-fit: contain; 
             margin: 0 auto; /* Centraliza */
             display: block; 
+            cursor: pointer; /* 🚨 NOVO: Mostra que é clicável */
         }
         
         header p { 
@@ -161,7 +162,7 @@
         }
         .details-button:hover { background-color: #a15a70; }
         
-        /* 🚨 CSS DOS SELOS (BADGES) ATUALIZADO 🚨 */
+        /* CSS DOS SELOS (BADGES) ATUALIZADO */
         .badge {
             position: absolute; top: 10px; left: 10px;
             padding: 5px 10px; border-radius: 5px;
@@ -294,14 +295,39 @@
         const filterButtons = document.querySelectorAll('.filter-button');
         const collectionTitle = document.getElementById('collection-title');
         const cartCountEl = document.getElementById('cart-count'); 
-        const headerEl = document.getElementById('main-header'); // NOVO
+        const headerEl = document.getElementById('main-header');
         let currentFilter = 'pronta-entrega';
+        
+        // 🚨 NOVO: Easter Egg para Admin (Clicar 3x no Logo)
+        let logoClickCount = 0;
+        let logoClickTimer = null;
+        headerEl.addEventListener('click', (e) => {
+            // Verifica se o clique foi no logo (que é carregado dinamicamente)
+            if (e.target.closest('.header-logo')) {
+                logoClickCount++;
+                
+                if (logoClickTimer) {
+                    clearTimeout(logoClickTimer);
+                }
+
+                if (logoClickCount === 3) {
+                    // 3 cliques! Redireciona
+                    window.location.href = 'admin.html';
+                    logoClickCount = 0;
+                } else {
+                    // Inicia um timer. Se não houver mais cliques em 1.5s, zera a contagem
+                    logoClickTimer = setTimeout(() => {
+                        logoClickCount = 0;
+                    }, 1500); // 1.5 segundos de tolerância
+                }
+            }
+        });
         
         function getCart() {
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
         }
 
-        // 🚨 NOVO: updateCartIcon agora soma as QUANTIDADES
+        // updateCartIcon agora soma as QUANTIDADES
         function updateCartIcon() {
             const cart = getCart();
             let count = 0;
@@ -317,7 +343,7 @@
             }
         }
         
-        // 🚨 FUNÇÃO fetchProducts (ATUALIZADA) 🚨
+        // FUNÇÃO fetchProducts (ATUALIZADA)
         async function fetchProducts() {
             loadingMsg.style.display = 'block';
             errorMsg.style.display = 'none';
@@ -353,8 +379,7 @@
                         badge = '<span class="badge badge-destaque">🔥 Destaque</span>';
                     }
                     
-                    // 🚨 NOVO: Lógica do Selo "Esgotado"
-                    // Só mostra esgotado se for 'pronta-entrega' E o estoque total for 0
+                    // Lógica do Selo "Esgotado"
                     let soldOutBadge = '';
                     const totalStock = product.estoqueTotal || 0;
                     const source = product.source;
@@ -363,13 +388,10 @@
                         soldOutBadge = '<span class="badge badge-esgotado">Esgotado</span>';
                     }
                     
-                    // ----------------------------------
-
                     const card = document.createElement('a');
                     card.href = `detalhes.html?id=${id}`;
                     card.className = 'product-card';
                     
-                    // 🚨 ATUALIZADO: Adiciona o soldOutBadge
                     card.innerHTML = `
                         ${badge}
                         ${soldOutBadge}
