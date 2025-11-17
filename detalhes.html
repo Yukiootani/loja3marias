@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto (V3.6) | 3 Marias</title>
+    <title>Detalhes do Produto (V3.7) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -192,7 +192,7 @@
             box-shadow: 0 0 5px var(--primary-color);
         }
         
-        /* 🚨 NOVO: Label para a cor selecionada */
+        /* Label para a cor selecionada */
         .selected-color-label {
             display: none; /* Começa oculto */
             margin-bottom: 10px;
@@ -406,7 +406,7 @@
                                         </div>
                                      </div>`;
                     
-                    // 🚨 MUDANÇA AQUI (V3.6): Adiciona o span para o nome da cor
+                    // (V3.6): Adiciona o span para o nome da cor
                     variantsHTML += `<div class="variant-group">
                                         <label>Tamanho:</label>
                                         <span id="selected-color-name" class="selected-color-label"></span>
@@ -637,65 +637,67 @@
              }
         }
         
-        // 🚨 NOVO (V3.6): DICIONÁRIO DE CORES ATUALIZADO 🚨
+        // 🚨 NOVO (V3.7): DICIONÁRIO DE CORES INTELIGENTE 🚨
         function getSafeColor(colorName) {
             const lowerColor = colorName.toLowerCase();
+            
+            // Dicionário de cores (nomes exatos)
             const colors = {
-                // Cores Básicas
                 'preto': '#000000',
                 'branco': '#FFFFFF',
                 'marfim': '#FFFFF0',
                 'cinza mescla': '#D3D3D3',
                 'prata': '#C0C0C0',
-                
-                // Nudes
+                'cetim': '#C0C0C0', // Cetim (puro) é prata
                 'nude rosado': '#E3BC9A',
                 'nude bege': '#F5F5DC',
-                'nude': '#E3BC9A', // Fallback
-                'bege': '#F5F5DC', // Fallback
-                
-                // Marrons
+                'nude': '#E3BC9A', 
+                'bege': '#F5F5DC', 
                 'marrom': '#8B4513',
                 'chocolate': '#8B4513',
-
-                // Rosas
                 'rosa claro': '#FFC0CB',
-                'rosa': '#FFC0CB', // Fallback
+                'rosa': '#FFC0CB', 
                 'rosa antigo': '#b76e86',
                 'fúcsia': '#FF00FF',
                 'pink': '#FF00FF',
-
-                // Vermelhos
                 'vermelho': '#FF0000',
                 'cereja': '#D2042D',
                 'vinho': '#800000',
                 'bordô': '#800000',
-
-                // Azuis
-                'azul': '#98b6d4', // Default
+                'azul': '#98b6d4', 
                 'azul serenity': '#98b6d4',
                 'azul marinho': '#000080',
                 'azul royal': '#0000CD',
-                
-                // Verdes
                 'verde menta': '#98FF98',
                 'verde musgo': '#556B2F',
-                'verde': '#98FF98', // Default
-
-                // Roxos
+                'verde': '#98FF98', 
                 'lilás': '#C8A2C8',
-                'odalisca': '#C8A2C8', // Alias
+                'odalisca': '#C8A2C8', 
                 'roxo': '#800080',
-                
-                // Amarelos
                 'amarelo': '#FFFF00',
                 'dourado': '#FFD700',
-                
-                // Outros
                 'estampado': '#cccccc'
             };
             
-            return colors[lowerColor] || colorName; 
+            // 1. Tenta encontrar uma correspondência exata
+            if (colors[lowerColor]) {
+                return colors[lowerColor];
+            }
+            
+            // 2. 🚨 NOVO: Tenta encontrar uma cor *dentro* do nome
+            // (ex: "Preto Cetim" vai encontrar "preto")
+            // Itera pelas chaves do dicionário para encontrar a "cor base"
+            for (const key in colors) {
+                if (lowerColor.includes(key)) {
+                    return colors[key];
+                }
+            }
+            
+            // 3. Se não encontrar nada, retorna o nome (para cores hex) ou um cinza
+            if (colorName.startsWith('#')) {
+                return colorName;
+            }
+            return '#cccccc'; // Cor padrão para nomes desconhecidos
         }
 
         // Lógica das Mídias (sem mudança)
