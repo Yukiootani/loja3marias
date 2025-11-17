@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto (V3.7) | 3 Marias</title>
+    <title>Detalhes do Produto (V3.8) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -558,7 +558,7 @@
                     selectedColor = target.dataset.color;
                     selectedSize = null; // Reseta o tamanho
                     
-                    // 🚨 MUDANÇA AQUI (V3.6): Atualiza o nome da cor
+                    // (V3.6): Atualiza o nome da cor
                     const colorNameLabel = document.getElementById('selected-color-name');
                     colorNameLabel.textContent = `Cor: ${selectedColor}`;
                     colorNameLabel.style.display = 'block';
@@ -637,45 +637,64 @@
              }
         }
         
-        // 🚨 NOVO (V3.7): DICIONÁRIO DE CORES INTELIGENTE 🚨
+        // 🚨 NOVO (V3.8): DICIONÁRIO DE CORES INTELIGENTE 🚨
         function getSafeColor(colorName) {
             const lowerColor = colorName.toLowerCase();
             
             // Dicionário de cores (nomes exatos)
             const colors = {
+                // Cores Básicas
                 'preto': '#000000',
                 'branco': '#FFFFFF',
                 'marfim': '#FFFFF0',
                 'cinza mescla': '#D3D3D3',
                 'prata': '#C0C0C0',
-                'cetim': '#C0C0C0', // Cetim (puro) é prata
+                'cetim': '#D2B48C', // 🚨 MUDANÇA: Cetim (Bege/Marrom claro)
+                
+                // Nudes
                 'nude rosado': '#E3BC9A',
                 'nude bege': '#F5F5DC',
                 'nude': '#E3BC9A', 
                 'bege': '#F5F5DC', 
+                
+                // Marrons
                 'marrom': '#8B4513',
                 'chocolate': '#8B4513',
+
+                // Rosas
                 'rosa claro': '#FFC0CB',
                 'rosa': '#FFC0CB', 
                 'rosa antigo': '#b76e86',
                 'fúcsia': '#FF00FF',
                 'pink': '#FF00FF',
+
+                // Vermelhos
                 'vermelho': '#FF0000',
                 'cereja': '#D2042D',
                 'vinho': '#800000',
                 'bordô': '#800000',
+
+                // Azuis
                 'azul': '#98b6d4', 
                 'azul serenity': '#98b6d4',
                 'azul marinho': '#000080',
                 'azul royal': '#0000CD',
+                
+                // Verdes
                 'verde menta': '#98FF98',
                 'verde musgo': '#556B2F',
                 'verde': '#98FF98', 
+
+                // Roxos
                 'lilás': '#C8A2C8',
                 'odalisca': '#C8A2C8', 
                 'roxo': '#800080',
+                
+                // Amarelos
                 'amarelo': '#FFFF00',
                 'dourado': '#FFD700',
+                
+                // Outros
                 'estampado': '#cccccc'
             };
             
@@ -684,16 +703,19 @@
                 return colors[lowerColor];
             }
             
-            // 2. 🚨 NOVO: Tenta encontrar uma cor *dentro* do nome
-            // (ex: "Preto Cetim" vai encontrar "preto")
-            // Itera pelas chaves do dicionário para encontrar a "cor base"
+            // 2. Tenta encontrar uma cor *dentro* do nome (ex: "Preto Cetim")
             for (const key in colors) {
-                if (lowerColor.includes(key)) {
+                // Evita que "Cetim" (sozinho) seja pego por "Bege" ou "Marrom"
+                if (lowerColor.includes('cetim') && key === 'cetim') {
+                    return colors[key];
+                }
+                // Lógica principal
+                if (lowerColor.includes(key) && key !== 'cetim') {
                     return colors[key];
                 }
             }
             
-            // 3. Se não encontrar nada, retorna o nome (para cores hex) ou um cinza
+            // 3. Se não encontrar nada
             if (colorName.startsWith('#')) {
                 return colorName;
             }
