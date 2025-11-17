@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin V3.1 (Cores Novas) | 3 Marias</title>
+    <title>Admin V3.2 (Paleta Real) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -70,7 +70,7 @@
 <body>
 
     <div class="container">
-        <h1>Painel de Administração (V3.1)</h1>
+        <h1>Painel de Administração (V3.2)</h1>
         <h2>3 Marias - Stock por Tamanho</h2>
 
         <section id="login-section">
@@ -268,26 +268,34 @@
                 return await uploadTask.ref.getDownloadURL();
             }
 
-            // --- LÓGICA DE VARIANTES (V3.1 - Lista de Cores Atualizada) ---
+            // --- LÓGICA DE VARIANTES (V3.2 - Paleta de Cores Profissional) ---
             // 🚨 MUDANÇA AQUI: Lista de cores atualizada
             const predefinedColors = [
-                { name: "Preto", value: "black" },
-                { name: "Branco", value: "white" },
-                { name: "Vermelho", value: "red" },
-                { name: "Rosa", value: "#FFC0CB" },
-                { name: "Azul", value: "blue" },
-                { name: "Azul Marinho", value: "#000080" },
-                { name: "Verde", value: "green" },
-                { name: "Verde Musgo", value: "#556B2F" },
-                { name: "Amarelo", value: "yellow" },
-                { name: "Cinza", value: "gray" },
-                { name: "Marrom", value: "brown" },
-                { name: "Bege", value: "#F5F5DC" },
-                { name: "Nude", value: "#E3BC9A" },
+                { name: "Preto", value: "#000000" },
+                { name: "Branco", value: "#FFFFFF" },
+                { name: "Marfim", value: "#FFFFF0" },
+                { name: "Cinza Mescla", value: "#D3D3D3" },
+                { name: "Prata", value: "#C0C0C0" },
+                { name: "Nude Rosado", value: "#E3BC9A" },
+                { name: "Nude Bege", value: "#F5F5DC" },
+                { name: "Marrom", value: "#8B4513" },
+                { name: "Rosa Claro", value: "#FFC0CB" },
+                { name: "Rosa Antigo", value: "#b76e86" },
+                { name: "Fúcsia", value: "#FF00FF" },
+                { name: "Vermelho", value: "#FF0000" },
+                { name: "Cereja", value: "#D2042D" },
                 { name: "Vinho", value: "#800000" },
+                { name: "Azul Marinho", value: "#000080" },
+                { name: "Azul Serenity", value: "#98b6d4" },
+                { name: "Azul Royal", value: "#0000CD" },
+                { name: "Verde Menta", value: "#98FF98" },
+                { name: "Verde Musgo", value: "#556B2F" },
+                { name: "Lilás", value: "#C8A2C8" }, 
+                { name: "Odalisca", value: "#C8A2C8" }, // Mesmo que lilás
                 { name: "Roxo", value: "#800080" },
-                { name: "Lilás", value: "#C8A2C8" },
-                { name: "Odalisca", value: "#C8A2C8" } // Mesmo que lilás
+                { name: "Amarelo", value: "#FFFF00" },
+                { name: "Dourado", value: "#FFD700" },
+                { name: "Estampado", value: "#cccccc" }
             ];
 
             addVariantBtn.addEventListener('click', () => {
@@ -300,7 +308,12 @@
                 variantEntry.className = 'variant-entry';
                 variantEntry.id = `variant-${entryId}`;
                 
-                let colorOptions = predefinedColors.map(c => `<option value="${c.name}" style="background-color:${c.value}; color:${c.value === 'black' || c.value === '#000080' || c.value === '#800000' || c.value === '#556B2F' ? 'white' : 'black'};">${c.name}</option>`).join('');
+                // 🚨 MUDANÇA: Lógica de cor de texto atualizada
+                const darkColors = ["#000000", "#8B4513", "#D2042D", "#800000", "#000080", "#0000CD", "#556B2F", "#800080", "#b76e86"];
+                let colorOptions = predefinedColors.map(c => {
+                    const textColor = darkColors.includes(c.value) ? 'white' : 'black';
+                    return `<option value="${c.name}" style="background-color:${c.value}; color:${textColor};">${c.name}</option>`;
+                }).join('');
                 
                 let isCustom = color && !predefinedColors.find(c => c.name === color);
                 let customValue = isCustom ? color : '';
