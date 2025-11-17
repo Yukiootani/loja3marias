@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 Marias Moda Feminina</title>
+    <title>3 Marias Moda Feminina (V4)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* --- CSS Minimalista (Victoria's Secret Style) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
-            --silver-color: #C0C0C0; /* Cor Prata para o brilho */
+            --silver-color: #C0C0C0;
             --text-color: #333; 
             --light-text: #666; 
             --bg-color: #FFFFFF; 
@@ -21,17 +20,10 @@
 
         /* Animação de Brilho */
         @keyframes shimmer-glow {
-            0% {
-                box-shadow: 0 0 5px var(--accent-color);
-            }
-            50% {
-                box-shadow: 0 0 10px var(--silver-color);
-            }
-            100% {
-                box-shadow: 0 0 5px var(--accent-color);
-            }
+            0% { box-shadow: 0 0 5px var(--accent-color); }
+            50% { box-shadow: 0 0 10px var(--silver-color); }
+            100% { box-shadow: 0 0 5px var(--accent-color); }
         }
-
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
@@ -41,35 +33,63 @@
             padding-bottom: 80px; 
         }
         
-        /* Cabeçalho Minimalista com Logo */
+        /* Cabeçalho */
         header { 
             background-color: var(--bg-color); 
             color: var(--text-color); 
-            padding: 0.5rem 1rem; /* Cabeçalho fino */
+            padding: 0.5rem 1rem;
             text-align: center; 
             border-bottom: 1px solid var(--border-color); 
         }
         
-        /* Estilo do Logo */
         .header-logo {
             max-width: 250px; 
             width: 100%;
             height: auto;     
             object-fit: contain; 
-            margin: 0 auto; /* Centraliza */
+            margin: 0 auto;
             display: block; 
-            cursor: pointer; /* 🚨 NOVO: Mostra que é clicável */
+            cursor: pointer;
         }
         
         header p { 
             font-size: 1em; 
             color: var(--light-text);
-            margin: 2px 0 0 0; /* Margem pequena acima do slogan */
+            margin: 2px 0 0 0;
         }
         
         main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
         
-        /* Controles de Filtro Minimalistas */
+        /* 🚨 NOVO: Filtros de Seção */
+        #secao-filters {
+            display: flex;
+            flex-wrap: wrap; /* Permite quebrar linha no mobile */
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .secao-button {
+            background-color: #f5f5f5;
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .secao-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+
+        /* Filtros de Disponibilidade */
         #controls {
             display: flex; 
             flex-direction: row; 
@@ -101,16 +121,16 @@
             animation: none;
         }
         
-        .section-title {
+        .section-title { /* Agora é o título dinâmico */
             font-size: 1.5em;
             color: var(--text-color); 
             margin-bottom: 20px;
             font-weight: 600;
-            text-align: left;
+            text-align: center;
             border-bottom: none; 
         }
         
-        /* Grid de Produtos Limpa */
+        /* Grid de Produtos */
         #products-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr); 
@@ -145,7 +165,6 @@
         .product-name { font-size: 1em; font-weight: 600; margin: 0 0 5px 0; }
         .product-price { font-size: 1.1em; font-weight: 700; color: var(--primary-color); margin: 0 0 15px 0; }
         
-        /* Botão de "Ver Detalhes" */
         .details-button {
             display: inline-block;
             background-color: var(--primary-color);
@@ -162,7 +181,6 @@
         }
         .details-button:hover { background-color: #a15a70; }
         
-        /* CSS DOS SELOS (BADGES) ATUALIZADO */
         .badge {
             position: absolute; top: 10px; left: 10px;
             padding: 5px 10px; border-radius: 5px;
@@ -176,8 +194,8 @@
             background-color: rgba(100, 100, 100, 0.9);
             color: white;
             top: 10px;
-            right: 10px; /* Posição no canto direito */
-            left: auto;  /* Remove o 'left' padrão */
+            right: 10px; 
+            left: auto;  
         }
         
         #loading-message, #error-message {
@@ -229,12 +247,6 @@
             #products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
             }
-            .section-title {
-                font-size: 1.8em;
-                text-align: center;
-                border-bottom: 1px solid var(--border-color);
-                padding-bottom: 10px;
-            }
         }
     </style>
 </head>
@@ -246,6 +258,17 @@
     </header>
 
     <main>
+        <div id="secao-filters">
+            <button class="secao-button active" data-secao="todos">Todas</button>
+            <button class="secao-button" data-secao="calcinhas">Calcinhas</button>
+            <button class="secao-button" data-secao="sutias">Sutiãs</button>
+            <button class="secao-button" data-secao="conjuntos">Conjuntos</button>
+            <button class="secao-button" data-secao="body">Body</button>
+            <button class="secao-button" data-secao="perfumaria">Perfumaria</button>
+            <button class="secao-button" data-secao="cremes">Cremes</button>
+            <button class="secao-button" data-secao="variados">Variados</button>
+        </div>
+
         <div id="controls">
             <button class="filter-button active" data-filter="pronta-entrega">
                 Pronta Entrega
@@ -255,7 +278,7 @@
             </button>
         </div>
 
-        <h2 id="collection-title" class="section-title">Nossa Coleção</h2>
+        <h2 id="collection-title" class="section-title">Carregando...</h2>
         <div id="products-grid">
             </div>
         <div id="loading-message">Carregando produtos...</div>
@@ -293,32 +316,29 @@
         const loadingMsg = document.getElementById('loading-message');
         const errorMsg = document.getElementById('error-message');
         const filterButtons = document.querySelectorAll('.filter-button');
+        const secaoButtons = document.querySelectorAll('.secao-button'); // 🚨 NOVO
         const collectionTitle = document.getElementById('collection-title');
         const cartCountEl = document.getElementById('cart-count'); 
         const headerEl = document.getElementById('main-header');
+        
         let currentFilter = 'pronta-entrega';
+        let currentSecao = 'todos'; // 🚨 NOVO
+
         
         // 🚨 NOVO: Easter Egg para Admin (Clicar 3x no Logo)
         let logoClickCount = 0;
         let logoClickTimer = null;
         headerEl.addEventListener('click', (e) => {
-            // Verifica se o clique foi no logo (que é carregado dinamicamente)
             if (e.target.closest('.header-logo')) {
                 logoClickCount++;
-                
-                if (logoClickTimer) {
-                    clearTimeout(logoClickTimer);
-                }
-
+                if (logoClickTimer) clearTimeout(logoClickTimer);
                 if (logoClickCount === 3) {
-                    // 3 cliques! Redireciona
                     window.location.href = 'admin.html';
                     logoClickCount = 0;
                 } else {
-                    // Inicia um timer. Se não houver mais cliques em 1.5s, zera a contagem
                     logoClickTimer = setTimeout(() => {
                         logoClickCount = 0;
-                    }, 1500); // 1.5 segundos de tolerância
+                    }, 1500); 
                 }
             }
         });
@@ -343,26 +363,37 @@
             }
         }
         
-        // FUNÇÃO fetchProducts (ATUALIZADA)
+        // 🚨 FUNÇÃO fetchProducts (TOTALMENTE ATUALIZADA) 🚨
         async function fetchProducts() {
             loadingMsg.style.display = 'block';
             errorMsg.style.display = 'none';
             grid.innerHTML = '';
+            
+            // Atualiza o título
+            const secaoText = document.querySelector(`.secao-button[data-secao="${currentSecao}"]`).textContent;
+            const filterText = document.querySelector(`.filter-button[data-filter="${currentFilter}"]`).textContent;
+            collectionTitle.textContent = `${secaoText} | ${filterText}`;
 
             try {
-                const snapshot = await db.collection("products")
-                                        .where("source", "==", currentFilter)
-                                        .orderBy("isFeatured", "desc") 
-                                        .orderBy("createdAt", "desc")
-                                        .get();
+                // 1. Inicia a consulta
+                let query = db.collection("products");
+                
+                // 2. Filtro de Seção (se não for "Todas")
+                if (currentSecao !== 'todos') {
+                    query = query.where("secao", "==", currentSecao);
+                }
+                
+                // 3. Filtro de Disponibilidade (Pronta Entrega / Encomenda)
+                query = query.where("source", "==", currentFilter);
+                
+                // 4. Ordenação (Removemos 'isFeatured' para permitir os filtros)
+                query = query.orderBy("createdAt", "desc");
+                
+                const snapshot = await query.get();
 
                 if (snapshot.empty) {
                     loadingMsg.style.display = 'none';
-                    if (currentFilter === 'pronta-entrega') {
-                        grid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Nenhum produto em Pronta Entrega no momento.</p>';
-                    } else {
-                        grid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Nenhum produto Sob Encomenda no momento.</p>';
-                    }
+                    grid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Nenhum produto encontrado para esta combinação de filtros.</p>';
                     return;
                 }
 
@@ -371,7 +402,6 @@
                     const id = doc.id;
                     const precoFormatado = (product.price || 0).toLocaleString('ja-JP');
 
-                    // --- Lógica dos Selos (Badges) ---
                     let badge = '';
                     if (product.isFeatured === 'novo') {
                         badge = '<span class="badge badge-novo">✨ Novidade</span>';
@@ -379,7 +409,6 @@
                         badge = '<span class="badge badge-destaque">🔥 Destaque</span>';
                     }
                     
-                    // Lógica do Selo "Esgotado"
                     let soldOutBadge = '';
                     const totalStock = product.estoqueTotal || 0;
                     const source = product.source;
@@ -413,7 +442,9 @@
                 console.error("Erro ao carregar produtos:", error);
                 loadingMsg.style.display = 'none';
                 errorMsg.style.display = 'block';
-                errorMsg.innerHTML = `Erro: Não foi possível carregar os produtos.<br>Verifique o painel /admin e os Índices do Firebase.`;
+                // 🚨 AVISO DE ÍNDICE
+                errorMsg.innerHTML = `Erro: Não foi possível carregar os produtos.<br>
+                                      <b>(Provavelmente falta um índice no Firebase. Aperte F12, vá em "Console" e clique no link de erro para criar o índice.)</b>`;
             }
         }
         
@@ -432,19 +463,22 @@
             }
         }
 
-        // Lógica dos Filtros
+        // 🚨 NOVO: Lógica dos Filtros de Seção
+        secaoButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                secaoButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentSecao = button.dataset.secao;
+                fetchProducts();
+            });
+        });
+
+        // Lógica dos Filtros de Disponibilidade
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 currentFilter = button.dataset.filter;
-                
-                if (currentFilter === 'pronta-entrega') {
-                    collectionTitle.textContent = "Pronta Entrega";
-                } else {
-                    collectionTitle.textContent = "Catálogo Sob Encomenda";
-                }
-                
                 fetchProducts();
             });
         });
