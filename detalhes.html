@@ -637,7 +637,7 @@
              }
         }
         
-        // 🚨 NOVO (V3.9): DICIONÁRIO DE CORES ATUALIZADO 🚨
+        // 🚨 NOVO (V3.9): DICIONÁRIO DE CORES COMPLETO 🚨
         function getSafeColor(colorName) {
             const lowerColor = colorName.toLowerCase();
             
@@ -647,38 +647,44 @@
                 'preto': '#000000',
                 'branco': '#FFFFFF',
                 'marfim': '#FFFFF0',
+                'cinza claro': '#E0E0E0',
                 'cinza mescla': '#D3D3D3',
+                'grafite': '#404040',
                 'prata': '#C0C0C0',
-                'cetim': '#D2B48C', // 🚨 MUDANÇA: Cetim (Bege/Marrom claro)
                 
-                // Nudes
+                // Nudes/Marrons
+                'cetim': '#D2B48C',
                 'nude rosado': '#E3BC9A',
                 'nude bege': '#F5F5DC',
                 'nude': '#E3BC9A', 
                 'bege': '#F5F5DC', 
-                
-                // Marrons
                 'marrom': '#8B4513',
-                'chocolate': '#8B4513',
+                'chocolate': '#D2691E',
+                'terracota': '#E2725B',
 
                 // Rosas
+                'rosa bebê': '#F4C2C2',
                 'rosa claro': '#FFC0CB',
                 'rosa': '#FFC0CB', 
                 'rosa antigo': '#b76e86',
+                'pink': '#FFC0CB',
                 'fúcsia': '#FF00FF',
-                'pink': '#FF00FF',
-
+                
                 // Vermelhos
                 'vermelho': '#FF0000',
                 'cereja': '#D2042D',
                 'vinho': '#800000',
                 'bordô': '#800000',
+                'marsala': '#B1907F',
 
                 // Azuis
-                'azul': '#98b6d4', 
+                'azul bebê': '#E0FFFF',
                 'azul serenity': '#98b6d4',
-                'azul marinho': '#000080',
                 'azul royal': '#0000CD',
+                'azul tiffany': '#AFEEEE',
+                'azul petróleo': '#008080',
+                'azul marinho': '#000080',
+                'azul': '#98b6d4', 
                 
                 // Verdes (NOVOS)
                 'verde menta': '#98FF98',
@@ -687,16 +693,20 @@
                 'verde oliva': '#808000',
                 'verde musgo': '#556B2F',
                 'verde esmeralda': '#50C878',
-                'verde': '#98FF98', // Default
+                'verde': '#98FF98', 
 
                 // Roxos
                 'lilás': '#C8A2C8',
+                'lavanda': '#E6E6FA',
                 'odalisca': '#C8A2C8', 
                 'roxo': '#800080',
+                'violeta': '#EE82EE',
                 
-                // Amarelos
+                // Amarelos/Laranjas
                 'amarelo': '#FFFF00',
                 'dourado': '#FFD700',
+                'laranja': '#FFA500',
+                'coral': '#FF7F50',
                 
                 // Outros
                 'estampado': '#cccccc'
@@ -707,17 +717,14 @@
                 return colors[lowerColor];
             }
             
-            // 2. 🚨 MUDANÇA: Lógica inteligente para "Cetim"
-            // Se o nome contém "cetim", ele vai procurar a *outra* cor no nome
-            // Ex: "Preto Cetim" -> procura "preto"
+            // 2. Lógica inteligente para "Cetim" (ex: "Preto Cetim")
             if (lowerColor.includes('cetim')) {
                 for (const key in colors) {
                     if (lowerColor.includes(key) && key !== 'cetim') {
                         return colors[key];
                     }
                 }
-                // Se for SÓ "Cetim", usa a cor padrão de cetim
-                return colors['cetim'];
+                return colors['cetim']; // Se for SÓ "Cetim"
             }
             
             // 3. Tenta encontrar uma cor *dentro* do nome (para outras estampas)
