@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto (V3.9) | 3 Marias</title>
+    <title>Detalhes do Produto (V3.11-Zoom) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* --- CSS (sem mudanças) --- */
+        /* --- CSS (com 1 adição) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
@@ -53,7 +53,7 @@
             min-width: 300px;
         }
         #main-media-display {
-            position: relative;
+            position: relative; /* Essencial para o zoom */
             width: 100%;
             padding-top: 150%; 
             margin-bottom: 15px;
@@ -106,6 +106,26 @@
             transform: translate(-50%, -50%);
             z-index: 10;
         }
+        
+        /* 🚨 NOVO (V3.11): Estilo da Lupa de Zoom 🚨 */
+        #zoom-loupe {
+            display: none; /* Começa oculto */
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%; /* Lupa redonda */
+            background-repeat: no-repeat;
+            pointer-events: none; /* Impede que a lupa bloqueie o mouse */
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            z-index: 99;
+        }
+        /* Esconde a lupa se o item principal for um vídeo */
+        #main-media-display video ~ #zoom-loupe {
+            display: none !important;
+        }
+        
+        
         .info-area {
             flex: 1 1 40%;
             padding-top: 10px;
@@ -418,7 +438,10 @@
                 // --- Renderiza o HTML Completo ---
                 detailsContainer.innerHTML = `
                     <div class="media-area">
-                        <div id="main-media-display">${mainMediaHTML}</div>
+                        <div id="main-media-display">
+                            ${mainMediaHTML}
+                            <div id="zoom-loupe"></div>
+                        </div>
                         <div id="thumbnails">${galleryHTML}</div>
                     </div>
                     <div class="info-area">
@@ -439,6 +462,8 @@
 
                 // --- Adiciona Eventos de Clique ---
                 setupMediaThumbnails();
+                setupImageZoom(); // 🚨 NOVO (V3.11): Inicia o zoom
+                
                 if (colors.length > 0) {
                     setupVariantSelectors();
                     
@@ -637,133 +662,112 @@
              }
         }
         
-        // 🚨 NOVO (V3.9): DICIONÁRIO DE CORES COMPLETO 🚨
+        // (V3.10): DICIONÁRIO DE CORES COMPLETO
         function getSafeColor(colorName) {
             const lowerColor = colorName.toLowerCase();
-            
-            // Dicionário de cores (nomes exatos)
             const colors = {
-                // Básicos
-                'preto': '#000000',
-                'branco': '#FFFFFF',
-                'marfim': '#FFFFF0',
-                'cinza claro': '#E0E0E0',
-                'cinza mescla': '#D3D3D3',
-                'grafite': '#404040',
-                'prata': '#C0C0C0',
-                
-                // Nudes/Marrons
-                'cetim': '#D2B48C',
-                'nude rosado': '#E3BC9A',
-                'nude bege': '#F5F5DC',
-                'nude': '#E3BC9A', 
-                'bege': '#F5F5DC', 
-                'marrom': '#8B4513',
-                'chocolate': '#D2691E',
-                'terracota': '#E2725B',
-
-                // Rosas
-                'rosa bebê': '#F4C2C2',
-                'rosa claro': '#FFC0CB',
-                'rosa': '#FFC0CB', 
-                'rosa antigo': '#b76e86',
-                'pink': '#FFC0CB',
-                'fúcsia': '#FF00FF',
-                
-                // Vermelhos
-                'vermelho': '#FF0000',
-                'cereja': '#D2042D',
-                'vinho': '#800000',
-                'bordô': '#800000',
-                'marsala': '#B1907F',
-
-                // Azuis
-                'azul bebê': '#E0FFFF',
-                'azul serenity': '#98b6d4',
-                'azul royal': '#0000CD',
-                'azul tiffany': '#AFEEEE',
-                'azul petróleo': '#008080',
-                'azul marinho': '#000080',
-                'azul': '#98b6d4', 
-                
-                // Verdes (NOVOS)
-                'verde menta': '#98FF98',
-                'verde água': '#AFEEEE',
-                'verde musgo claro': '#ADBC9F',
-                'verde oliva': '#808000',
-                'verde musgo': '#556B2F',
-                'verde esmeralda': '#50C878',
-                'verde': '#98FF98', 
-
-                // Roxos
-                'lilás': '#C8A2C8',
-                'lavanda': '#E6E6FA',
-                'odalisca': '#C8A2C8', 
-                'roxo': '#800080',
-                'violeta': '#EE82EE',
-                
-                // Amarelos/Laranjas
-                'amarelo': '#FFFF00',
-                'dourado': '#FFD700',
-                'laranja': '#FFA500',
-                'coral': '#FF7F50',
-                
-                // Outros
-                'estampado': '#cccccc'
+                'preto': '#000000', 'branco': '#FFFFFF', 'marfim': '#FFFFF0',
+                'cinza claro': '#E0E0E0', 'cinza mescla': '#D3D3D3', 'grafite': '#404040', 'prata': '#C0C0C0',
+                'cetim': '#D2B48C', 'nude rosado': '#E3BC9A', 'nude bege': '#F5F5DC', 'nude': '#E3BC9A', 
+                'bege': '#F5F5DC', 'marrom': '#8B4513', 'chocolate': '#D2691E', 'terracota': '#E2725B',
+                'rosa bebê': '#F4C2C2', 'rosa claro': '#FFC0CB', 'rosa': '#FFC0CB', 'rosa antigo': '#b76e86',
+                'pink': '#FFC0CB', 'fúcsia': '#FF00FF', 'vermelho': '#FF0000', 'cereja': '#D2042D',
+                'vinho': '#800000', 'bordô': '#800000', 'marsala': '#B1907F', 'azul bebê': '#E0FFFF',
+                'azul serenity': '#98b6d4', 'azul royal': '#0000CD', 'azul tiffany': '#AFEEEE',
+                'azul petróleo': '#008080', 'azul marinho': '#000080', 'azul': '#98b6d4', 
+                'verde menta': '#98FF98', 'verde água': '#AFEEEE', 'verde musgo claro': '#ADBC9F',
+                'verde oliva': '#808000', 'verde musgo': '#556B2F', 'verde esmeralda': '#50C878',
+                'verde': '#98FF98', 'lilás': '#C8A2C8', 'lavanda': '#E6E6FA', 'odalisca': '#C8A2C8', 
+                'roxo': '#800080', 'violeta': '#EE82EE', 'amarelo': '#FFFF00', 'dourado': '#FFD700',
+                'laranja': '#FFA500', 'coral': '#FF7F50', 'estampado': '#cccccc'
             };
             
-            // 1. Tenta encontrar uma correspondência exata
-            if (colors[lowerColor]) {
-                return colors[lowerColor];
-            }
-            
-            // 2. Lógica inteligente para "Cetim" (ex: "Preto Cetim")
+            if (colors[lowerColor]) return colors[lowerColor];
             if (lowerColor.includes('cetim')) {
-                for (const key in colors) {
-                    if (lowerColor.includes(key) && key !== 'cetim') {
-                        return colors[key];
-                    }
-                }
-                return colors['cetim']; // Se for SÓ "Cetim"
+                for (const key in colors) { if (lowerColor.includes(key) && key !== 'cetim') return colors[key]; }
+                return colors['cetim'];
             }
-            
-            // 3. Tenta encontrar uma cor *dentro* do nome (para outras estampas)
-            for (const key in colors) {
-                if (lowerColor.includes(key)) {
-                    return colors[key];
-                }
-            }
-            
-            // 4. Se não encontrar nada
-            if (colorName.startsWith('#')) {
-                return colorName;
-            }
-            return '#cccccc'; // Cor padrão para nomes desconhecidos
+            for (const key in colors) { if (lowerColor.includes(key)) return colors[key]; }
+            if (colorName.startsWith('#')) return colorName;
+            return '#cccccc';
         }
 
-        // Lógica das Mídias (sem mudança)
+        // Lógica das Mídias
         function setupMediaThumbnails() {
             const mainMediaDisplay = document.getElementById('main-media-display');
             const thumbContainers = document.querySelectorAll('.thumb-container');
-            const productNameEl = document.querySelector('.info-area h1');
-            const productName = productNameEl ? productNameEl.textContent : 'Produto';
+            const productName = document.querySelector('.info-area h1').textContent;
 
             thumbContainers.forEach(container => {
                 container.addEventListener('click', () => {
                     const newSrc = container.dataset.fullSrc; 
                     const mediaType = container.dataset.type; 
-                    mainMediaDisplay.innerHTML = ''; 
                     
+                    // 🚨 MUDANÇA AQUI (V3.11): Recria a Lupa ao trocar
                     if (mediaType === 'video') { 
-                        mainMediaDisplay.innerHTML = `<video src="${newSrc}" controls autoplay loop style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">Vídeo não suportado.</video>`; 
+                        mainMediaDisplay.innerHTML = `<video id="main-video" src="${newSrc}" controls autoplay loop style="width: 100%; height: 100%; object-fit: contain; background-color: white; border-radius: 6px;">Vídeo não suportado.</video><div id="zoom-loupe"></div>`; 
                     } else { 
-                        mainMediaDisplay.innerHTML = `<img src="${newSrc}" alt="${productName}">`; 
+                        mainMediaDisplay.innerHTML = `<img id="main-image" src="${newSrc}" alt="${productName}"><div id="zoom-loupe"></div>`; 
                     }
+                    
+                    setupImageZoom(); // 🚨 NOVO (V3.11): Re-inicia o zoom
+                    
                     thumbContainers.forEach(t => t.classList.remove('active')); 
                     container.classList.add('active');
                 });
             });
         }
+        
+        // 🚨 NOVO (V3.11): FUNÇÃO DE ZOOM 🚨
+        function setupImageZoom() {
+            const mediaDisplay = document.getElementById('main-media-display');
+            const loupe = document.getElementById('zoom-loupe');
+            const mainImage = document.getElementById('main-image');
+            
+            if (!mainImage || !loupe) {
+                if(loupe) loupe.style.display = 'none';
+                return; // Não faz nada se for um vídeo
+            }
+
+            const zoomLevel = 2; // Zoom de 2x
+
+            mediaDisplay.addEventListener('mousemove', (e) => {
+                const img = document.getElementById('main-image'); // Pega a imagem atual
+                if (!img) return; // Sai se for vídeo
+                
+                // Atualiza o fundo da lupa (caso tenha mudado)
+                loupe.style.backgroundImage = `url('${img.src}')`;
+                loupe.style.backgroundSize = `${img.width * zoomLevel}px ${img.height * zoomLevel}px`;
+                
+                const rect = mediaDisplay.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+
+                // Evita que a lupa saia da imagem
+                if (x < 0 || x > rect.width || y < 0 || y > rect.height) {
+                    loupe.style.display = 'none';
+                    return;
+                }
+                
+                loupe.style.display = 'block';
+
+                // Posição da lupa
+                let loupeX = x - (loupe.offsetWidth / 2);
+                let loupeY = y - (loupe.offsetHeight / 2);
+                loupe.style.left = `${loupeX}px`;
+                loupe.style.top = `${loupeY}px`;
+                
+                // Posição do background
+                let bgX = -(x * zoomLevel - loupe.offsetWidth / 2);
+                let bgY = -(y * zoomLevel - loupe.offsetHeight / 2);
+                loupe.style.backgroundPosition = `${bgX}px ${bgY}px`;
+            });
+            
+            mediaDisplay.addEventListener('mouseleave', () => {
+                loupe.style.display = 'none';
+            });
+        }
+        
     </script>
 </body>
 </html>
