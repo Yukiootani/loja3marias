@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin V3 (Stock por Tamanho) | 3 Marias</title>
+    <title>Admin V3.1 (Cores Novas) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -40,7 +40,7 @@
         .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
         .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; }
         
-        /* NOVO Estilo das Variantes (com Stock) */
+        /* Estilo das Variantes (com Stock) */
         #variants-container { border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: #fff; }
         .variant-entry { border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
         .variant-entry:last-child { border-bottom: none; }
@@ -59,7 +59,7 @@
         
         /* Estilo de Login */
         #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
-        #admin-panel { display: none; } /* Oculto por padrão */
+        #admin-panel { display: none; } 
         #btnLogout { background-color: #777; margin-top: 20px; }
 
         /* Estilo do Preview do Logo */
@@ -70,7 +70,7 @@
 <body>
 
     <div class="container">
-        <h1>Painel de Administração (V3)</h1>
+        <h1>Painel de Administração (V3.1)</h1>
         <h2>3 Marias - Stock por Tamanho</h2>
 
         <section id="login-section">
@@ -101,7 +101,7 @@
 
                 <label>Variantes (Cores e Stock por Tamanho):</label>
                 <div id="variants-container">
-                    </div>
+                </div>
                 <button type="button" id="add-variant-btn">+ Adicionar Cor</button>
 
                 <label for="source">Disponibilidade:</label>
@@ -124,7 +124,7 @@
                 <input type="file" id="videoUrl" accept="video/mp4, video/webm">
 
                 <label for="galeria">Galeria (Upload Múltiplo):</label>
-                <input type="file" id="galeria" **multiple** accept="image/png, image/jpeg">
+                <input type="file" id="galeria" multiple accept="image/png, image/jpeg">
                 
                 <button type="submit" id="save-btn">Salvar Produto</button>
                 <button type="button" id="cancel-edit-btn" style="display:none; background-color: #777;">Cancelar Edição</button>
@@ -218,7 +218,7 @@
             const isFeaturedField = document.getElementById('isFeatured');
             const imageUrlInput = document.getElementById('imageUrl');
             const videoUrlInput = document.getElementById('videoUrl');
-            const galeriaInput = document.getElementById('galeria'); // 🚨 É ESTE INPUT
+            const galeriaInput = document.getElementById('galeria');
 
             // Elementos do Logo
             const logoForm = document.getElementById('logo-form');
@@ -268,20 +268,26 @@
                 return await uploadTask.ref.getDownloadURL();
             }
 
-            // --- LÓGICA DE VARIANTES (V3 - Stock por Tamanho) ---
+            // --- LÓGICA DE VARIANTES (V3.1 - Lista de Cores Atualizada) ---
+            // 🚨 MUDANÇA AQUI: Lista de cores atualizada
             const predefinedColors = [
                 { name: "Preto", value: "black" },
                 { name: "Branco", value: "white" },
                 { name: "Vermelho", value: "red" },
                 { name: "Rosa", value: "#FFC0CB" },
                 { name: "Azul", value: "blue" },
+                { name: "Azul Marinho", value: "#000080" },
                 { name: "Verde", value: "green" },
+                { name: "Verde Musgo", value: "#556B2F" },
                 { name: "Amarelo", value: "yellow" },
                 { name: "Cinza", value: "gray" },
+                { name: "Marrom", value: "brown" },
                 { name: "Bege", value: "#F5F5DC" },
                 { name: "Nude", value: "#E3BC9A" },
                 { name: "Vinho", value: "#800000" },
-                { name: "Oncinha", value: "tan" }
+                { name: "Roxo", value: "#800080" },
+                { name: "Lilás", value: "#C8A2C8" },
+                { name: "Odalisca", value: "#C8A2C8" } // Mesmo que lilás
             ];
 
             addVariantBtn.addEventListener('click', () => {
@@ -294,7 +300,7 @@
                 variantEntry.className = 'variant-entry';
                 variantEntry.id = `variant-${entryId}`;
                 
-                let colorOptions = predefinedColors.map(c => `<option value="${c.name}" style="background-color:${c.value}; color:${c.value === 'black' ? 'white' : 'black'};">${c.name}</option>`).join('');
+                let colorOptions = predefinedColors.map(c => `<option value="${c.name}" style="background-color:${c.value}; color:${c.value === 'black' || c.value === '#000080' || c.value === '#800000' || c.value === '#556B2F' ? 'white' : 'black'};">${c.name}</option>`).join('');
                 
                 let isCustom = color && !predefinedColors.find(c => c.name === color);
                 let customValue = isCustom ? color : '';
@@ -444,7 +450,6 @@
                         videoUrl = await uploadFile(file, path);
                     }
                     
-                    // 🚨 A LÓGICA DE UPLOAD MÚLTIPLO ESTÁ CORRETA AQUI
                     if (galeriaInput.files.length > 0) {
                         showStatus(statusDiv, `Fazendo upload de ${galeriaInput.files.length} imagens da galeria (3/3)...`, "loading");
                         galeriaUrls = []; 
@@ -505,7 +510,7 @@
                     try {
                         await db.collection("products").doc(id).delete();
                         showStatus(statusDiv, "Produto excluído com sucesso!", "success");
-                        fetchProducts(); // Recarrega a lista
+                        fetchProducts(); 
                     } catch (error) {
                         console.error("Erro ao excluir:", error);
                         showStatus(statusDiv, "Erro ao excluir: " + String(error.message), "error");
