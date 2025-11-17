@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto (V3.8) | 3 Marias</title>
+    <title>Detalhes do Produto (V3.9) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* --- CSS (com 1 adição) --- */
+        /* --- CSS (sem mudanças) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
@@ -637,13 +637,13 @@
              }
         }
         
-        // 🚨 NOVO (V3.8): DICIONÁRIO DE CORES INTELIGENTE 🚨
+        // 🚨 NOVO (V3.9): DICIONÁRIO DE CORES ATUALIZADO 🚨
         function getSafeColor(colorName) {
             const lowerColor = colorName.toLowerCase();
             
             // Dicionário de cores (nomes exatos)
             const colors = {
-                // Cores Básicas
+                // Básicos
                 'preto': '#000000',
                 'branco': '#FFFFFF',
                 'marfim': '#FFFFF0',
@@ -680,10 +680,14 @@
                 'azul marinho': '#000080',
                 'azul royal': '#0000CD',
                 
-                // Verdes
+                // Verdes (NOVOS)
                 'verde menta': '#98FF98',
+                'verde água': '#AFEEEE',
+                'verde musgo claro': '#ADBC9F',
+                'verde oliva': '#808000',
                 'verde musgo': '#556B2F',
-                'verde': '#98FF98', 
+                'verde esmeralda': '#50C878',
+                'verde': '#98FF98', // Default
 
                 // Roxos
                 'lilás': '#C8A2C8',
@@ -703,19 +707,27 @@
                 return colors[lowerColor];
             }
             
-            // 2. Tenta encontrar uma cor *dentro* do nome (ex: "Preto Cetim")
-            for (const key in colors) {
-                // Evita que "Cetim" (sozinho) seja pego por "Bege" ou "Marrom"
-                if (lowerColor.includes('cetim') && key === 'cetim') {
-                    return colors[key];
+            // 2. 🚨 MUDANÇA: Lógica inteligente para "Cetim"
+            // Se o nome contém "cetim", ele vai procurar a *outra* cor no nome
+            // Ex: "Preto Cetim" -> procura "preto"
+            if (lowerColor.includes('cetim')) {
+                for (const key in colors) {
+                    if (lowerColor.includes(key) && key !== 'cetim') {
+                        return colors[key];
+                    }
                 }
-                // Lógica principal
-                if (lowerColor.includes(key) && key !== 'cetim') {
+                // Se for SÓ "Cetim", usa a cor padrão de cetim
+                return colors['cetim'];
+            }
+            
+            // 3. Tenta encontrar uma cor *dentro* do nome (para outras estampas)
+            for (const key in colors) {
+                if (lowerColor.includes(key)) {
                     return colors[key];
                 }
             }
             
-            // 3. Se não encontrar nada
+            // 4. Se não encontrar nada
             if (colorName.startsWith('#')) {
                 return colorName;
             }
