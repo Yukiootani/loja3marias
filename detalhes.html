@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto (V3.3) | 3 Marias</title>
+    <title>Detalhes do Produto (V3.4) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -627,7 +627,7 @@
              }
         }
         
-        // 🚨 NOVO (V3.3): DICIONÁRIO DE CORES ATUALIZADO 🚨
+        // 🚨 NOVO (V3.4): DICIONÁRIO DE CORES ATUALIZADO 🚨
         function getSafeColor(colorName) {
             // Dicionário de cores expandido
             const colors = {
@@ -638,7 +638,8 @@
                 'rosa': '#FFC0CB', // Rosa claro
                 'pink': '#FFC0CB',
                 'cinza': 'gray', 
-                'marrom': 'brown',
+                'marrom': 'brown', // 🚨 MARROM ESTÁ AQUI
+                'brown': 'brown',
                 
                 // Tons de Azul
                 'azul': 'blue',
@@ -656,7 +657,7 @@
                 'laranja': '#FFA500',
 
                 // Tons de Roxo
-                'odalisca': '#C8A2C8', // Lilás que você pediu
+                'odalisca': '#C8A2C8', // Lilás
                 'lilás': '#C8A2C8',
                 'roxo': '#800080',
                 'vinho': '#800000', 
@@ -665,17 +666,11 @@
                 // Nudes e Estampas
                 'bege': '#F5F5DC', 
                 'nude': '#E3BC9A',
-                'oncinha': 'tan', // 'tan' é uma cor bege/marrom claro
-                'onça': 'tan',
-                'estampado': '#cccccc' // Um cinza neutro para "estampado"
+                // 'oncinha' foi removido
+                'estampado': '#cccccc' 
             };
             
             const lowerColor = colorName.toLowerCase();
-            
-            // Tratamento especial para "Oncinha" para mostrar a cor 'tan'
-            if (lowerColor === 'oncinha' || lowerColor === 'onça') {
-                 return 'tan'; 
-            }
             
             // Retorna a cor do dicionário, ou o próprio nome (se for um hex, ex: #FFF)
             return colors[lowerColor] || colorName; 
