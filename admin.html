@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin V5 (Paleta Completa) | 3 Marias</title>
+    <title>Admin V5.1 (Login Corrigido) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -70,7 +70,7 @@
 <body>
 
     <div class="container">
-        <h1>Painel de Administração (V5)</h1>
+        <h1>Painel de Administração (V5.1)</h1>
         <h2>3 Marias - Paleta Completa</h2>
 
         <section id="login-section">
@@ -283,8 +283,7 @@
                 return await uploadTask.ref.getDownloadURL();
             }
 
-            // --- LÓGICA DE VARIANTES (V3.5 - Paleta de Cores Completa) ---
-            // 🚨 MUDANÇA AQUI: Lista de cores atualizada
+            // --- LÓGICA DE VARIANTES (V3.5 - Paleta Completa) ---
             const predefinedColors = [
                 // Básicos
                 { name: "Preto", value: "#000000" },
@@ -327,7 +326,7 @@
                 
                 // Verdes
                 { name: "Verde Menta", value: "#98FF98" },
-                { name:C: "Verde Água", value: "#AFEEEE" },
+                { name: "Verde Água", value: "#AFEEEE" },
                 { name: "Verde Musgo Claro", value: "#ADBC9F" },
                 { name: "Verde Oliva", value: "#808000" },
                 { name: "Verde Musgo", value: "#556B2F" },
@@ -360,9 +359,8 @@
                 variantEntry.className = 'variant-entry';
                 variantEntry.id = `variant-${entryId}`;
                 
-                // 🚨 MUDANÇA: Lista de cores escuras atualizada
                 const darkColors = [
-                    "#000000", "#8B4513", "#D2691E", "#b76e86", "#D2042D", "#800000", 
+                    "#000000", "#404040", "#8B4513", "#D2691E", "#b76e86", "#D2042D", "#800000", 
                     "#000080", "#0000CD", "#008080", "#556B2F", "#808000", "#50C878", "#800080"
                 ];
                 let colorOptions = predefinedColors.map(c => {
@@ -687,7 +685,7 @@
                 }
             });
 
-            // --- LÓGICA DE LOGIN (sem mudança) ---
+            // --- LÓGICA DE LOGIN (V5.1 - CORRIGIDA) ---
             
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
