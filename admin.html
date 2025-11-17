@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin V3.5 (Paleta Verde) | 3 Marias</title>
+    <title>Admin V4 (com Seções) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -70,8 +70,8 @@
 <body>
 
     <div class="container">
-        <h1>Painel de Administração (V3.5)</h1>
-        <h2>3 Marias - Stock por Tamanho</h2>
+        <h1>Painel de Administração (V4)</h1>
+        <h2>3 Marias - Com Seções</h2>
 
         <section id="login-section">
             <h3>Login de Admin</h3>
@@ -90,11 +90,25 @@
 
             <form id="product-form">
                 <h3 id="form-title">1. Adicionar Novo Produto</h3>
-                <input type="hidden" id="productId"> <label for="name">Nome do Produto:</label>
+                <input type="hidden" id="productId"> 
+                
+                <label for="name">Nome do Produto:</label>
                 <input type="text" id="name" required>
 
                 <label for="price">Preço (¥):</label>
                 <input type="number" id="price" required>
+                
+                <label for="secao">Seção (Categoria):</label>
+                <select id="secao" required>
+                    <option value="">Escolha uma seção...</option>
+                    <option value="calcinhas">Calcinhas</option>
+                    <option value="sutias">Sutiãs</option>
+                    <option value="conjuntos">Conjuntos</option>
+                    <option value="body">Body</option>
+                    <option value="perfumaria">Perfumaria</option>
+                    <option value="cremes">Cremes</option>
+                    <option value="variados">Variados</option>
+                </select>
 
                 <label for="description">Descrição:</label>
                 <textarea id="description" rows="4"></textarea>
@@ -152,10 +166,9 @@
                         <tr>
                             <th>Foto</th>
                             <th>Nome</th>
-                            <th>Preço (¥)</th>
+                            <th>Seção</th> <th>Preço (¥)</th>
                             <th>Estoque (Total)</th>
                             <th>Disponibilidade</th>
-                            <th>Selo</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -213,6 +226,7 @@
             // Campos do formulário
             const nameField = document.getElementById('name');
             const priceField = document.getElementById('price');
+            const secaoField = document.getElementById('secao'); // 🚨 NOVO CAMPO
             const descField = document.getElementById('description');
             const sourceField = document.getElementById('source');
             const isFeaturedField = document.getElementById('isFeatured');
@@ -269,54 +283,37 @@
             }
 
             // --- LÓGICA DE VARIANTES (V3.5 - Paleta de Verdes) ---
-            // 🚨 MUDANÇA AQUI: Lista de cores atualizada
+            // (Esta lógica não precisa mudar, usamos a V3.5)
             const predefinedColors = [
-                // Básicos
                 { name: "Preto", value: "#000000" },
                 { name: "Branco", value: "#FFFFFF" },
                 { name: "Marfim", value: "#FFFFF0" },
                 { name: "Cinza Mescla", value: "#D3D3D3" },
                 { name: "Prata", value: "#C0C0C0" },
-                
-                // Nudes/Marrons
-                { name: "Cetim", value: "#D2B48C" }, 
+                { name: "Cetim", value: "#D2B48C" },
                 { name: "Nude Rosado", value: "#E3BC9A" },
                 { name: "Nude Bege", value: "#F5F5DC" },
                 { name: "Marrom", value: "#8B4513" },
-
-                // Rosas
                 { name: "Rosa Claro", value: "#FFC0CB" },
                 { name: "Rosa Antigo", value: "#b76e86" },
                 { name: "Fúcsia", value: "#FF00FF" },
-                
-                // Vermelhos
                 { name: "Vermelho", value: "#FF0000" },
                 { name: "Cereja", value: "#D2042D" },
                 { name: "Vinho", value: "#800000" },
-                
-                // Azuis
                 { name: "Azul Marinho", value: "#000080" },
                 { name: "Azul Serenity", value: "#98b6d4" },
                 { name: "Azul Royal", value: "#0000CD" },
-                
-                // Verdes (NOVOS)
                 { name: "Verde Menta", value: "#98FF98" },
                 { name: "Verde Água", value: "#AFEEEE" },
                 { name: "Verde Musgo Claro", value: "#ADBC9F" },
                 { name: "Verde Oliva", value: "#808000" },
                 { name: "Verde Musgo", value: "#556B2F" },
                 { name: "Verde Esmeralda", value: "#50C878" },
-
-                // Roxos
                 { name: "Lilás", value: "#C8A2C8" }, 
                 { name: "Odalisca", value: "#C8A2C8" }, 
                 { name: "Roxo", value: "#800080" },
-                
-                // Amarelos
                 { name: "Amarelo", value: "#FFFF00" },
                 { name: "Dourado", value: "#FFD700" },
-                
-                // Outros
                 { name: "Estampado", value: "#cccccc" }
             ];
 
@@ -330,7 +327,6 @@
                 variantEntry.className = 'variant-entry';
                 variantEntry.id = `variant-${entryId}`;
                 
-                // 🚨 MUDANÇA: Lista de cores escuras atualizada
                 const darkColors = ["#000000", "#8B4513", "#D2042D", "#800000", "#000080", "#0000CD", "#556B2F", "#800080", "#b76e86", "#808000", "#50C878"];
                 let colorOptions = predefinedColors.map(c => {
                     const textColor = darkColors.includes(c.value) ? 'white' : 'black';
@@ -437,14 +433,15 @@
                         const id = doc.id;
                         const precoFormatado = (product.price || 0).toLocaleString('ja-JP');
                         
+                        // 🚨 MUDANÇA: Adiciona product.secao
                         html += `
                             <tr id="product-${id}">
                                 <td><img src="${product.imageUrl || 'https://via.placeholder.com/50'}" alt="${product.name}"></td>
                                 <td>${product.name || 'Sem nome'}</td>
+                                <td>${product.secao || 'N/A'}</td>
                                 <td>¥${precoFormatado}</td>
                                 <td>${product.estoqueTotal || 0}</td> 
                                 <td>${product.source === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda'}</td>
-                                <td>${product.isFeatured || 'nenhum'}</td>
                                 <td>
                                     <button class="edit-btn" data-id="${id}">Editar</button>
                                     <button class="delete-btn" data-id="${id}">Excluir</button>
@@ -463,6 +460,14 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 saveBtn.disabled = true;
+                
+                // 🚨 NOVO: Validação da Seção
+                if (secaoField.value === "") {
+                    showStatus(statusDiv, "Erro: Por favor, escolha uma seção para o produto.", "error");
+                    saveBtn.disabled = false;
+                    return;
+                }
+
                 showStatus(statusDiv, "Salvando... Por favor, aguarde o upload.", "loading");
 
                 const currentProductId = productIdField.value || `pid_${Date.now()}`;
@@ -498,9 +503,11 @@
                     const productVariants = getVariantsFromForm();
                     const totalStock = calculateTotalStock(productVariants);
                     
+                    // 🚨 MUDANÇA: Adiciona 'secao'
                     const productData = {
                         name: nameField.value,
                         price: parseFloat(priceField.value),
+                        secao: secaoField.value, // 🚨 NOVO CAMPO
                         description: descField.value,
                         variantes: productVariants, 
                         estoqueTotal: totalStock, 
@@ -565,6 +572,7 @@
                         productIdField.value = id;
                         nameField.value = product.name || '';
                         priceField.value = product.price || 0;
+                        secaoField.value = product.secao || ''; // 🚨 NOVO CAMPO
                         descField.value = product.description || '';
                         
                         setVariantsInForm(product.variantes || {});
@@ -594,7 +602,7 @@
             cancelEditBtn.addEventListener('click', cancelEditMode);
             function cancelEditMode() {
                 productIdField.value = '';
-                form.reset();
+                form.reset(); // O form.reset() já limpa o campo 'secao'
                 variantsContainer.innerHTML = ''; 
                 oldImageUrl = ''; oldVideoUrl = ''; oldGaleria = [];
                 
