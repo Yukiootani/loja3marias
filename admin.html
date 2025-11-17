@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin V3.2 (Paleta Real) | 3 Marias</title>
+    <title>Admin V3.3 (Cetim) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -70,7 +70,7 @@
 <body>
 
     <div class="container">
-        <h1>Painel de Administração (V3.2)</h1>
+        <h1>Painel de Administração (V3.3)</h1>
         <h2>3 Marias - Stock por Tamanho</h2>
 
         <section id="login-section">
@@ -268,7 +268,7 @@
                 return await uploadTask.ref.getDownloadURL();
             }
 
-            // --- LÓGICA DE VARIANTES (V3.2 - Paleta de Cores Profissional) ---
+            // --- LÓGICA DE VARIANTES (V3.3 - com Cetim) ---
             // 🚨 MUDANÇA AQUI: Lista de cores atualizada
             const predefinedColors = [
                 { name: "Preto", value: "#000000" },
@@ -276,6 +276,7 @@
                 { name: "Marfim", value: "#FFFFF0" },
                 { name: "Cinza Mescla", value: "#D3D3D3" },
                 { name: "Prata", value: "#C0C0C0" },
+                { name: "Cetim", value: "#C0C0C0" }, // 🚨 NOVO (Prata/Cinza)
                 { name: "Nude Rosado", value: "#E3BC9A" },
                 { name: "Nude Bege", value: "#F5F5DC" },
                 { name: "Marrom", value: "#8B4513" },
@@ -291,7 +292,7 @@
                 { name: "Verde Menta", value: "#98FF98" },
                 { name: "Verde Musgo", value: "#556B2F" },
                 { name: "Lilás", value: "#C8A2C8" }, 
-                { name: "Odalisca", value: "#C8A2C8" }, // Mesmo que lilás
+                { name: "Odalisca", value: "#C8A2C8" }, 
                 { name: "Roxo", value: "#800080" },
                 { name: "Amarelo", value: "#FFFF00" },
                 { name: "Dourado", value: "#FFD700" },
@@ -308,7 +309,6 @@
                 variantEntry.className = 'variant-entry';
                 variantEntry.id = `variant-${entryId}`;
                 
-                // 🚨 MUDANÇA: Lógica de cor de texto atualizada
                 const darkColors = ["#000000", "#8B4513", "#D2042D", "#800000", "#000080", "#0000CD", "#556B2F", "#800080", "#b76e86"];
                 let colorOptions = predefinedColors.map(c => {
                     const textColor = darkColors.includes(c.value) ? 'white' : 'black';
