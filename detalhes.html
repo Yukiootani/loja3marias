@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto (V4.0 - Modal) | 3 Marias</title>
+    <title>Detalhes do Produto (V4.1 - Zoom Lupa) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* --- CSS (com o estilo da Lupa) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
@@ -52,7 +53,7 @@
             min-width: 300px;
         }
         #main-media-display {
-            position: relative; 
+            position: relative; /* Essencial para o zoom */
             width: 100%;
             padding-top: 150%; 
             margin-bottom: 15px;
@@ -60,7 +61,7 @@
             background-color: #f9f9f9;
             border: 1px solid var(--border-color);
             overflow: hidden;
-            cursor: zoom-in; /* 🚨 NOVO: Cursor de Lupa */
+            /* Remove o cursor de lupa do modal */
         }
         #main-media-display img, #main-media-display video {
             position: absolute;
@@ -106,6 +107,25 @@
             transform: translate(-50%, -50%);
             z-index: 10;
         }
+        
+        /* 🚨 NOVO (V4.1): Estilo da Lupa de Zoom (Revertido) 🚨 */
+        #zoom-loupe {
+            display: none; /* Começa oculto */
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%; /* Lupa redonda */
+            background-repeat: no-repeat;
+            pointer-events: none; /* Impede que a lupa bloqueie o mouse */
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            z-index: 99;
+        }
+        /* Esconde a lupa se o item principal for um vídeo */
+        #main-media-display video ~ #zoom-loupe {
+            display: none !important;
+        }
+        
         
         .info-area {
             flex: 1 1 40%;
@@ -264,58 +284,6 @@
             border: 2px solid white;
             display: none; /* Começa oculto */
         }
-        
-        /* 🚨 NOVO (V4.0): CSS DA GALERIA MODAL (LIGHTBOX) 🚨 */
-        #modal-gallery {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            justify-content: center;
-            align-items: center;
-        }
-        #modal-content {
-            position: relative;
-            max-width: 90vw;
-            max-height: 90vh;
-        }
-        #modal-content img, #modal-content video {
-            width: 100%;
-            height: 100%;
-            max-width: 90vw;
-            max-height: 90vh;
-            object-fit: contain;
-        }
-        #modal-close, .modal-nav {
-            cursor: pointer;
-            position: absolute;
-            color: white;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
-            user-select: none;
-        }
-        #modal-close {
-            top: 15px;
-            right: 35px;
-            z-index: 2002;
-        }
-        .modal-nav {
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 16px;
-            z-index: 2001;
-        }
-        #modal-prev { left: 0; }
-        #modal-next { right: 0; }
-        #modal-close:hover, .modal-nav:hover {
-            color: #bbb;
-        }
-
     </style>
 </head>
 <body>
@@ -335,15 +303,6 @@
         <span id="cart-count">0</span>
     </a>
     
-    <div id="modal-gallery">
-        <span id="modal-close">&times;</span>
-        <span class="modal-nav" id="modal-prev">&#10094;</span>
-        <span class="modal-nav" id="modal-next">&#10095;</span>
-        <div id="modal-content">
-            </div>
-    </div>
-
-
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
@@ -376,10 +335,7 @@
         let productPrice = 0;
         let productImageUrl = '';
         
-        // 🚨 NOVO (V4.0): Variáveis da Galeria Modal
         let allMediaUrls = []; // Armazena todas as mídias (imgs/vídeos)
-        let currentMediaIndex = 0;
-        let modal = document.getElementById('modal-gallery');
 
         // LÓGICA DE CARREGAMENTO
         document.addEventListener('DOMContentLoaded', () => {
@@ -455,7 +411,7 @@
                     
                     if (isActive) {
                         if(media.type === 'video') {
-                            mainMediaHTML = `<video id="main-video" src="${media.url}" alt="${productName}" style="pointer-events: none;"></video>`; // pointer-events none para deixar clicável
+                            mainMediaHTML = `<video id="main-video" src="${media.url}" alt="${productName}"></video>`;
                         } else {
                             mainMediaHTML = `<img id="main-image" src="${media.url}" alt="${productName}">`;
                         }
@@ -489,6 +445,7 @@
                     <div class="media-area">
                         <div id="main-media-display" data-index="0">
                             ${mainMediaHTML}
+                            <div id="zoom-loupe"></div>
                         </div>
                         <div id="thumbnails">${galleryHTML}</div>
                     </div>
@@ -510,7 +467,7 @@
 
                 // --- Adiciona Eventos de Clique ---
                 setupMediaThumbnails();
-                setupModalGallery(); // 🚨 NOVO (V4.0): Inicia o modal
+                setupImageZoom(); // 🚨 REATIVADO (V4.1): Inicia o zoom
                 
                 if (colors.length > 0) {
                     setupVariantSelectors();
@@ -534,7 +491,7 @@
             }
         }
 
-        // --- LÓGICA DO CARRINHO (V3.1 - com verificação de estoque) ---
+        // --- LÓGICA DO CARRINHO (V3.1) ---
         
         function getCart() {
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
@@ -616,7 +573,7 @@
         }
 
 
-        // --- LÓGICA DAS VARIANTES (V3.6 - Mostra nome da cor) ---
+        // --- LÓGICA DAS VARIANTES (V3.6) ---
 
         function setupVariantSelectors() {
             const colorContainer = document.getElementById('color-selector');
@@ -628,15 +585,14 @@
                     colorContainer.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('active'));
                     target.classList.add('active');
                     selectedColor = target.dataset.color;
-                    selectedSize = null; // Reseta o tamanho
+                    selectedSize = null; 
                     
-                    // (V3.6): Atualiza o nome da cor
                     const colorNameLabel = document.getElementById('selected-color-name');
                     colorNameLabel.textContent = `Cor: ${selectedColor}`;
                     colorNameLabel.style.display = 'block';
 
                     renderSizeOptions(selectedColor);
-                    checkButtonState(); // Atualiza o botão
+                    checkButtonState(); 
                 }
             });
             
@@ -646,7 +602,7 @@
                     sizeContainer.querySelectorAll('.size-button').forEach(btn => btn.classList.remove('active'));
                     target.classList.add('active');
                     selectedSize = target.dataset.size;
-                    checkButtonState(); // Atualiza o botão
+                    checkButtonState(); 
                 }
             });
         }
@@ -749,16 +705,16 @@
                 container.addEventListener('click', () => {
                     const newSrc = container.dataset.fullSrc; 
                     const mediaType = container.dataset.type; 
-                    const index = parseInt(container.dataset.index); // 🚨 NOVO
+                    const index = parseInt(container.dataset.index); 
                     
+                    // 🚨 MUDANÇA (V4.1): Recria a Lupa ao trocar
                     if (mediaType === 'video') { 
-                        mainMediaDisplay.innerHTML = `<video id="main-video" src="${newSrc}" alt="${productName}" style="pointer-events: none;"></video>`; 
+                        mainMediaDisplay.innerHTML = `<video id="main-video" src="${newSrc}" alt="${productName}"></video><div id="zoom-loupe"></div>`; 
                     } else { 
-                        mainMediaDisplay.innerHTML = `<img id="main-image" src="${newSrc}" alt="${productName}">`; 
+                        mainMediaDisplay.innerHTML = `<img id="main-image" src="${newSrc}" alt="${productName}"><div id="zoom-loupe"></div>`; 
                     }
                     
-                    mainMediaDisplay.dataset.index = index; // 🚨 NOVO: Atualiza o índice da imagem principal
-                    currentMediaIndex = index; // 🚨 NOVO: Atualiza o índice global
+                    setupImageZoom(); // 🚨 REATIVADO (V4.1): Re-inicia o zoom
                     
                     thumbContainers.forEach(t => t.classList.remove('active')); 
                     container.classList.add('active');
@@ -766,68 +722,50 @@
             });
         }
         
-        // 🚨 NOVO (V4.0): FUNÇÕES DA GALERIA MODAL 🚨
-        
-        function setupModalGallery() {
-            const mainMediaDisplay = document.getElementById('main-media-display');
-            const closeModalBtn = document.getElementById('modal-close');
-            const nextBtn = document.getElementById('modal-next');
-            const prevBtn = document.getElementById('modal-prev');
+        // 🚨 REATIVADO (V4.1): FUNÇÃO DE ZOOM LUPA 🚨
+        function setupImageZoom() {
+            const mediaDisplay = document.getElementById('main-media-display');
+            const loupe = document.getElementById('zoom-loupe');
+            const mainImage = document.getElementById('main-image');
+            
+            if (!mainImage || !loupe) {
+                if(loupe) loupe.style.display = 'none';
+                return; // Não faz nada se for um vídeo
+            }
 
-            // Abrir ao clicar na imagem principal
-            mainMediaDisplay.addEventListener('click', () => {
-                const index = parseInt(mainMediaDisplay.dataset.index) || 0;
-                openModal(index);
-            });
+            const zoomLevel = 2; // Zoom de 2x
 
-            // Fechar modal
-            closeModalBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) { // Fecha se clicar no fundo escuro
-                    closeModal();
+            mediaDisplay.addEventListener('mousemove', (e) => {
+                const img = document.getElementById('main-image'); 
+                if (!img) return; 
+                
+                loupe.style.backgroundImage = `url('${img.src}')`;
+                loupe.style.backgroundSize = `${img.width * zoomLevel}px ${img.height * zoomLevel}px`;
+                
+                const rect = mediaDisplay.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+
+                if (x < 0 || x > rect.width || y < 0 || y > rect.height) {
+                    loupe.style.display = 'none';
+                    return;
                 }
+                
+                loupe.style.display = 'block';
+
+                let loupeX = x - (loupe.offsetWidth / 2);
+                let loupeY = y - (loupe.offsetHeight / 2);
+                loupe.style.left = `${loupeX}px`;
+                loupe.style.top = `${loupeY}px`;
+                
+                let bgX = -(x * zoomLevel - loupe.offsetWidth / 2);
+                let bgY = -(y * zoomLevel - loupe.offsetHeight / 2);
+                loupe.style.backgroundPosition = `${bgX}px ${bgY}px`;
             });
-
-            // Navegação
-            nextBtn.addEventListener('click', () => changeModalMedia(1));
-            prevBtn.addEventListener('click', () => changeModalMedia(-1));
-        }
-        
-        function openModal(index) {
-            currentMediaIndex = index;
-            updateModalContent();
-            modal.style.display = 'flex';
-        }
-
-        function closeModal() {
-            modal.style.display = 'none';
-            // 🚨 NOVO: Para o vídeo se estiver tocando
-            document.getElementById('modal-content').innerHTML = ''; 
-        }
-
-        function changeModalMedia(direction) {
-            currentMediaIndex += direction;
             
-            // Loop na galeria
-            if (currentMediaIndex >= allMediaUrls.length) {
-                currentMediaIndex = 0;
-            }
-            if (currentMediaIndex < 0) {
-                currentMediaIndex = allMediaUrls.length - 1;
-            }
-            
-            updateModalContent();
-        }
-        
-        function updateModalContent() {
-            const media = allMediaUrls[currentMediaIndex];
-            const contentDiv = document.getElementById('modal-content');
-            
-            if (media.type === 'video') {
-                contentDiv.innerHTML = `<video src="${media.url}" controls autoplay loop></video>`;
-            } else {
-                contentDiv.innerHTML = `<img src="${media.url}" alt="${productName}">`;
-            }
+            mediaDisplay.addEventListener('mouseleave', () => {
+                loupe.style.display = 'none';
+            });
         }
         
     </script>
