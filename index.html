@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 Marias Moda Feminina (V4.1)</title>
+    <title>3 Marias Moda Feminina (V4.2)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -94,7 +94,7 @@
             display: flex; 
             flex-direction: row; 
             gap: 10px; 
-            margin-bottom: 20px;
+            margin-bottom: 10px; /* 🚨 MUDANÇA: Reduzido */
             padding: 10px; 
             background-color: var(--bg-color); 
             border-radius: 8px;
@@ -119,6 +119,18 @@
             color: var(--text-color);
             border-color: var(--accent-color); 
             animation: none;
+        }
+        
+        /* 🚨 NOVO (V4.2): Detalhes do Filtro */
+        #filter-details {
+            text-align: center;
+            color: var(--light-text);
+            font-size: 0.9em;
+            margin: 0 auto 20px auto;
+            padding: 0 15px;
+            max-width: 500px;
+            line-height: 1.5;
+            white-space: pre-line; /* Respeita as quebras de linha do JS */
         }
         
         .section-title { /* Agora é o título dinâmico */
@@ -277,6 +289,10 @@
                 Sob Encomenda
             </button>
         </div>
+        
+        <div id="filter-details">
+            </div>
+
 
         <h2 id="collection-title" class="section-title">Carregando...</h2>
         <div id="products-grid">
@@ -320,10 +336,17 @@
         const collectionTitle = document.getElementById('collection-title');
         const cartCountEl = document.getElementById('cart-count'); 
         const headerEl = document.getElementById('main-header');
+        const filterDetails = document.getElementById('filter-details'); // 🚨 NOVO
         
         let currentFilter = 'pronta-entrega';
         let currentSecao = 'todos'; 
 
+        // 🚨 NOVO (V4.2): Textos de Ajuda
+        const filterHelpTexts = {
+            'pronta-entrega': ".Disponível para retirar em Toyohashi\ne região .",
+            'sob-encomenda': ".Disponível para retirar em Toyohashi na próxima quinta-feira após o pedido.\n. Receba por correio entre 3-5 dias , pedido mínimo ¥10.000"
+        };
+        
         
         // Easter Egg para Admin (Clicar 3x no Logo)
         let logoClickCount = 0;
@@ -347,7 +370,6 @@
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
         }
 
-        // updateCartIcon agora soma as QUANTIDADES
         function updateCartIcon() {
             const cart = getCart();
             let count = 0;
@@ -373,6 +395,9 @@
             const secaoText = document.querySelector(`.secao-button[data-secao="${currentSecao}"]`).textContent;
             const filterText = document.querySelector(`.filter-button[data-filter="${currentFilter}"]`).textContent;
             collectionTitle.textContent = `${secaoText} | ${filterText}`;
+            
+            // 🚨 NOVO (V4.2): Atualiza o texto de ajuda
+            filterDetails.textContent = filterHelpTexts[currentFilter];
 
             try {
                 // 1. Inicia a consulta
@@ -478,13 +503,13 @@
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 currentFilter = button.dataset.filter;
-                fetchProducts();
+                fetchProducts(); // 🚨 MUDANÇA: O fetchProducts() agora cuida de atualizar o texto
             });
         });
 
         // Carregamento Inicial
         document.addEventListener('DOMContentLoaded', () => {
-            fetchProducts();
+            fetchProducts(); // Isso já vai carregar o texto de "Pronta Entrega"
             updateCartIcon(); 
             fetchSiteConfig(); 
         });
