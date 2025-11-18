@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 Marias Moda Feminina (V4.2)</title>
+    <title>3 Marias Moda Feminina (V4.3)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -56,6 +56,7 @@
             font-size: 1em; 
             color: var(--light-text);
             margin: 2px 0 0 0;
+            line-height: 1.4; /* 🚨 NOVO: Melhora o espaçamento do slogan quebrado */
         }
         
         main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
@@ -94,7 +95,7 @@
             display: flex; 
             flex-direction: row; 
             gap: 10px; 
-            margin-bottom: 10px; /* 🚨 MUDANÇA: Reduzido */
+            margin-bottom: 10px; 
             padding: 10px; 
             background-color: var(--bg-color); 
             border-radius: 8px;
@@ -121,7 +122,7 @@
             animation: none;
         }
         
-        /* 🚨 NOVO (V4.2): Detalhes do Filtro */
+        /* Detalhes do Filtro */
         #filter-details {
             text-align: center;
             color: var(--light-text);
@@ -130,10 +131,10 @@
             padding: 0 15px;
             max-width: 500px;
             line-height: 1.5;
-            white-space: pre-line; /* Respeita as quebras de linha do JS */
+            white-space: pre-line; 
         }
         
-        .section-title { /* Agora é o título dinâmico */
+        .section-title { 
             font-size: 1.5em;
             color: var(--text-color); 
             margin-bottom: 20px;
@@ -266,7 +267,7 @@
     
     <header id="main-header">
         <h1>3 MARIAS MODA FEMININA</h1> 
-        <p>O melhor do Brasil, agora ao seu alcance no Japão.</p>
+        <p>O melhor do Brasil,<br>agora ao seu alcance no Japão.</p>
     </header>
 
     <main>
@@ -336,12 +337,12 @@
         const collectionTitle = document.getElementById('collection-title');
         const cartCountEl = document.getElementById('cart-count'); 
         const headerEl = document.getElementById('main-header');
-        const filterDetails = document.getElementById('filter-details'); // 🚨 NOVO
+        const filterDetails = document.getElementById('filter-details'); 
         
         let currentFilter = 'pronta-entrega';
         let currentSecao = 'todos'; 
 
-        // 🚨 NOVO (V4.2): Textos de Ajuda
+        // (V4.2): Textos de Ajuda
         const filterHelpTexts = {
             'pronta-entrega': ".Disponível para retirar em Toyohashi\ne região .",
             'sob-encomenda': ".Disponível para retirar em Toyohashi na próxima quinta-feira após o pedido.\n. Receba por correio entre 3-5 dias , pedido mínimo ¥10.000"
@@ -391,27 +392,20 @@
             errorMsg.style.display = 'none';
             grid.innerHTML = '';
             
-            // Atualiza o título
             const secaoText = document.querySelector(`.secao-button[data-secao="${currentSecao}"]`).textContent;
             const filterText = document.querySelector(`.filter-button[data-filter="${currentFilter}"]`).textContent;
             collectionTitle.textContent = `${secaoText} | ${filterText}`;
             
-            // 🚨 NOVO (V4.2): Atualiza o texto de ajuda
             filterDetails.textContent = filterHelpTexts[currentFilter];
 
             try {
-                // 1. Inicia a consulta
                 let query = db.collection("products");
                 
-                // 2. Filtro de Seção (se não for "Todas")
                 if (currentSecao !== 'todos') {
                     query = query.where("secao", "==", currentSecao);
                 }
                 
-                // 3. Filtro de Disponibilidade (Pronta Entrega / Encomenda)
                 query = query.where("source", "==", currentFilter);
-                
-                // 4. Ordenação
                 query = query.orderBy("createdAt", "desc");
                 
                 const snapshot = await query.get();
@@ -479,7 +473,7 @@
                 if (doc.exists && doc.data().logoUrl) {
                     headerEl.innerHTML = `
                         <img src="${doc.data().logoUrl}" alt="3 Marias Moda Feminina Logo" class="header-logo">
-                        <p>O melhor do Brasil, agora ao seu alcance no Japão.</p>
+                        <p>O melhor do Brasil,<br>agora ao seu alcance no Japão.</p>
                     `;
                 }
             } catch (error) {
@@ -503,13 +497,13 @@
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 currentFilter = button.dataset.filter;
-                fetchProducts(); // 🚨 MUDANÇA: O fetchProducts() agora cuida de atualizar o texto
+                fetchProducts(); 
             });
         });
 
         // Carregamento Inicial
         document.addEventListener('DOMContentLoaded', () => {
-            fetchProducts(); // Isso já vai carregar o texto de "Pronta Entrega"
+            fetchProducts(); 
             updateCartIcon(); 
             fetchSiteConfig(); 
         });
