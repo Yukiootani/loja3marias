@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto (V4.1 - Zoom Lupa) | 3 Marias</title>
+    <title>Detalhes do Produto (V4.2 - Guia de Medidas) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* --- CSS (com o estilo da Lupa) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
@@ -53,7 +52,7 @@
             min-width: 300px;
         }
         #main-media-display {
-            position: relative; /* Essencial para o zoom */
+            position: relative; 
             width: 100%;
             padding-top: 150%; 
             margin-bottom: 15px;
@@ -61,7 +60,6 @@
             background-color: #f9f9f9;
             border: 1px solid var(--border-color);
             overflow: hidden;
-            /* Remove o cursor de lupa do modal */
         }
         #main-media-display img, #main-media-display video {
             position: absolute;
@@ -108,20 +106,19 @@
             z-index: 10;
         }
         
-        /* 🚨 NOVO (V4.1): Estilo da Lupa de Zoom (Revertido) 🚨 */
+        /* Estilo da Lupa de Zoom (V4.1) */
         #zoom-loupe {
-            display: none; /* Começa oculto */
+            display: none; 
             position: absolute;
             width: 150px;
             height: 150px;
             border: 2px solid var(--primary-color);
-            border-radius: 50%; /* Lupa redonda */
+            border-radius: 50%; 
             background-repeat: no-repeat;
-            pointer-events: none; /* Impede que a lupa bloqueie o mouse */
+            pointer-events: none; 
             box-shadow: 0 0 10px rgba(0,0,0,0.3);
             z-index: 99;
         }
-        /* Esconde a lupa se o item principal for um vídeo */
         #main-media-display video ~ #zoom-loupe {
             display: none !important;
         }
@@ -184,6 +181,17 @@
             margin-bottom: 10px;
             display: block;
         }
+        
+        /* 🚨 NOVO (V4.2): Link do Guia de Medidas */
+        #open-size-guide {
+            font-size: 0.8em;
+            font-weight: 500;
+            color: var(--primary-color);
+            text-decoration: underline;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
         .color-selector {
             display: flex;
             flex-wrap: wrap;
@@ -282,8 +290,55 @@
             font-size: 14px;
             font-weight: bold;
             border: 2px solid white;
-            display: none; /* Começa oculto */
+            display: none; 
         }
+        
+        /* 🚨 NOVO (V4.2): CSS DO MODAL GUIA DE MEDIDAS 🚨 */
+        #size-guide-modal {
+            display: none; /* Começa oculto */
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-size-guide-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .modal-size-guide-content img {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+        #modal-size-guide-close {
+            cursor: pointer;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            color: white;
+            background-color: black;
+            font-size: 25px;
+            font-weight: bold;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1;
+            border: 2px solid white;
+        }
+        
     </style>
 </head>
 <body>
@@ -303,6 +358,14 @@
         <span id="cart-count">0</span>
     </a>
     
+    <div id="size-guide-modal">
+        <div class="modal-size-guide-content">
+            <span id="modal-size-guide-close">&times;</span>
+            <img src="https://i.imgur.com/HqbesbC.jpeg" alt="Guia de Medidas">
+        </div>
+    </div>
+
+
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
@@ -335,7 +398,7 @@
         let productPrice = 0;
         let productImageUrl = '';
         
-        let allMediaUrls = []; // Armazena todas as mídias (imgs/vídeos)
+        let allMediaUrls = [];
 
         // LÓGICA DE CARREGAMENTO
         document.addEventListener('DOMContentLoaded', () => {
@@ -347,6 +410,7 @@
             }
             fetchProductDetails(currentProductId);
             updateCartIcon(); 
+            setupSizeGuideModalListeners(); // 🚨 NOVO (V4.2): Inicia os ouvintes do modal
         });
 
         function showError(message) {
@@ -377,7 +441,7 @@
                 parsedVariants = product.variantes || {};
                 
                 let galleryUrls = product.galeria || [];
-                allMediaUrls = []; // 🚨 Reseta a galeria global
+                allMediaUrls = []; 
 
                 if (productImageUrl) { 
                     allMediaUrls.push({ type: 'image', url: productImageUrl, thumb: productImageUrl }); 
@@ -432,8 +496,9 @@
                                         </div>
                                      </div>`;
                     
+                    // 🚨 MUDANÇA (V4.2): Adiciona o link do Guia de Medidas
                     variantsHTML += `<div class="variant-group">
-                                        <label>Tamanho:</label>
+                                        <label>Tamanho: <a id="open-size-guide">(Ver Guia de Medidas)</a></label>
                                         <span id="selected-color-name" class="selected-color-label"></span>
                                         <div class="size-selector" id="size-selector">
                                             </div>
@@ -467,10 +532,16 @@
 
                 // --- Adiciona Eventos de Clique ---
                 setupMediaThumbnails();
-                setupImageZoom(); // 🚨 REATIVADO (V4.1): Inicia o zoom
+                setupImageZoom(); 
                 
                 if (colors.length > 0) {
                     setupVariantSelectors();
+                    
+                    // 🚨 NOVO (V4.2): Adiciona listener para o Guia de Medidas
+                    document.getElementById('open-size-guide').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        document.getElementById('size-guide-modal').style.display = 'flex';
+                    });
                     
                     const firstColorSwatch = document.querySelector('.color-swatch');
                     if (firstColorSwatch) {
@@ -707,14 +778,13 @@
                     const mediaType = container.dataset.type; 
                     const index = parseInt(container.dataset.index); 
                     
-                    // 🚨 MUDANÇA (V4.1): Recria a Lupa ao trocar
                     if (mediaType === 'video') { 
                         mainMediaDisplay.innerHTML = `<video id="main-video" src="${newSrc}" alt="${productName}"></video><div id="zoom-loupe"></div>`; 
                     } else { 
                         mainMediaDisplay.innerHTML = `<img id="main-image" src="${newSrc}" alt="${productName}"><div id="zoom-loupe"></div>`; 
                     }
                     
-                    setupImageZoom(); // 🚨 REATIVADO (V4.1): Re-inicia o zoom
+                    setupImageZoom(); // Re-inicia o zoom
                     
                     thumbContainers.forEach(t => t.classList.remove('active')); 
                     container.classList.add('active');
@@ -722,7 +792,7 @@
             });
         }
         
-        // 🚨 REATIVADO (V4.1): FUNÇÃO DE ZOOM LUPA 🚨
+        // FUNÇÃO DE ZOOM LUPA (V4.1)
         function setupImageZoom() {
             const mediaDisplay = document.getElementById('main-media-display');
             const loupe = document.getElementById('zoom-loupe');
@@ -766,6 +836,30 @@
             mediaDisplay.addEventListener('mouseleave', () => {
                 loupe.style.display = 'none';
             });
+        }
+        
+        // 🚨 NOVO (V4.2): Lógica do Modal de Guia de Medidas
+        function setupSizeGuideModalListeners() {
+            const modal = document.getElementById('size-guide-modal');
+            const closeBtn = document.getElementById('modal-size-guide-close');
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+            }
+            
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    // Fecha se clicar no fundo escuro
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+            
+            // O listener para ABRIR o modal é adicionado no fetchProductDetails,
+            // pois o link #open-size-guide ainda não existe no DOM.
         }
         
     </script>
