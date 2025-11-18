@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Carrinho (V3.1) | 3 Marias</title>
+    <title>Meu Carrinho (V4.0) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* --- CSS Minimalista (Victoria's Secret Style) --- */
+        /* --- CSS (com novas seções) --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
             --whatsapp-green: #28a745; 
             --text-color: #333; 
             --light-text: #666; 
-            --bg-color: #FFFFFF; /* Fundo principal Branco */
-            --border-color: #f0f0f0; /* Bordas bem claras */
+            --bg-color: #FFFFFF;
+            --border-color: #f0f0f0; 
             --error-color: #dc3545;
         }
         body {
@@ -23,12 +23,11 @@
             background-color: var(--bg-color);
             color: var(--text-color);
         }
-        /* Cabeçalho Minimalista */
         header {
             background-color: white; 
             color: var(--text-color); 
             padding: 1rem 1rem;
-            text-align: left; /* Alinhado à esquerda */
+            text-align: left; 
             border-bottom: 1px solid var(--border-color); 
         }
         header a {
@@ -43,18 +42,18 @@
             padding: 0 15px;
         }
         h1 {
-            color: var(--text-color); /* Título preto */
+            color: var(--text-color);
             text-align: center;
             font-size: 1.8em;
             font-weight: 700;
-            border-bottom: 1px solid var(--border-color); /* Linha fina */
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 15px;
         }
         
         /* Estilo do Carrinho */
         #cart-items-container {
             background-color: white;
-            padding: 0; /* Remove padding */
+            padding: 0;
             border-radius: 0;
             box-shadow: none;
         }
@@ -69,7 +68,6 @@
             border-bottom: none;
             margin-bottom: 0;
         }
-        /* 🚨 NOVO: Estilo para item removido */
         .cart-item-removed {
             background-color: #fdeeee;
             color: var(--error-color);
@@ -79,7 +77,7 @@
         }
         .cart-item-image {
             width: 80px;
-            height: 100px; /* Mais alto */
+            height: 100px; 
             object-fit: cover;
             border-radius: 4px;
             border: 1px solid var(--border-color);
@@ -186,6 +184,47 @@
             color: var(--light-text);
             padding: 40px 0;
         }
+        
+        /* 🚨 NOVO (V4.0): Mensagem de Sucesso */
+        #success-message {
+            display: none; /* Começa oculto */
+            text-align: center;
+            padding: 30px;
+            border: 2px solid var(--whatsapp-green);
+            background-color: #f0fff4;
+            border-radius: 8px;
+        }
+        #success-message .fa-check-circle {
+            font-size: 48px;
+            color: var(--whatsapp-green);
+            margin-bottom: 20px;
+        }
+        #success-message h2 {
+            color: var(--text-color);
+            border-bottom: none;
+            margin-top: 0;
+        }
+        #success-message p {
+            color: var(--light-text);
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        .back-to-shop-btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+        .back-to-shop-btn:hover {
+            background-color: #a15a70;
+        }
+
     </style>
 </head>
 <body>
@@ -197,18 +236,28 @@
     <main>
         <h1>Meu Carrinho WhatsApp</h1>
 
-        <div id="cart-items-container">
-            <p id="empty-cart-message">Carregando itens...</p>
-        </div>
-
-        <div id="cart-summary" style="display: none;">
-            <div class="summary-total">
-                <span>Total:</span>
-                <span id="cart-total">¥0</span>
+        <div id="cart-view">
+            <div id="cart-items-container">
+                <p id="empty-cart-message">Carregando itens...</p>
             </div>
-            <a href="#" id="whatsapp-checkout-btn" class="checkout-button">
-                <i class="fab fa-whatsapp"></i> Enviar Pedido via WhatsApp
-            </a>
+
+            <div id="cart-summary" style="display: none;">
+                <div class="summary-total">
+                    <span>Total:</span>
+                    <span id="cart-total">¥0</span>
+                </div>
+                <a href="#" id="whatsapp-checkout-btn" class="checkout-button">
+                    <i class="fab fa-whatsapp"></i> Enviar Pedido via WhatsApp
+                </a>
+            </div>
+        </div>
+        
+        <div id="success-message">
+            <i class="fas fa-check-circle"></i>
+            <h2>Pedido Enviado!</h2>
+            <p>Seu pedido foi enviado. Por favor, aguarde as instruções sobre pagamento e o método de retirada/recebimento.</p>
+            <p style="font-size: 0.9em; margin-top: 15px;">(Verifique a aba do WhatsApp que abriu para confirmar o envio da mensagem.)</p>
+            <a href="index.html" class="back-to-shop-btn">Continuar Comprando</a>
         </div>
         
     </main>
@@ -235,6 +284,10 @@
         const cartSummary = document.getElementById('cart-summary');
         const cartTotalEl = document.getElementById('cart-total');
         const checkoutBtn = document.getElementById('whatsapp-checkout-btn');
+        
+        // 🚨 NOVO (V4.0): Seletores da nova UI
+        const cartView = document.getElementById('cart-view');
+        const successMessage = document.getElementById('success-message');
         
         let productCache = {};
         
@@ -272,7 +325,7 @@
             }
         }
         
-        // 🚨 FUNÇÃO renderCart (ATUALIZADA V3.1) 🚨
+        // FUNÇÃO renderCart (V3.1)
         async function renderCart() {
             const cart = getCart();
             const items = cart.items;
@@ -281,7 +334,7 @@
             let total = 0;
             let whatsappMessage = "Olá, Harumi! Gostaria de fazer o seguinte pedido:\n\n";
             
-            let itemsToDelete = []; // Array para marcar "itens fantasma"
+            let itemsToDelete = []; 
 
             if (Object.keys(items).length === 0) {
                 cartItemsContainer.innerHTML = '<p id="empty-cart-message">Seu carrinho está vazio.</p>';
@@ -305,7 +358,6 @@
                 let stockStatusClass = "stock-sob-encomenda";
                 let stockCount = 0;
                 
-                // 🚨 Verifica se o produto AINDA EXISTE
                 if (product) {
                     // Produto existe
                     if(product.source === 'pronta-entrega') {
@@ -326,7 +378,7 @@
                     }
                     
                 } else {
-                    // 🚨 Produto NÃO foi encontrado (foi apagado)
+                    // Produto NÃO foi encontrado (foi apagado)
                     cartItemsContainer.innerHTML += `
                         <div class="cart-item cart-item-removed">
                             <p>O produto <strong>"${item.name || 'Item desconhecido'}"</strong> não está mais disponível e foi removido do seu carrinho.</p>
@@ -402,7 +454,7 @@
             whatsappMessage += `\n\nAguardo as instruções para pagamento.`;
             checkoutBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
             
-            // 🚨 Seção para limpar os "itens fantasma" do localStorage
+            // Seção para limpar os "itens fantasma" do localStorage
             if (itemsToDelete.length > 0) {
                 itemsToDelete.forEach(id => {
                     delete cart.items[id];
@@ -411,7 +463,7 @@
             
             saveCart(cart); // Salva o carrinho (com correções e remoções)
             
-            // 🚨 Se o carrinho ficou vazio após a limpeza, mostra a mensagem
+            // Se o carrinho ficou vazio após a limpeza, mostra a mensagem
             if (Object.keys(cart.items).length === 0) {
                 cartItemsContainer.innerHTML = '<p id="empty-cart-message">Seu carrinho está vazio (itens esgotados ou removidos).</p>';
                 cartSummary.style.display = 'none';
@@ -457,6 +509,30 @@
                 return;
             }
         });
+        
+        // 🚨 NOVO (V4.0): Lógica de Finalização de Pedido
+        checkoutBtn.addEventListener('click', function(event) {
+            const cart = getCart();
+            
+            if (Object.keys(cart.items).length === 0) {
+                alert("Seu carrinho está vazio.");
+                event.preventDefault(); // Impede o clique no link se o carrinho estiver vazio
+                return; 
+            }
+
+            // 1. Limpa o carrinho do localStorage
+            localStorage.removeItem('whatsappCart');
+
+            // 2. Esconde a visualização do carrinho
+            if (cartView) cartView.style.display = 'none';
+
+            // 3. Mostra a mensagem de sucesso
+            if (successMessage) successMessage.style.display = 'block';
+            
+            // 4. O link do WhatsApp (href) será aberto normalmente pelo navegador,
+            //    pois não usamos event.preventDefault() (exceto se o carrinho estiver vazio)
+        });
+
 
         // Carregamento Inicial
         document.addEventListener('DOMContentLoaded', renderCart);
