@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 Marias Moda Feminina (V4)</title>
+    <title>3 Marias Moda Feminina (V4.1)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -60,10 +60,10 @@
         
         main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
         
-        /* 🚨 NOVO: Filtros de Seção */
+        /* Filtros de Seção */
         #secao-filters {
             display: flex;
-            flex-wrap: wrap; /* Permite quebrar linha no mobile */
+            flex-wrap: wrap; 
             justify-content: center;
             gap: 8px;
             margin-bottom: 15px;
@@ -254,7 +254,7 @@
     
     <header id="main-header">
         <h1>3 MARIAS MODA FEMININA</h1> 
-        <p>A moda íntima brasileira que te entende, no Japão.</p>
+        <p>O melhor do Brasil, agora ao seu alcance no Japão.</p>
     </header>
 
     <main>
@@ -316,16 +316,16 @@
         const loadingMsg = document.getElementById('loading-message');
         const errorMsg = document.getElementById('error-message');
         const filterButtons = document.querySelectorAll('.filter-button');
-        const secaoButtons = document.querySelectorAll('.secao-button'); // 🚨 NOVO
+        const secaoButtons = document.querySelectorAll('.secao-button'); 
         const collectionTitle = document.getElementById('collection-title');
         const cartCountEl = document.getElementById('cart-count'); 
         const headerEl = document.getElementById('main-header');
         
         let currentFilter = 'pronta-entrega';
-        let currentSecao = 'todos'; // 🚨 NOVO
+        let currentSecao = 'todos'; 
 
         
-        // 🚨 NOVO: Easter Egg para Admin (Clicar 3x no Logo)
+        // Easter Egg para Admin (Clicar 3x no Logo)
         let logoClickCount = 0;
         let logoClickTimer = null;
         headerEl.addEventListener('click', (e) => {
@@ -363,7 +363,7 @@
             }
         }
         
-        // 🚨 FUNÇÃO fetchProducts (TOTALMENTE ATUALIZADA) 🚨
+        // FUNÇÃO fetchProducts (V4.0)
         async function fetchProducts() {
             loadingMsg.style.display = 'block';
             errorMsg.style.display = 'none';
@@ -386,7 +386,7 @@
                 // 3. Filtro de Disponibilidade (Pronta Entrega / Encomenda)
                 query = query.where("source", "==", currentFilter);
                 
-                // 4. Ordenação (Removemos 'isFeatured' para permitir os filtros)
+                // 4. Ordenação
                 query = query.orderBy("createdAt", "desc");
                 
                 const snapshot = await query.get();
@@ -442,7 +442,6 @@
                 console.error("Erro ao carregar produtos:", error);
                 loadingMsg.style.display = 'none';
                 errorMsg.style.display = 'block';
-                // 🚨 AVISO DE ÍNDICE
                 errorMsg.innerHTML = `Erro: Não foi possível carregar os produtos.<br>
                                       <b>(Provavelmente falta um índice no Firebase. Aperte F12, vá em "Console" e clique no link de erro para criar o índice.)</b>`;
             }
@@ -455,7 +454,7 @@
                 if (doc.exists && doc.data().logoUrl) {
                     headerEl.innerHTML = `
                         <img src="${doc.data().logoUrl}" alt="3 Marias Moda Feminina Logo" class="header-logo">
-                        <p>A moda íntima brasileira que te entende, no Japão.</p>
+                        <p>O melhor do Brasil, agora ao seu alcance no Japão.</p>
                     `;
                 }
             } catch (error) {
@@ -463,7 +462,7 @@
             }
         }
 
-        // 🚨 NOVO: Lógica dos Filtros de Seção
+        // Lógica dos Filtros de Seção
         secaoButtons.forEach(button => {
             button.addEventListener('click', () => {
                 secaoButtons.forEach(btn => btn.classList.remove('active'));
