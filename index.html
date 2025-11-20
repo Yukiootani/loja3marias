@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     
-    <title>3 Marias Moda Feminina (V6.2)</title>
+    <title>3 Marias Moda Feminina (V6.3)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -38,46 +38,29 @@
             padding-bottom: 80px; 
         }
         
-        /* Cabeçalho */
         header { 
             background-color: var(--bg-color); 
             color: var(--text-color); 
             padding: 0.5rem 1rem;
             text-align: center; 
             border-bottom: 1px solid var(--border-color); 
-            /* Removi position relative daqui */
+            /* Sino está fora daqui agora */
         }
         
-        /* 🚨 SINO CORRIGIDO (Fixo e Seguro) */
+        /* 🚨 SINO FIXO (Correção do desaparecimento) */
         #notification-bell {
-            position: fixed; /* Fixado na tela, não no cabeçalho */
+            position: fixed;
             top: 15px;
             right: 15px;
             font-size: 26px;
             color: var(--primary-color);
             cursor: pointer;
             z-index: 2000; /* Acima de tudo */
-            background-color: rgba(255, 255, 255, 0.8); /* Fundo leve para leitura */
+            background-color: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             padding: 5px;
         }
-        #notification-badge {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            font-size: 10px;
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            display: none; 
-        }
-
+        
         .header-logo {
             max-width: 250px; 
             width: 100%;
@@ -97,7 +80,7 @@
         
         main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
         
-        /* Busca */
+        /* Barra de Busca */
         #search-container {
             position: relative;
             margin-bottom: 20px;
@@ -422,7 +405,6 @@
     
     <div id="notification-bell">
         <i class="fas fa-bell"></i>
-        <div id="notification-badge">!</div>
     </div>
     
     <header id="main-header">
@@ -440,14 +422,29 @@
     <main>
         <div id="search-container"><input type="text" id="search-input" placeholder="Buscar produto (ex: Sutiã, Vermelho)..."><i class="fas fa-search search-icon"></i></div>
         
-        <div id="secao-filters"><button class="secao-button active" data-secao="todos">Todas</button><button class="secao-button" data-secao="calcinhas">Calcinhas</button><button class="secao-button" data-secao="sutias">Sutiãs</button><button class="secao-button" data-secao="conjuntos">Conjuntos</button><button class="secao-button" data-secao="body">Body</button><button class="secao-button" data-secao="perfumaria">Perfumaria</button><button class="secao-button" data-secao="cremes">Cremes</button><button class="secao-button" data-secao="variados">Variados</button></div>
-        <div id="controls"><button class="filter-button active" data-filter="pronta-entrega">Pronta Entrega</button><button class="filter-button" data-filter="sob-encomenda">Sob Encomenda</button></div>
+        <div id="secao-filters">
+            <button class="secao-button active" data-secao="todos">Todas</button>
+            <button class="secao-button" data-secao="calcinhas">Calcinhas</button>
+            <button class="secao-button" data-secao="sutias">Sutiãs</button>
+            <button class="secao-button" data-secao="conjuntos">Conjuntos</button>
+            <button class="secao-button" data-secao="body">Body</button>
+            <button class="secao-button" data-secao="perfumaria">Perfumaria</button>
+            <button class="secao-button" data-secao="cremes">Cremes</button>
+            <button class="secao-button" data-secao="variados">Variados</button>
+        </div>
+
+        <div id="controls">
+            <button class="filter-button active" data-filter="pronta-entrega">Pronta Entrega</button>
+            <button class="filter-button" data-filter="sob-encomenda">Sob Encomenda</button>
+        </div>
+        
         <div id="filter-details"></div>
 
         <h2 id="collection-title" class="section-title">Carregando...</h2>
         <div id="products-grid"></div>
         <div id="loading-message">Carregando produtos...</div>
         <div id="error-message" style="display: none;"></div>
+        
         <p id="search-no-results">Nenhum produto encontrado com esse nome.</p>
     </main>
 
@@ -462,6 +459,7 @@
         const firebaseConfig = { apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI", authDomain: "loja3marias-50204.firebaseapp.com", projectId: "loja3marias-50204", storageBucket: "loja3marias-50204.firebasestorage.app", messagingSenderId: "405330133487", appId: "1:405330133487:web:606de41211df52245f761a", measurementId: "G-TK877V6P0S" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) { console.log("Messaging não suportado"); }
 
         const grid=document.getElementById('products-grid'), loadingMsg=document.getElementById('loading-message'), errorMsg=document.getElementById('error-message'), filterButtons=document.querySelectorAll('.filter-button'), secaoButtons=document.querySelectorAll('.secao-button'), collectionTitle=document.getElementById('collection-title'), cartCountEl=document.getElementById('cart-count'), headerEl=document.getElementById('main-header'), filterDetails=document.getElementById('filter-details'), searchInput=document.getElementById('search-input'), searchNoResults=document.getElementById('search-no-results'), cartIcon=document.getElementById('cart-icon');
@@ -476,7 +474,7 @@
         const isInStandaloneMode=()=>('standalone' in window.navigator)&&(window.navigator.standalone);
         if(isIos()&&!isInStandaloneMode()){const b=document.getElementById('ios-install-banner');b.style.display='block';if(cartIcon)cartIcon.style.bottom='100px';document.getElementById('close-ios-banner').addEventListener('click',()=>{b.style.display='none';if(cartIcon)cartIcon.style.bottom='20px'})}
 
-        // Inbox
+        // Inbox (Sino Fixo)
         const bell=document.getElementById('notification-bell'), inboxModal=document.getElementById('inbox-modal'), inboxList=document.getElementById('inbox-list'), inboxClose=document.getElementById('inbox-close');
         bell.addEventListener('click',async()=>{
             inboxModal.style.display='flex'; inboxList.innerHTML='<li class="inbox-empty">Carregando...</li>';
@@ -517,6 +515,15 @@
         if (denyBtn) { denyBtn.addEventListener('click', () => { pushModal.style.display = 'none'; }); }
 
         async function saveToken(){ try{ const t=await messaging.getToken({vapidKey:'BInIXSUQdmOW6xyauTrERRsEgA0QtupR2fmDrhIckU-QA2sLBCJQnKsJk1eK40esRAW3EGYWQMz1WOnVHaIsPPA'}); if(t)await db.collection('push_tokens').doc(t).set({token:t,createdAt:firebase.firestore.FieldValue.serverTimestamp()}) }catch(e){console.log(e)}}
+        
+        // 🚨 NOVO: Correção Android (Site Aberto)
+        if(messaging) {
+            messaging.onMessage((payload) => {
+                console.log('Mensagem site aberto:', payload);
+                const { title, body } = payload.notification;
+                alert(`🔔 ${title}\n\n${body}`);
+            });
+        }
 
         let lc=0, lt=null; headerEl.addEventListener('click',(e)=>{if(e.target.closest('.header-logo')){lc++;if(lt)clearTimeout(lt);if(lc===3){window.location.href='admin.html';lc=0}else{lt=setTimeout(()=>{lc=0},1500)}}});
         function getCart(){return JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}}
