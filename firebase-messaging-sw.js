@@ -1,7 +1,7 @@
 importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js');
 
-// Suas chaves (As mesmas do index)
+// 🚨 SUAS CHAVES REAIS (Verifique se estão assim no arquivo)
 const firebaseConfig = {
     apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
     authDomain: "loja3marias-50204.firebaseapp.com",
@@ -16,7 +16,6 @@ firebase.initializeApp(firebaseConfig);
 
 const messaging = firebase.messaging();
 
-// Isso faz a notificação aparecer quando o site está fechado (Background)
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Mensagem recebida: ', payload);
   
