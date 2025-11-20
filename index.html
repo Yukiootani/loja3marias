@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 Marias Moda Feminina (V4.3)</title>
+    
+    <meta name="theme-color" content="#b76e86">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    
+    <title>3 Marias Moda Feminina (V4.4)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -18,7 +24,6 @@
             --whatsapp-green: #28a745; 
         }
 
-        /* Animação de Brilho */
         @keyframes shimmer-glow {
             0% { box-shadow: 0 0 5px var(--accent-color); }
             50% { box-shadow: 0 0 10px var(--silver-color); }
@@ -33,7 +38,6 @@
             padding-bottom: 80px; 
         }
         
-        /* Cabeçalho */
         header { 
             background-color: var(--bg-color); 
             color: var(--text-color); 
@@ -56,7 +60,7 @@
             font-size: 1em; 
             color: var(--light-text);
             margin: 2px 0 0 0;
-            line-height: 1.4; /* 🚨 NOVO: Melhora o espaçamento do slogan quebrado */
+            line-height: 1.4;
         }
         
         main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
@@ -88,7 +92,6 @@
             border-color: var(--primary-color);
             font-weight: 600;
         }
-
 
         /* Filtros de Disponibilidade */
         #controls {
@@ -211,9 +214,6 @@
             left: auto;  
         }
         
-        #loading-message, #error-message {
-            text-align: center; font-size: 1.2em; color: var(--light-text); padding: 40px 0;
-        }
         footer {
             text-align: center; padding: 20px; margin-top: 40px;
             color: var(--light-text); font-size: 0.9em; border-top: 1px solid var(--border-color);
@@ -256,6 +256,51 @@
             display: none; 
         }
 
+        /* 🚨 NOVO: Botão e Aviso de Instalação (PWA) */
+        #install-app-btn {
+            display: none; /* Oculto por padrão */
+            width: 100%;
+            background-color: var(--accent-color);
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+            padding: 12px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        #ios-install-banner {
+            display: none; /* Oculto por padrão */
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #ccc;
+            padding: 15px;
+            text-align: center;
+            z-index: 2000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        #ios-install-banner p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #333;
+        }
+        #ios-install-banner span {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #close-ios-banner {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+
         @media (min-width: 768px) {
             #products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -265,6 +310,8 @@
 </head>
 <body>
     
+    <button id="install-app-btn">📲 Instalar Aplicativo 3 Marias</button>
+
     <header id="main-header">
         <h1>3 MARIAS MODA FEMININA</h1> 
         <p>O melhor do Brasil,<br>agora ao seu alcance no Japão.</p>
@@ -294,7 +341,6 @@
         <div id="filter-details">
             </div>
 
-
         <h2 id="collection-title" class="section-title">Carregando...</h2>
         <div id="products-grid">
             </div>
@@ -310,6 +356,11 @@
         <i class="fas fa-shopping-bag"></i>
         <span id="cart-count">0</span>
     </a>
+    
+    <div id="ios-install-banner">
+        <span id="close-ios-banner">&times;</span>
+        <p>Para instalar o App, toque em <strong>Compartilhar</strong> <i class="fas fa-share-square"></i> e depois em <strong>Adicionar à Tela de Início</strong> <i class="fas fa-plus-square"></i>.</p>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -342,12 +393,57 @@
         let currentFilter = 'pronta-entrega';
         let currentSecao = 'todos'; 
 
-        // (V4.2): Textos de Ajuda
+        // Textos de Ajuda
         const filterHelpTexts = {
             'pronta-entrega': ".Disponível para retirar em Toyohashi\ne região .",
             'sob-encomenda': ".Disponível para retirar em Toyohashi na próxima quinta-feira após o pedido.\n. Receba por correio entre 3-5 dias , pedido mínimo ¥10.000"
         };
         
+        // 🚨 NOVO (V4.4): Lógica de Instalação PWA 🚨
+        
+        // 1. Registra o Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        // 2. Lógica para Android (Botão de Instalar)
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-app-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block'; // Mostra o botão
+        });
+
+        installBtn.addEventListener('click', (e) => {
+            installBtn.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    deferredPrompt = null;
+                });
+            }
+        });
+        
+        // 3. Lógica para iPhone (Aviso de Rodapé)
+        const isIos = () => {
+          const userAgent = window.navigator.userAgent.toLowerCase();
+          return /iphone|ipad|ipod/.test(userAgent);
+        }
+        const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+
+        if (isIos() && !isInStandaloneMode()) {
+            // Se for iPhone e NÃO estiver instalado ainda
+            const iosBanner = document.getElementById('ios-install-banner');
+            iosBanner.style.display = 'block';
+            
+            document.getElementById('close-ios-banner').addEventListener('click', () => {
+                iosBanner.style.display = 'none';
+            });
+        }
+
+        // --- FIM DA LÓGICA PWA ---
         
         // Easter Egg para Admin (Clicar 3x no Logo)
         let logoClickCount = 0;
@@ -371,6 +467,7 @@
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
         }
 
+        // updateCartIcon agora soma as QUANTIDADES
         function updateCartIcon() {
             const cart = getCart();
             let count = 0;
@@ -392,20 +489,27 @@
             errorMsg.style.display = 'none';
             grid.innerHTML = '';
             
+            // Atualiza o título
             const secaoText = document.querySelector(`.secao-button[data-secao="${currentSecao}"]`).textContent;
             const filterText = document.querySelector(`.filter-button[data-filter="${currentFilter}"]`).textContent;
             collectionTitle.textContent = `${secaoText} | ${filterText}`;
             
+            // Atualiza o texto de ajuda
             filterDetails.textContent = filterHelpTexts[currentFilter];
 
             try {
+                // 1. Inicia a consulta
                 let query = db.collection("products");
                 
+                // 2. Filtro de Seção (se não for "Todas")
                 if (currentSecao !== 'todos') {
                     query = query.where("secao", "==", currentSecao);
                 }
                 
+                // 3. Filtro de Disponibilidade (Pronta Entrega / Encomenda)
                 query = query.where("source", "==", currentFilter);
+                
+                // 4. Ordenação
                 query = query.orderBy("createdAt", "desc");
                 
                 const snapshot = await query.get();
@@ -497,13 +601,13 @@
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 currentFilter = button.dataset.filter;
-                fetchProducts(); 
+                fetchProducts();
             });
         });
 
         // Carregamento Inicial
         document.addEventListener('DOMContentLoaded', () => {
-            fetchProducts(); 
+            fetchProducts();
             updateCartIcon(); 
             fetchSiteConfig(); 
         });
