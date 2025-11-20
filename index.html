@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     
-    <title>3 Marias Moda Feminina (V5.4)</title>
+    <title>3 Marias Moda Feminina (V5.5)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -306,7 +306,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
-        /* 🚨 NOVO: Botão de Ativar Notificação */
+        /* Botão de Ativar Notificação */
         #enable-push-btn {
             display: none; /* Aparece via JS */
             width: 100%;
@@ -372,6 +372,7 @@
 <body>
     
     <button id="install-app-btn">📲 Instalar Aplicativo 3 Marias</button>
+    
     <button id="enable-push-btn">🔔 Ativar Notificações de Ofertas</button>
     
     <header id="main-header">
@@ -405,7 +406,8 @@
             </button>
         </div>
         
-        <div id="filter-details"></div>
+        <div id="filter-details">
+            </div>
 
         <h2 id="collection-title" class="section-title">Carregando...</h2>
         <div id="products-grid"></div>
@@ -516,7 +518,7 @@
             });
         }
 
-        // 🚨 LÓGICA DE PUSH NOTIFICATION (Manual) 🚨
+        // 🚨 LÓGICA DE PUSH NOTIFICATION (V5.5 - Com VAPID Key) 🚨
         const pushBtn = document.getElementById('enable-push-btn');
         
         async function checkPushPermission() {
@@ -547,7 +549,8 @@
 
         async function saveToken() {
             try {
-                const token = await messaging.getToken({ vapidKey: '' }); 
+                // 🚨 VAPID KEY INSERIDA AQUI 🚨
+                const token = await messaging.getToken({ vapidKey: 'BInIXSUQdmOW6xyauTrERRsEgA0QtupR2fmDrhIckU-QA2sLBCJQnKsJk1eK40esRAW3EGYWQMz1WOnVHaIsPPA' }); 
                 if (token) {
                     await db.collection('push_tokens').doc(token).set({
                         token: token,
