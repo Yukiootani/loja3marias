@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin V5.1 (Login Corrigido) | 3 Marias</title>
+    <title>Admin V7 (Profissional) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -65,13 +65,23 @@
         /* Estilo do Preview do Logo */
         #logo-preview-container { text-align: center; margin-bottom: 15px; }
         #logo-preview { max-width: 250px; max-height: 100px; border: 1px dashed var(--border-color); padding: 5px; }
+
+        /* 🚨 NOVO: Painel de Notificação */
+        #push-panel {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        #push-panel h3 { color: #856404; border-bottom-color: #856404; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Painel de Administração (V5.1)</h1>
-        <h2>3 Marias - Paleta Completa</h2>
+        <h1>Painel de Administração (V7)</h1>
+        <h2>3 Marias - Gestão Completa</h2>
 
         <section id="login-section">
             <h3>Login de Admin</h3>
@@ -87,6 +97,24 @@
 
         <section id="admin-panel">
             <div id="status"></div>
+
+            <div id="push-panel">
+                <h3>📢 Enviar Notificação Push (App)</h3>
+                <p style="font-size: 0.9em; color: #666;">Envie novidades para todos os clientes que instalaram o App.</p>
+                
+                <label>Título:</label>
+                <input type="text" id="push-title" placeholder="Ex: Chegou Reposição!">
+                
+                <label>Mensagem:</label>
+                <textarea id="push-body" style="min-height: 60px;" placeholder="Ex: Confira as novas cores..."></textarea>
+                
+                <label>Link (opcional):</label>
+                <input type="text" id="push-link" value="https://loja3marias.netlify.app" placeholder="https://...">
+
+                <button id="btn-send-push" style="background-color: #856404; margin-top: 10px;">🚀 Enviar Notificação</button>
+            </div>
+            
+            <hr>
 
             <form id="product-form">
                 <h3 id="form-title">1. Adicionar Novo Produto</h3>
@@ -216,6 +244,7 @@
             const cancelEditBtn = document.getElementById('cancel-edit-btn');
             const addVariantBtn = document.getElementById('add-variant-btn');
             const variantsContainer = document.getElementById('variants-container');
+            const btnSendPush = document.getElementById('btn-send-push'); // 🚨 NOVO
 
             // Elementos de Login
             const loginSection = document.getElementById('login-section');
@@ -246,7 +275,7 @@
             
             let statusTimeout; 
 
-            // Função de Status (sem mudanças)
+            // Função de Status
             function showStatus(div, message, type) {
                 clearTimeout(statusTimeout); 
                 div.textContent = String(message); 
@@ -276,82 +305,72 @@
                 }
             }
 
-            // --- LÓGICA DE UPLOAD (sem mudanças) ---
+            // 🚨 NOVA LÓGICA: Enviar Push via Netlify Functions (Seguro) 🚨
+            if (btnSendPush) {
+                btnSendPush.addEventListener('click', async () => {
+                    const title = document.getElementById('push-title').value;
+                    const body = document.getElementById('push-body').value;
+                    const link = document.getElementById('push-link').value;
+
+                    if(!title || !body) {
+                        alert("Preencha título e mensagem!");
+                        return;
+                    }
+                    if(!confirm("Tem certeza que deseja enviar essa mensagem para TODOS os clientes?")) return;
+
+                    showStatus(statusDiv, "Enviando notificação via sistema seguro...", "loading");
+                    btnSendPush.disabled = true;
+
+                    try {
+                        // Chama a nossa função no Netlify
+                        const response = await fetch('/.netlify/functions/send-push', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ title, body, link })
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            showStatus(statusDiv, `Sucesso! Enviado para ${result.successCount} clientes.`, "success");
+                            document.getElementById('push-title').value = "";
+                            document.getElementById('push-body').value = "";
+                        } else {
+                            throw new Error(result.error || "Erro desconhecido no servidor.");
+                        }
+
+                    } catch (error) {
+                        console.error("Erro no envio:", error);
+                        showStatus(statusDiv, "Erro ao enviar: " + error.message, "error");
+                    } finally {
+                        btnSendPush.disabled = false;
+                    }
+                });
+            }
+
+            // Lógica de Upload
             async function uploadFile(file, path) {
                 const storageRef = storage.ref(path);
                 const uploadTask = await storageRef.put(file);
                 return await uploadTask.ref.getDownloadURL();
             }
 
-            // --- LÓGICA DE VARIANTES (V3.5 - Paleta Completa) ---
+            // Lógica de Variantes (V3.5 - Paleta Completa)
             const predefinedColors = [
-                // Básicos
-                { name: "Preto", value: "#000000" },
-                { name: "Branco", value: "#FFFFFF" },
-                { name: "Marfim", value: "#FFFFF0" },
-                { name: "Cinza Claro", value: "#E0E0E0" },
-                { name: "Cinza Mescla", value: "#D3D3D3" },
-                { name: "Grafite", value: "#404040" },
-                { name: "Prata", value: "#C0C0C0" },
-                
-                // Nudes/Marrons
-                { name: "Cetim", value: "#D2B48C" },
-                { name: "Nude Rosado", value: "#E3BC9A" },
-                { name: "Nude Bege", value: "#F5F5DC" },
-                { name: "Marrom", value: "#8B4513" },
-                { name: "Chocolate", value: "#D2691E" },
-                { name: "Terracota", value: "#E2725B" },
-
-                // Rosas
-                { name: "Rosa Bebê", value: "#F4C2C2" },
-                { name: "Rosa Claro", value: "#FFC0CB" },
-                { name: "Rosa Antigo", value: "#b76e86" },
-                { name: "Pink", value: "#FFC0CB" },
-                { name: "Fúcsia", value: "#FF00FF" },
-                
-                // Vermelhos
-                { name: "Vermelho", value: "#FF0000" },
-                { name: "Cereja", value: "#D2042D" },
-                { name: "Vinho", value: "#800000" },
-                { name: "Bordô", value: "#800000" },
-                { name: "Marsala", value: "#B1907F" }, // Tom de vinho/marrom
-                
-                // Azuis
-                { name: "Azul Bebê", value: "#E0FFFF" },
-                { name: "Azul Serenity", value: "#98b6d4" },
-                { name: "Azul Royal", value: "#0000CD" },
-                { name: "Azul Tiffany", value: "#AFEEEE" },
-                { name: "Azul Petróleo", value: "#008080" },
-                { name: "Azul Marinho", value: "#000080" },
-                
-                // Verdes
-                { name: "Verde Menta", value: "#98FF98" },
-                { name: "Verde Água", value: "#AFEEEE" },
-                { name: "Verde Musgo Claro", value: "#ADBC9F" },
-                { name: "Verde Oliva", value: "#808000" },
-                { name: "Verde Musgo", value: "#556B2F" },
-                { name: "Verde Esmeralda", value: "#50C878" },
-
-                // Roxos
-                { name: "Lilás", value: "#C8A2C8" }, 
-                { name: "Lavanda", value: "#E6E6FA" },
-                { name: "Odalisca", value: "#C8A2C8" }, 
-                { name: "Roxo", value: "#800080" },
-                { name: "Violeta", value: "#EE82EE" },
-                
-                // Amarelos/Laranjas
-                { name: "Amarelo", value: "#FFFF00" },
-                { name: "Dourado", value: "#FFD700" },
-                { name: "Laranja", value: "#FFA500" },
-                { name: "Coral", value: "#FF7F50" },
-                
-                // Outros
+                { name: "Preto", value: "#000000" }, { name: "Branco", value: "#FFFFFF" }, { name: "Marfim", value: "#FFFFF0" },
+                { name: "Cinza Claro", value: "#E0E0E0" }, { name: "Cinza Mescla", value: "#D3D3D3" }, { name: "Grafite", value: "#404040" }, { name: "Prata", value: "#C0C0C0" },
+                { name: "Cetim", value: "#D2B48C" }, { name: "Nude Rosado", value: "#E3BC9A" }, { name: "Nude Bege", value: "#F5F5DC" }, { name: "Marrom", value: "#8B4513" },
+                { name: "Chocolate", value: "#D2691E" }, { name: "Terracota", value: "#E2725B" },
+                { name: "Rosa Bebê", value: "#F4C2C2" }, { name: "Rosa Claro", value: "#FFC0CB" }, { name: "Rosa Antigo", value: "#b76e86" }, { name: "Pink", value: "#FFC0CB" }, { name: "Fúcsia", value: "#FF00FF" },
+                { name: "Vermelho", value: "#FF0000" }, { name: "Cereja", value: "#D2042D" }, { name: "Vinho", value: "#800000" }, { name: "Bordô", value: "#800000" }, { name: "Marsala", value: "#B1907F" },
+                { name: "Azul Bebê", value: "#E0FFFF" }, { name: "Azul Serenity", value: "#98b6d4" }, { name: "Azul Royal", value: "#0000CD" }, { name: "Azul Tiffany", value: "#AFEEEE" }, { name: "Azul Petróleo", value: "#008080" }, { name: "Azul Marinho", value: "#000080" },
+                { name: "Verde Menta", value: "#98FF98" }, { name: "Verde Água", value: "#AFEEEE" }, { name: "Verde Musgo Claro", value: "#ADBC9F" }, { name: "Verde Oliva", value: "#808000" }, { name: "Verde Musgo", value: "#556B2F" }, { name: "Verde Esmeralda", value: "#50C878" },
+                { name: "Lilás", value: "#C8A2C8" }, { name: "Lavanda", value: "#E6E6FA" }, { name: "Odalisca", value: "#C8A2C8" }, { name: "Roxo", value: "#800080" }, { name: "Violeta", value: "#EE82EE" },
+                { name: "Amarelo", value: "#FFFF00" }, { name: "Dourado", value: "#FFD700" }, { name: "Laranja", value: "#FFA500" }, { name: "Coral", value: "#FF7F50" },
                 { name: "Estampado", value: "#cccccc" }
             ];
 
-            addVariantBtn.addEventListener('click', () => {
-                createVariantEntry(); 
-            });
+            addVariantBtn.addEventListener('click', () => { createVariantEntry(); });
             
             function createVariantEntry(color = '', stockData = { P: 0, M: 0, G: 0, GG: 0 }) {
                 const entryId = Date.now() + Math.random(); 
@@ -359,10 +378,7 @@
                 variantEntry.className = 'variant-entry';
                 variantEntry.id = `variant-${entryId}`;
                 
-                const darkColors = [
-                    "#000000", "#404040", "#8B4513", "#D2691E", "#b76e86", "#D2042D", "#800000", 
-                    "#000080", "#0000CD", "#008080", "#556B2F", "#808000", "#50C878", "#800080"
-                ];
+                const darkColors = ["#000000", "#404040", "#8B4513", "#D2691E", "#b76e86", "#D2042D", "#800000", "#000080", "#0000CD", "#008080", "#556B2F", "#808000", "#50C878", "#800080"];
                 let colorOptions = predefinedColors.map(c => {
                     const textColor = darkColors.includes(c.value) ? 'white' : 'black';
                     return `<option value="${c.name}" style="background-color:${c.value}; color:${textColor};">${c.name}</option>`;
@@ -384,13 +400,10 @@
                     <div class="variant-size-stock-group">
                         <label for="p-${entryId}">P:</label>
                         <input type="number" id="p-${entryId}" class="variant-size-stock" data-size="P" value="${stockData.P || 0}" min="0">
-                        
                         <label for="m-${entryId}">M:</label>
                         <input type="number" id="m-${entryId}" class="variant-size-stock" data-size="M" value="${stockData.M || 0}" min="0">
-                        
                         <label for="g-${entryId}">G:</label>
                         <input type="number" id="g-${entryId}" class="variant-size-stock" data-size="G" value="${stockData.G || 0}" min="0">
-                        
                         <label for="gg-${entryId}">GG:</label>
                         <input type="number" id="gg-${entryId}" class="variant-size-stock" data-size="GG" value="${stockData.GG || 0}" min="0">
                     </div>
@@ -399,12 +412,10 @@
                 variantsContainer.appendChild(variantEntry);
                 
                 variantEntry.querySelector('.variant-color-select').value = selectValue;
-                
                 variantEntry.querySelector('.variant-color-select').addEventListener('change', function() {
                     const customInput = variantEntry.querySelector('.variant-color-custom');
                     customInput.style.display = (this.value === 'custom') ? 'block' : 'none';
                 });
-                
                 variantEntry.querySelector('.remove-variant-btn').addEventListener('click', function() {
                     document.getElementById(`variant-${this.dataset.id}`).remove();
                 });
@@ -416,9 +427,7 @@
                 entries.forEach(entry => {
                     const select = entry.querySelector('.variant-color-select');
                     const custom = entry.querySelector('.variant-color-custom');
-                    
                     let color = (select.value === 'custom') ? custom.value : select.value;
-                    
                     if (color) {
                         const stocks = {};
                         entry.querySelectorAll('.variant-size-stock').forEach(input => {
@@ -433,9 +442,7 @@
             function calculateTotalStock(variants) {
                 let total = 0;
                 for (const color in variants) {
-                    for (const size in variants[color]) {
-                        total += (parseInt(variants[color][size]) || 0);
-                    }
+                    for (const size in variants[color]) { total += (parseInt(variants[color][size]) || 0); }
                 }
                 return total;
             }
@@ -443,24 +450,16 @@
             function setVariantsInForm(variants) {
                 variantsContainer.innerHTML = ''; 
                 if (!variants || Object.keys(variants).length === 0) return;
-
-                for (const color in variants) {
-                    const stockData = variants[color]; 
-                    createVariantEntry(color, stockData);
-                }
+                for (const color in variants) { const stockData = variants[color]; createVariantEntry(color, stockData); }
             }
 
-
-            // 1. CARREGAR PRODUTOS (READ)
+            // CARREGAR PRODUTOS
             async function fetchProducts() {
                 try {
                     productsList.innerHTML = '<tr><td colspan="7">Carregando produtos...</td></tr>';
                     const snapshot = await db.collection("products").orderBy("createdAt", "desc").get();
                     
-                    if (snapshot.empty) {
-                        productsList.innerHTML = '<tr><td colspan="7">Nenhum produto cadastrado ainda.</td></tr>';
-                        return;
-                    }
+                    if (snapshot.empty) { productsList.innerHTML = '<tr><td colspan="7">Nenhum produto cadastrado ainda.</td></tr>'; return; }
                     
                     let html = '';
                     snapshot.forEach(doc => {
@@ -476,33 +475,21 @@
                                 <td>¥${precoFormatado}</td>
                                 <td>${product.estoqueTotal || 0}</td> 
                                 <td>${product.source === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda'}</td>
-                                <td>
-                                    <button class="edit-btn" data-id="${id}">Editar</button>
-                                    <button class="delete-btn" data-id="${id}">Excluir</button>
-                                </td>
+                                <td><button class="edit-btn" data-id="${id}">Editar</button> <button class="delete-btn" data-id="${id}">Excluir</button></td>
                             </tr>
                         `;
                     });
                     productsList.innerHTML = html;
-                } catch (error) {
-                    console.error("Erro ao carregar produtos:", error);
-                    showStatus(statusDiv, "Erro ao carregar produtos: " + String(error.message), "error");
-                }
+                } catch (error) { console.error("Erro ao carregar produtos:", error); showStatus(statusDiv, "Erro ao carregar produtos: " + String(error.message), "error"); }
             }
 
-            // 2. SALVAR/ATUALIZAR PRODUTO (CREATE/UPDATE)
+            // SALVAR PRODUTO
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 saveBtn.disabled = true;
-                
-                if (secaoField.value === "") {
-                    showStatus(statusDiv, "Erro: Por favor, escolha uma seção para o produto.", "error");
-                    saveBtn.disabled = false;
-                    return;
-                }
+                if (secaoField.value === "") { showStatus(statusDiv, "Erro: Por favor, escolha uma seção para o produto.", "error"); saveBtn.disabled = false; return; }
 
                 showStatus(statusDiv, "Salvando... Por favor, aguarde o upload.", "loading");
-
                 const currentProductId = productIdField.value || `pid_${Date.now()}`;
                 
                 try {
@@ -522,7 +509,6 @@
                         const path = `products/${currentProductId}/video_${file.name}`;
                         videoUrl = await uploadFile(file, path);
                     }
-                    
                     if (galeriaInput.files.length > 0) {
                         showStatus(statusDiv, `Fazendo upload de ${galeriaInput.files.length} imagens da galeria (3/3)...`, "loading");
                         galeriaUrls = []; 
@@ -535,188 +521,83 @@
                     
                     const productVariants = getVariantsFromForm();
                     const totalStock = calculateTotalStock(productVariants);
-                    
-                    const productData = {
-                        name: nameField.value,
-                        price: parseFloat(priceField.value),
-                        secao: secaoField.value, 
-                        description: descField.value,
-                        variantes: productVariants, 
-                        estoqueTotal: totalStock, 
-                        source: sourceField.value,
-                        isFeatured: isFeaturedField.value,
-                        imageUrl: imageUrl,
-                        videoUrl: videoUrl,
-                        galeria: galeriaUrls
-                    };
+                    const productData = { name: nameField.value, price: parseFloat(priceField.value), secao: secaoField.value, description: descField.value, variantes: productVariants, estoqueTotal: totalStock, source: sourceField.value, isFeatured: isFeaturedField.value, imageUrl: imageUrl, videoUrl: videoUrl, galeria: galeriaUrls };
 
                     if (productIdField.value) {
-                        // Atualizar (Update)
                         showStatus(statusDiv, "Atualizando produto no banco de dados...", "loading");
                         await db.collection("products").doc(currentProductId).update(productData);
                         showStatus(statusDiv, "Produto atualizado com sucesso!", "success");
                     } else {
-                        // Criar (Create)
                         showStatus(statusDiv, "Criando produto no banco de dados...", "loading");
                         productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                         await db.collection("products").doc(currentProductId).set(productData);
                         showStatus(statusDiv, "Produto salvo com sucesso!", "success");
                     }
-                    
-                    cancelEditMode(); 
-                    fetchProducts(); // Recarrega a lista
-                } catch (error) {
-                    console.error("Erro ao salvar:", error);
-                    showStatus(statusDiv, "Erro ao salvar: " + String(error.message), "error");
-                } finally {
-                    saveBtn.disabled = false;
-                }
+                    cancelEditMode(); fetchProducts(); 
+                } catch (error) { console.error("Erro ao salvar:", error); showStatus(statusDiv, "Erro ao salvar: " + String(error.message), "error"); } finally { saveBtn.disabled = false; }
             });
 
-            // 3. EXCLUIR E EDITAR (Event Delegation)
+            // EXCLUIR E EDITAR
             productsList.addEventListener('click', async (e) => {
                 const target = e.target;
                 const id = target.dataset.id;
 
                 if (target.classList.contains('delete-btn')) {
-                    // Excluir
                     if (!confirm("Tem certeza que deseja excluir este produto?")) return;
-                    try {
-                        await db.collection("products").doc(id).delete();
-                        showStatus(statusDiv, "Produto excluído com sucesso!", "success");
-                        fetchProducts(); 
-                    } catch (error) {
-                        console.error("Erro ao excluir:", error);
-                        showStatus(statusDiv, "Erro ao excluir: " + String(error.message), "error");
-                    }
+                    try { await db.collection("products").doc(id).delete(); showStatus(statusDiv, "Produto excluído com sucesso!", "success"); fetchProducts(); } 
+                    catch (error) { console.error("Erro ao excluir:", error); showStatus(statusDiv, "Erro ao excluir: " + String(error.message), "error"); }
                 }
                 
                 if (target.classList.contains('edit-btn')) {
-                    // Editar
                     try {
                         const doc = await db.collection("products").doc(id).get();
-                        if (!doc.exists) {
-                            showStatus(statusDiv, "Erro: Produto não encontrado.", "error");
-                            return;
-                        }
+                        if (!doc.exists) { showStatus(statusDiv, "Erro: Produto não encontrado.", "error"); return; }
                         const product = doc.data();
-                        
-                        productIdField.value = id;
-                        nameField.value = product.name || '';
-                        priceField.value = product.price || 0;
-                        secaoField.value = product.secao || ''; 
-                        descField.value = product.description || '';
-                        
+                        productIdField.value = id; nameField.value = product.name || ''; priceField.value = product.price || 0; secaoField.value = product.secao || ''; descField.value = product.description || '';
                         setVariantsInForm(product.variantes || {});
-                        
-                        sourceField.value = product.source || 'pronta-entrega';
-                        isFeaturedField.value = product.isFeatured || 'nenhum';
-                        
-                        oldImageUrl = product.imageUrl || '';
-                        oldVideoUrl = product.videoUrl || '';
-                        oldGaleria = product.galeria || [];
-                        
-                        imageUrlInput.value = '';
-                        videoUrlInput.value = '';
-                        galeriaInput.value = '';
-
-                        formTitle.textContent = "2. Editando Produto";
-                        saveBtn.textContent = "Atualizar Produto";
-                        cancelEditBtn.style.display = "block";
-                        window.scrollTo(0, 0); 
-                    } catch (error) {
-                        showStatus(statusDiv, "Erro ao carregar para edição: " + String(error.message), "error");
-                    }
+                        sourceField.value = product.source || 'pronta-entrega'; isFeaturedField.value = product.isFeatured || 'nenhum';
+                        oldImageUrl = product.imageUrl || ''; oldVideoUrl = product.videoUrl || ''; oldGaleria = product.galeria || [];
+                        imageUrlInput.value = ''; videoUrlInput.value = ''; galeriaInput.value = '';
+                        formTitle.textContent = "2. Editando Produto"; saveBtn.textContent = "Atualizar Produto"; cancelEditBtn.style.display = "block"; window.scrollTo(0, 0); 
+                    } catch (error) { showStatus(statusDiv, "Erro ao carregar para edição: " + String(error.message), "error"); }
                 }
             });
 
-            // 5. Cancelar Edição
             cancelEditBtn.addEventListener('click', cancelEditMode);
-            function cancelEditMode() {
-                productIdField.value = '';
-                form.reset(); 
-                variantsContainer.innerHTML = ''; 
-                oldImageUrl = ''; oldVideoUrl = ''; oldGaleria = [];
-                
-                formTitle.textContent = "1. Adicionar Novo Produto";
-                saveBtn.textContent = "Salvar Produto";
-                cancelEditBtn.style.display = "none";
-            }
+            function cancelEditMode() { productIdField.value = ''; form.reset(); variantsContainer.innerHTML = ''; oldImageUrl = ''; oldVideoUrl = ''; oldGaleria = []; formTitle.textContent = "1. Adicionar Novo Produto"; saveBtn.textContent = "Salvar Produto"; cancelEditBtn.style.display = "none"; }
 
-            // LÓGICA DO LOGO (sem mudança)
+            // LÓGICA DO LOGO
             async function loadSiteConfig() {
-                try {
-                    const doc = await db.collection("configuracoes").doc("siteInfo").get();
-                    if (doc.exists && doc.data().logoUrl) {
-                        logoPreview.src = doc.data().logoUrl;
-                    } else {
-                        logoPreview.src = "https://via.placeholder.com/250x100?text=Sem+Logo";
-                    }
-                } catch (e) {
-                    console.error("Erro ao carregar logo:", e);
-                    logoPreview.src = "https://via.placeholder.com/250x100?text=Erro+ao+carregar";
-                }
+                try { const doc = await db.collection("configuracoes").doc("siteInfo").get(); if (doc.exists && doc.data().logoUrl) { logoPreview.src = doc.data().logoUrl; } else { logoPreview.src = "https://via.placeholder.com/250x100?text=Sem+Logo"; } } 
+                catch (e) { console.error("Erro ao carregar logo:", e); logoPreview.src = "https://via.placeholder.com/250x100?text=Erro+ao+carregar"; }
             }
             logoForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const file = logoUploadInput.files[0];
-                if (!file) {
-                    showStatus(statusDiv, "Por favor, escolha um ficheiro de logo.", "error");
-                    return;
-                }
-                
+                if (!file) { showStatus(statusDiv, "Por favor, escolha um ficheiro de logo.", "error"); return; }
                 showStatus(statusDiv, "Fazendo upload do novo logo...", "loading");
-                
                 try {
-                    const path = "configuracoes/logo_principal";
-                    const logoUrl = await uploadFile(file, path);
-                    
-                    await db.collection("configuracoes").doc("siteInfo").set({
-                        logoUrl: logoUrl
-                    }, { merge: true });
-                    
-                    showStatus(statusDiv, "Novo logo salvo com sucesso!", "success");
-                    logoPreview.src = logoUrl;
-                    logoUploadInput.value = '';
-                    
-                } catch (error) {
-                    console.error("Erro ao salvar logo:", error);
-                    showStatus(statusDiv, "Erro ao salvar logo: " + String(error.message), "error");
-                }
+                    const path = "configuracoes/logo_principal"; const logoUrl = await uploadFile(file, path);
+                    await db.collection("configuracoes").doc("siteInfo").set({ logoUrl: logoUrl }, { merge: true });
+                    showStatus(statusDiv, "Novo logo salvo com sucesso!", "success"); logoPreview.src = logoUrl; logoUploadInput.value = '';
+                } catch (error) { console.error("Erro ao salvar logo:", error); showStatus(statusDiv, "Erro ao salvar logo: " + String(error.message), "error"); }
             });
 
-            // --- LÓGICA DE LOGIN (V5.1 - CORRIGIDA) ---
-            
+            // LÓGICA DE LOGIN
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
                 showLoginStatus('Tentando entrar...', 'loading');
-                try {
-                    await auth.signInWithEmailAndPassword(email, password);
-                } catch (error) {
-                    showLoginStatus(`Erro de Acesso: ${error.message}`, 'error');
-                }
+                try { await auth.signInWithEmailAndPassword(email, password); } 
+                catch (error) { showLoginStatus(`Erro de Acesso: ${error.message}`, 'error'); }
             });
-
-            btnLogout.addEventListener('click', async () => {
-                await auth.signOut();
-            });
-
+            btnLogout.addEventListener('click', async () => { await auth.signOut(); });
             auth.onAuthStateChanged((user) => {
-                if (user) {
-                    loginSection.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    fetchProducts(); 
-                    loadSiteConfig();
-                } else {
-                    loginSection.style.display = 'block';
-                    adminPanel.style.display = 'none';
-                }
+                if (user) { loginSection.style.display = 'none'; adminPanel.style.display = 'block'; fetchProducts(); loadSiteConfig(); } 
+                else { loginSection.style.display = 'block'; adminPanel.style.display = 'none'; }
             });
-        
-        }); // FIM DO DOMCONTENTLOADED
+        });
     </script>
-
 </body>
 </html>
