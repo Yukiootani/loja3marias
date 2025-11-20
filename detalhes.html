@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto (V4.2 - Guia de Medidas) | 3 Marias</title>
+    <title>Detalhes do Produto (V5.0) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* --- CSS GERAL --- */
         :root {
             --primary-color: #b76e86; 
             --accent-color: #DAA520; 
@@ -42,10 +43,13 @@
             margin: 20px auto;
             padding: 0 15px;
         }
+        
+        /* --- ÁREA DO PRODUTO PRINCIPAL --- */
         #product-details {
             display: flex;
             flex-wrap: wrap;
             gap: 30px;
+            margin-bottom: 50px; /* Espaço para os relacionados */
         }
         .media-area {
             flex: 1 1 50%; 
@@ -106,7 +110,7 @@
             z-index: 10;
         }
         
-        /* Estilo da Lupa de Zoom (V4.1) */
+        /* Lupa de Zoom */
         #zoom-loupe {
             display: none; 
             position: absolute;
@@ -122,7 +126,6 @@
         #main-media-display video ~ #zoom-loupe {
             display: none !important;
         }
-        
         
         .info-area {
             flex: 1 1 40%;
@@ -171,174 +174,86 @@
             color: var(--light-text);
         }
         
-        /* CSS DAS VARIANTES */
-        .variant-group {
-            margin-top: 20px;
+        /* Variantes */
+        .variant-group { margin-top: 20px; }
+        .variant-group label { font-weight: 600; color: var(--text-color); margin-bottom: 10px; display: block; }
+        #open-size-guide { font-size: 0.8em; font-weight: 500; color: var(--primary-color); text-decoration: underline; margin-left: 10px; cursor: pointer; }
+        
+        .color-selector { display: flex; flex-wrap: wrap; gap: 10px; }
+        .color-swatch { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--border-color); cursor: pointer; transition: transform 0.2s, border-color 0.2s; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 0.7em; text-align: center; overflow: hidden; }
+        .color-swatch:hover { transform: scale(1.1); }
+        .color-swatch.active { border-color: var(--primary-color); box-shadow: 0 0 5px var(--primary-color); }
+        .selected-color-label { display: none; margin-bottom: 10px; font-weight: 600; font-size: 1em; color: var(--text-color); }
+        
+        .size-selector { display: flex; flex-wrap: wrap; gap: 10px; }
+        .size-button { padding: 10px 15px; border: 1px solid var(--border-color); border-radius: 4px; background-color: white; cursor: pointer; font-weight: bold; min-width: 40px; text-align: center; }
+        .size-button.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .size-button.disabled { background-color: #f5f5f5; color: #aaa; cursor: not-allowed; text-decoration: line-through; }
+        
+        /* Carrinho Flutuante */
+        #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1000; transition: transform 0.2s; text-decoration: none; }
+        #cart-icon:hover { transform: scale(1.1); }
+        #cart-count { position: absolute; top: -5px; right: -5px; background-color: var(--primary-color); color: white; border-radius: 50%; padding: 2px 7px; font-size: 14px; font-weight: bold; border: 2px solid white; display: none; }
+        
+        /* Modal Guia de Medidas */
+        #size-guide-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; }
+        .modal-size-guide-content { position: relative; max-width: 90vw; max-height: 90vh; background-color: white; padding: 15px; border-radius: 5px; }
+        .modal-size-guide-content img { width: 100%; height: auto; max-height: 80vh; object-fit: contain; }
+        #modal-size-guide-close { cursor: pointer; position: absolute; top: -10px; right: -10px; color: white; background-color: black; font-size: 25px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; line-height: 1; border: 2px solid white; }
+
+        /* 🚨 NOVO (V5.0): Estilos para Produtos Relacionados 🚨 */
+        #related-products-section {
+            margin-top: 60px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 30px;
+            display: none; /* Oculto até carregar */
         }
-        .variant-group label {
-            font-weight: 600;
+        .related-title {
+            font-size: 1.4em;
+            font-weight: 700;
             color: var(--text-color);
-            margin-bottom: 10px;
-            display: block;
-        }
-        
-        /* 🚨 NOVO (V4.2): Link do Guia de Medidas */
-        #open-size-guide {
-            font-size: 0.8em;
-            font-weight: 500;
-            color: var(--primary-color);
-            text-decoration: underline;
-            margin-left: 10px;
-            cursor: pointer;
-        }
-        
-        .color-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .color-swatch {
-            width: 35px; 
-            height: 35px;
-            border-radius: 50%;
-            border: 2px solid var(--border-color);
-            cursor: pointer;
-            transition: transform 0.2s, border-color 0.2s;
-            box-sizing: border-box; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7em; 
-            text-align: center;
-            overflow: hidden;
-        }
-        .color-swatch:hover {
-            transform: scale(1.1);
-        }
-        .color-swatch.active {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 5px var(--primary-color);
-        }
-        
-        .selected-color-label {
-            display: none;
-            margin-bottom: 10px;
-            font-weight: 600;
-            font-size: 1em;
-            color: var(--text-color);
-        }
-        
-        .size-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .size-button {
-            padding: 10px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background-color: white;
-            cursor: pointer;
-            font-weight: bold;
-            min-width: 40px;
+            margin-bottom: 20px;
             text-align: center;
         }
-        .size-button.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+        #related-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
         }
-        
-        .size-button.disabled {
-            background-color: #f5f5f5;
-            color: #aaa;
-            cursor: not-allowed;
-            text-decoration: line-through;
-        }
-        
-        /* CSS DO CARRINHO WHATSAPP */
-        #cart-icon {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background-color: var(--whatsapp-green);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            z-index: 1000;
-            transition: transform 0.2s;
-            text-decoration: none;
-        }
-        #cart-icon:hover {
-            transform: scale(1.1);
-        }
-        #cart-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 50%;
-            padding: 2px 7px;
-            font-size: 14px;
-            font-weight: bold;
-            border: 2px solid white;
-            display: none; 
-        }
-        
-        /* 🚨 NOVO (V4.2): CSS DO MODAL GUIA DE MEDIDAS 🚨 */
-        #size-guide-modal {
-            display: none; /* Começa oculto */
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-size-guide-content {
+        /* Reutilizando estilos de card */
+        .product-card {
+            background-color: white; 
+            border-radius: 8px;
+            box-shadow: none; 
+            border: 1px solid var(--border-color); 
+            overflow: hidden; 
+            text-decoration: none; 
+            color: var(--text-color);
+            transition: transform 0.2s; 
             position: relative;
-            max-width: 90vw;
-            max-height: 90vh;
-            background-color: white;
-            padding: 15px;
-            border-radius: 5px;
+            display: block; /* Importante */
         }
-        .modal-size-guide-content img {
+        .product-card:hover { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); }
+        .product-image-container {
             width: 100%;
-            height: auto;
-            max-height: 80vh;
-            object-fit: contain;
+            padding-top: 150%; 
+            position: relative;
+            background-color: #f0f0f0;
         }
-        #modal-size-guide-close {
-            cursor: pointer;
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            color: white;
-            background-color: black;
-            font-size: 25px;
-            font-weight: bold;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            line-height: 1;
-            border: 2px solid white;
+        .product-image {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover; 
         }
+        .product-info { padding: 10px; text-align: left; }
+        .product-name { font-size: 0.95em; font-weight: 600; margin: 0 0 5px 0; }
+        .product-price { font-size: 1em; font-weight: 700; color: var(--primary-color); margin: 0; }
         
+        @media (min-width: 768px) {
+            #related-grid {
+                grid-template-columns: repeat(4, 1fr); /* 4 colunas no PC */
+            }
+        }
     </style>
 </head>
 <body>
@@ -350,7 +265,14 @@
     <main>
         <div id="loading">Carregando detalhes do produto...</div>
         <div id="error" style="display: none;"></div>
+        
         <div id="product-details" style="display: none;"></div>
+        
+        <div id="related-products-section">
+            <h2 class="related-title">Você também pode gostar</h2>
+            <div id="related-grid">
+                </div>
+        </div>
     </main>
 
     <a id="cart-icon" href="carrinho.html">
@@ -369,7 +291,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
-        // 🚨 CHAVES CORRETAS DA LOJA 3 MARIAS 🚨
         const firebaseConfig = {
             apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
             authDomain: "loja3marias-50204.firebaseapp.com",
@@ -388,8 +309,11 @@
         const errorDiv = document.getElementById('error');
         const cartCountEl = document.getElementById('cart-count'); 
         const WHATSAPP_NUMBER = "818074558624"; 
+        
+        // Relacionados
+        const relatedSection = document.getElementById('related-products-section');
+        const relatedGrid = document.getElementById('related-grid');
 
-        // --- Variáveis globais para guardar estado ---
         let currentProductId = null;
         let parsedVariants = {}; 
         let selectedColor = null;
@@ -400,7 +324,6 @@
         
         let allMediaUrls = [];
 
-        // LÓGICA DE CARREGAMENTO
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             currentProductId = urlParams.get('id');
@@ -410,7 +333,7 @@
             }
             fetchProductDetails(currentProductId);
             updateCartIcon(); 
-            setupSizeGuideModalListeners(); // 🚨 NOVO (V4.2): Inicia os ouvintes do modal
+            setupSizeGuideModalListeners(); 
         });
 
         function showError(message) {
@@ -433,12 +356,18 @@
                 productName = product.name || 'Produto Sem Nome';
                 productPrice = product.price || 0;
                 productImageUrl = product.imageUrl || 'https://via.placeholder.com/400x600?text=3+Marias';
-                
                 const description = product.description || 'Descrição não disponível.';
                 const videoUrl = product.videoUrl; 
                 const source = product.source || 'pronta-entrega'; 
                 
                 parsedVariants = product.variantes || {};
+                
+                // 🚨 NOVO: Chama a função de relacionados
+                if (product.secao) {
+                    fetchRelatedProducts(product.secao, id);
+                }
+
+                // --- (O restante do código de exibição do produto é idêntico) ---
                 
                 let galleryUrls = product.galeria || [];
                 allMediaUrls = []; 
@@ -482,7 +411,6 @@
                     }
                 });
 
-                // --- HTML das Variantes ---
                 let variantsHTML = '';
                 const colors = Object.keys(parsedVariants);
                 
@@ -496,16 +424,14 @@
                                         </div>
                                      </div>`;
                     
-                    // 🚨 MUDANÇA (V4.2): Adiciona o link do Guia de Medidas
                     variantsHTML += `<div class="variant-group">
                                         <label>Tamanho: <a id="open-size-guide">(Ver Guia de Medidas)</a></label>
                                         <span id="selected-color-name" class="selected-color-label"></span>
                                         <div class="size-selector" id="size-selector">
-                                            </div>
+                                        </div>
                                      </div>`;
                 }
                 
-                // --- Renderiza o HTML Completo ---
                 detailsContainer.innerHTML = `
                     <div class="media-area">
                         <div id="main-media-display" data-index="0">
@@ -530,14 +456,12 @@
                 loadingDiv.style.display = 'none';
                 detailsContainer.style.display = 'flex';
 
-                // --- Adiciona Eventos de Clique ---
                 setupMediaThumbnails();
                 setupImageZoom(); 
                 
                 if (colors.length > 0) {
                     setupVariantSelectors();
                     
-                    // 🚨 NOVO (V4.2): Adiciona listener para o Guia de Medidas
                     document.getElementById('open-size-guide').addEventListener('click', (e) => {
                         e.preventDefault();
                         document.getElementById('size-guide-modal').style.display = 'flex';
@@ -561,95 +485,89 @@
                 showError(`Erro ao carregar os detalhes: ${error.message}.`);
             }
         }
-
-        // --- LÓGICA DO CARRINHO (V3.1) ---
         
-        function getCart() {
-            return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
+        // 🚨 NOVO (V5.0): BUSCA PRODUTOS RELACIONADOS 🚨
+        async function fetchRelatedProducts(secao, currentId) {
+            try {
+                // Busca 5 produtos da mesma seção (para garantir que temos 4 diferentes do atual)
+                const snapshot = await db.collection("products")
+                                         .where("secao", "==", secao)
+                                         .limit(5)
+                                         .get();
+                
+                if (snapshot.empty) return; // Se não tiver outros, não mostra nada
+
+                let count = 0;
+                relatedGrid.innerHTML = ''; // Limpa
+                
+                snapshot.forEach(doc => {
+                    if (count >= 4) return; // Mostra no máximo 4
+                    if (doc.id === currentId) return; // Pula o produto atual
+
+                    const product = doc.data();
+                    const id = doc.id;
+                    const preco = (product.price || 0).toLocaleString('ja-JP');
+                    
+                    const card = document.createElement('a');
+                    card.href = `detalhes.html?id=${id}`;
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <div class="product-image-container">
+                            <img src="${product.imageUrl || 'https://via.placeholder.com/400'}" class="product-image">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-price">¥${preco}</div>
+                        </div>
+                    `;
+                    relatedGrid.appendChild(card);
+                    count++;
+                });
+
+                // Se encontrou pelo menos 1 relacionado, mostra a seção
+                if (count > 0) {
+                    relatedSection.style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error("Erro ao carregar relacionados:", error);
+                // Silencioso: se der erro, apenas não mostra os relacionados
+            }
         }
-        function saveCart(cart) {
-            localStorage.setItem('whatsappCart', JSON.stringify(cart));
-            updateCartIcon(); 
-        }
+
+        // ... (O resto do código permanece igual: getCart, saveCart, handleAddToCart, Variants, getSafeColor, Zoom) ...
+        
+        function getCart() { return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} }; }
+        function saveCart(cart) { localStorage.setItem('whatsappCart', JSON.stringify(cart)); updateCartIcon(); }
         function updateCartIcon() {
             const cart = getCart();
             let count = 0;
-            Object.values(cart.items).forEach(item => {
-                count += item.quantity;
-            });
-            
-            if (count > 0) {
-                cartCountEl.textContent = count;
-                cartCountEl.style.display = 'flex';
-            } else {
-                cartCountEl.style.display = 'none';
-            }
+            Object.values(cart.items).forEach(item => { count += item.quantity; });
+            if (count > 0) { cartCountEl.textContent = count; cartCountEl.style.display = 'flex'; } 
+            else { cartCountEl.style.display = 'none'; }
         }
-        
         function handleAddToCart() {
             const btn = document.getElementById('add-to-cart-btn');
             const colorsAvailable = Object.keys(parsedVariants).length > 0;
-            
-            let itemId;
-            let maxStock = 999; 
-            
+            let itemId; let maxStock = 999; 
             if (colorsAvailable) {
-                if (!selectedColor || !selectedSize) {
-                    alert("Selecione uma cor e um tamanho.");
-                    return;
-                }
+                if (!selectedColor || !selectedSize) { alert("Selecione uma cor e um tamanho."); return; }
                 itemId = `${currentProductId}_${selectedColor}_${selectedSize}`;
                 maxStock = parsedVariants[selectedColor][selectedSize];
-            } else {
-                itemId = `${currentProductId}_padrao_padrao`;
-            }
-
+            } else { itemId = `${currentProductId}_padrao_padrao`; }
             const cart = getCart();
             const quantityInCart = cart.items[itemId] ? cart.items[itemId].quantity : 0;
-            
-            if (quantityInCart >= maxStock) {
-                alert("Desculpe, você já atingiu o limite de estoque para este item no seu carrinho.");
-                btn.textContent = "Limite de estoque";
-                btn.disabled = true;
-                return;
-            }
-
-            if (cart.items[itemId]) {
-                cart.items[itemId].quantity += 1;
-            } else {
-                cart.items[itemId] = {
-                    id: currentProductId,
-                    name: productName,
-                    price: productPrice,
-                    color: selectedColor,
-                    size: selectedSize,
-                    image: productImageUrl,
-                    quantity: 1
-                };
-            }
-
+            if (quantityInCart >= maxStock) { alert("Desculpe, você já atingiu o limite de estoque."); btn.textContent = "Limite de estoque"; btn.disabled = true; return; }
+            if (cart.items[itemId]) { cart.items[itemId].quantity += 1; } 
+            else { cart.items[itemId] = { id: currentProductId, name: productName, price: productPrice, color: selectedColor, size: selectedSize, image: productImageUrl, quantity: 1 }; }
             saveCart(cart); 
-            
             const newQuantityInCart = cart.items[itemId].quantity;
-            if (newQuantityInCart >= maxStock) {
-                btn.textContent = "Limite de estoque";
-                btn.disabled = true;
-            } else {
-                btn.textContent = "Adicionado! ✓";
-                btn.disabled = true;
-                setTimeout(() => {
-                    checkButtonState(); 
-                }, 2000);
-            }
+            if (newQuantityInCart >= maxStock) { btn.textContent = "Limite de estoque"; btn.disabled = true; } 
+            else { btn.textContent = "Adicionado! ✓"; btn.disabled = true; setTimeout(() => { checkButtonState(); }, 2000); }
         }
-
-
-        // --- LÓGICA DAS VARIANTES (V3.6) ---
-
         function setupVariantSelectors() {
             const colorContainer = document.getElementById('color-selector');
             const sizeContainer = document.getElementById('size-selector');
-            
             colorContainer.addEventListener('click', (e) => {
                 const target = e.target.closest('.color-swatch');
                 if (target) {
@@ -657,16 +575,13 @@
                     target.classList.add('active');
                     selectedColor = target.dataset.color;
                     selectedSize = null; 
-                    
                     const colorNameLabel = document.getElementById('selected-color-name');
                     colorNameLabel.textContent = `Cor: ${selectedColor}`;
                     colorNameLabel.style.display = 'block';
-
                     renderSizeOptions(selectedColor);
                     checkButtonState(); 
                 }
             });
-            
             sizeContainer.addEventListener('click', (e) => {
                 const target = e.target.closest('.size-button');
                 if (target && !target.classList.contains('disabled')) {
@@ -677,191 +592,94 @@
                 }
             });
         }
-
         function renderSizeOptions(color) {
             const sizeContainer = document.getElementById('size-selector');
             sizeContainer.innerHTML = ''; 
-            
             const stockForColor = parsedVariants[color]; 
             if (!stockForColor) return;
-
             const sizeOrder = ['P', 'M', 'G', 'GG']; 
-            
             sizeOrder.forEach(size => {
                 if (stockForColor.hasOwnProperty(size)) {
                     const stockCount = stockForColor[size];
                     const isDisabled = stockCount <= 0; 
-                    
-                    sizeContainer.innerHTML += `
-                        <div class="size-button ${isDisabled ? 'disabled' : ''}" data-size="${size}">
-                            ${size} ${isDisabled ? '(Esgotado)' : ''}
-                        </div>
-                    `;
+                    sizeContainer.innerHTML += `<div class="size-button ${isDisabled ? 'disabled' : ''}" data-size="${size}">${size} ${isDisabled ? '(Esgotado)' : ''}</div>`;
                 }
             });
         }
-        
         function checkButtonState() {
              const btn = document.getElementById('add-to-cart-btn');
              const colorsAvailable = Object.keys(parsedVariants).length > 0;
-             
-             if (!colorsAvailable) {
-                 btn.textContent = "Adicionar ao Carrinho";
-                 btn.disabled = false;
-                 return;
-             }
-             
-             if (!selectedColor) {
-                 btn.textContent = "Selecione uma Cor";
-                 btn.disabled = true;
-             } else if (!selectedSize) {
-                 btn.textContent = "Selecione um Tamanho";
-                 btn.disabled = true;
-             } else {
+             if (!colorsAvailable) { btn.textContent = "Adicionar ao Carrinho"; btn.disabled = false; return; }
+             if (!selectedColor) { btn.textContent = "Selecione uma Cor"; btn.disabled = true; } 
+             else if (!selectedSize) { btn.textContent = "Selecione um Tamanho"; btn.disabled = true; } 
+             else {
                  const maxStock = parsedVariants[selectedColor][selectedSize];
                  const cart = getCart();
                  const itemId = `${currentProductId}_${selectedColor}_${selectedSize}`;
                  const quantityInCart = cart.items[itemId] ? cart.items[itemId].quantity : 0;
-                 
-                 if (maxStock <= 0) {
-                     btn.textContent = "Esgotado";
-                     btn.disabled = true;
-                 } else if (quantityInCart >= maxStock) {
-                     btn.textContent = "Limite de estoque";
-                     btn.disabled = true;
-                 } else {
-                     btn.textContent = "Adicionar ao Carrinho";
-                     btn.disabled = false;
-                 }
+                 if (maxStock <= 0) { btn.textContent = "Esgotado"; btn.disabled = true; } 
+                 else if (quantityInCart >= maxStock) { btn.textContent = "Limite de estoque"; btn.disabled = true; } 
+                 else { btn.textContent = "Adicionar ao Carrinho"; btn.disabled = false; }
              }
         }
-        
-        // (V3.10): DICIONÁRIO DE CORES COMPLETO
         function getSafeColor(colorName) {
             const lowerColor = colorName.toLowerCase();
-            const colors = {
-                'preto': '#000000', 'branco': '#FFFFFF', 'marfim': '#FFFFF0',
-                'cinza claro': '#E0E0E0', 'cinza mescla': '#D3D3D3', 'grafite': '#404040', 'prata': '#C0C0C0',
-                'cetim': '#D2B48C', 'nude rosado': '#E3BC9A', 'nude bege': '#F5F5DC', 'nude': '#E3BC9A', 
-                'bege': '#F5F5DC', 'marrom': '#8B4513', 'chocolate': '#D2691E', 'terracota': '#E2725B',
-                'rosa bebê': '#F4C2C2', 'rosa claro': '#FFC0CB', 'rosa': '#FFC0CB', 'rosa antigo': '#b76e86',
-                'pink': '#FFC0CB', 'fúcsia': '#FF00FF', 'vermelho': '#FF0000', 'cereja': '#D2042D',
-                'vinho': '#800000', 'bordô': '#800000', 'marsala': '#B1907F', 'azul bebê': '#E0FFFF',
-                'azul serenity': '#98b6d4', 'azul royal': '#0000CD', 'azul tiffany': '#AFEEEE',
-                'azul petróleo': '#008080', 'azul marinho': '#000080', 'azul': '#98b6d4', 
-                'verde menta': '#98FF98', 'verde água': '#AFEEEE', 'verde musgo claro': '#ADBC9F',
-                'verde oliva': '#808000', 'verde musgo': '#556B2F', 'verde esmeralda': '#50C878',
-                'verde': '#98FF98', 'lilás': '#C8A2C8', 'lavanda': '#E6E6FA', 'odalisca': '#C8A2C8', 
-                'roxo': '#800080', 'violeta': '#EE82EE', 'amarelo': '#FFFF00', 'dourado': '#FFD700',
-                'laranja': '#FFA500', 'coral': '#FF7F50', 'estampado': '#cccccc'
-            };
-            
+            const colors = { 'preto': '#000000', 'branco': '#FFFFFF', 'marfim': '#FFFFF0', 'cinza claro': '#E0E0E0', 'cinza mescla': '#D3D3D3', 'grafite': '#404040', 'prata': '#C0C0C0', 'cetim': '#D2B48C', 'nude rosado': '#E3BC9A', 'nude bege': '#F5F5DC', 'nude': '#E3BC9A', 'bege': '#F5F5DC', 'marrom': '#8B4513', 'chocolate': '#D2691E', 'terracota': '#E2725B', 'rosa bebê': '#F4C2C2', 'rosa claro': '#FFC0CB', 'rosa': '#FFC0CB', 'rosa antigo': '#b76e86', 'pink': '#FFC0CB', 'fúcsia': '#FF00FF', 'vermelho': '#FF0000', 'cereja': '#D2042D', 'vinho': '#800000', 'bordô': '#800000', 'marsala': '#B1907F', 'azul bebê': '#E0FFFF', 'azul serenity': '#98b6d4', 'azul royal': '#0000CD', 'azul tiffany': '#AFEEEE', 'azul petróleo': '#008080', 'azul marinho': '#000080', 'azul': '#98b6d4', 'verde menta': '#98FF98', 'verde água': '#AFEEEE', 'verde musgo claro': '#ADBC9F', 'verde oliva': '#808000', 'verde musgo': '#556B2F', 'verde esmeralda': '#50C878', 'verde': '#98FF98', 'lilás': '#C8A2C8', 'lavanda': '#E6E6FA', 'odalisca': '#C8A2C8', 'roxo': '#800080', 'violeta': '#EE82EE', 'amarelo': '#FFFF00', 'dourado': '#FFD700', 'laranja': '#FFA500', 'coral': '#FF7F50', 'estampado': '#cccccc' };
             if (colors[lowerColor]) return colors[lowerColor];
-            if (lowerColor.includes('cetim')) {
-                for (const key in colors) { if (lowerColor.includes(key) && key !== 'cetim') return colors[key]; }
-                return colors['cetim'];
-            }
+            if (lowerColor.includes('cetim')) { for (const key in colors) { if (lowerColor.includes(key) && key !== 'cetim') return colors[key]; } return colors['cetim']; }
             for (const key in colors) { if (lowerColor.includes(key)) return colors[key]; }
             if (colorName.startsWith('#')) return colorName;
             return '#cccccc';
         }
-
-        // Lógica das Mídias
         function setupMediaThumbnails() {
             const mainMediaDisplay = document.getElementById('main-media-display');
             const thumbContainers = document.querySelectorAll('.thumb-container');
             const productName = document.querySelector('.info-area h1').textContent;
-
             thumbContainers.forEach(container => {
                 container.addEventListener('click', () => {
                     const newSrc = container.dataset.fullSrc; 
                     const mediaType = container.dataset.type; 
                     const index = parseInt(container.dataset.index); 
-                    
-                    if (mediaType === 'video') { 
-                        mainMediaDisplay.innerHTML = `<video id="main-video" src="${newSrc}" alt="${productName}"></video><div id="zoom-loupe"></div>`; 
-                    } else { 
-                        mainMediaDisplay.innerHTML = `<img id="main-image" src="${newSrc}" alt="${productName}"><div id="zoom-loupe"></div>`; 
-                    }
-                    
-                    setupImageZoom(); // Re-inicia o zoom
-                    
+                    if (mediaType === 'video') { mainMediaDisplay.innerHTML = `<video id="main-video" src="${newSrc}" alt="${productName}"></video><div id="zoom-loupe"></div>`; } 
+                    else { mainMediaDisplay.innerHTML = `<img id="main-image" src="${newSrc}" alt="${productName}"><div id="zoom-loupe"></div>`; }
+                    setupImageZoom(); 
                     thumbContainers.forEach(t => t.classList.remove('active')); 
                     container.classList.add('active');
                 });
             });
         }
-        
-        // FUNÇÃO DE ZOOM LUPA (V4.1)
         function setupImageZoom() {
             const mediaDisplay = document.getElementById('main-media-display');
             const loupe = document.getElementById('zoom-loupe');
             const mainImage = document.getElementById('main-image');
-            
-            if (!mainImage || !loupe) {
-                if(loupe) loupe.style.display = 'none';
-                return; // Não faz nada se for um vídeo
-            }
-
-            const zoomLevel = 2; // Zoom de 2x
-
+            if (!mainImage || !loupe) { if(loupe) loupe.style.display = 'none'; return; }
+            const zoomLevel = 2; 
             mediaDisplay.addEventListener('mousemove', (e) => {
                 const img = document.getElementById('main-image'); 
                 if (!img) return; 
-                
                 loupe.style.backgroundImage = `url('${img.src}')`;
                 loupe.style.backgroundSize = `${img.width * zoomLevel}px ${img.height * zoomLevel}px`;
-                
                 const rect = mediaDisplay.getBoundingClientRect();
                 let x = e.clientX - rect.left;
                 let y = e.clientY - rect.top;
-
-                if (x < 0 || x > rect.width || y < 0 || y > rect.height) {
-                    loupe.style.display = 'none';
-                    return;
-                }
-                
+                if (x < 0 || x > rect.width || y < 0 || y > rect.height) { loupe.style.display = 'none'; return; }
                 loupe.style.display = 'block';
-
                 let loupeX = x - (loupe.offsetWidth / 2);
                 let loupeY = y - (loupe.offsetHeight / 2);
                 loupe.style.left = `${loupeX}px`;
                 loupe.style.top = `${loupeY}px`;
-                
                 let bgX = -(x * zoomLevel - loupe.offsetWidth / 2);
                 let bgY = -(y * zoomLevel - loupe.offsetHeight / 2);
                 loupe.style.backgroundPosition = `${bgX}px ${bgY}px`;
             });
-            
-            mediaDisplay.addEventListener('mouseleave', () => {
-                loupe.style.display = 'none';
-            });
+            mediaDisplay.addEventListener('mouseleave', () => { loupe.style.display = 'none'; });
         }
-        
-        // 🚨 NOVO (V4.2): Lógica do Modal de Guia de Medidas
         function setupSizeGuideModalListeners() {
             const modal = document.getElementById('size-guide-modal');
             const closeBtn = document.getElementById('modal-size-guide-close');
-
-            if (closeBtn) {
-                closeBtn.addEventListener('click', () => {
-                    modal.style.display = 'none';
-                });
-            }
-            
-            if (modal) {
-                modal.addEventListener('click', (e) => {
-                    // Fecha se clicar no fundo escuro
-                    if (e.target === modal) {
-                        modal.style.display = 'none';
-                    }
-                });
-            }
-            
-            // O listener para ABRIR o modal é adicionado no fetchProductDetails,
-            // pois o link #open-size-guide ainda não existe no DOM.
+            if (closeBtn) { closeBtn.addEventListener('click', () => { modal.style.display = 'none'; }); }
+            if (modal) { modal.addEventListener('click', (e) => { if (e.target === modal) { modal.style.display = 'none'; } }); }
         }
-        
     </script>
 </body>
 </html>
