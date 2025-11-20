@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     
-    <title>3 Marias Moda Feminina (V4.4)</title>
+    <title>3 Marias Moda Feminina (V5.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -65,6 +65,43 @@
         
         main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
         
+        /* 🚨 NOVO (V5.0): Barra de Busca Estilizada */
+        #search-container {
+            position: relative;
+            margin-bottom: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #search-input {
+            width: 100%;
+            padding: 12px 40px 12px 20px; /* Espaço para o ícone */
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        #search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(183, 110, 134, 0.2);
+        }
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+        #search-no-results {
+            display: none;
+            text-align: center;
+            color: var(--light-text);
+            margin-top: 20px;
+            font-style: italic;
+        }
+
         /* Filtros de Seção */
         #secao-filters {
             display: flex;
@@ -92,6 +129,7 @@
             border-color: var(--primary-color);
             font-weight: 600;
         }
+
 
         /* Filtros de Disponibilidade */
         #controls {
@@ -256,9 +294,9 @@
             display: none; 
         }
 
-        /* 🚨 NOVO: Botão e Aviso de Instalação (PWA) */
+        /* Botão e Aviso de Instalação (PWA) */
         #install-app-btn {
-            display: none; /* Oculto por padrão */
+            display: none; 
             width: 100%;
             background-color: var(--accent-color);
             color: #333;
@@ -268,9 +306,10 @@
             border: none;
             cursor: pointer;
             margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         #ios-install-banner {
-            display: none; /* Oculto por padrão */
+            display: none; 
             position: fixed;
             bottom: 0;
             left: 0;
@@ -311,13 +350,18 @@
 <body>
     
     <button id="install-app-btn">📲 Instalar Aplicativo 3 Marias</button>
-
+    
     <header id="main-header">
         <h1>3 MARIAS MODA FEMININA</h1> 
         <p>O melhor do Brasil,<br>agora ao seu alcance no Japão.</p>
     </header>
 
     <main>
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="Buscar produto (ex: Sutiã, Vermelho)...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+        
         <div id="secao-filters">
             <button class="secao-button active" data-secao="todos">Todas</button>
             <button class="secao-button" data-secao="calcinhas">Calcinhas</button>
@@ -346,6 +390,8 @@
             </div>
         <div id="loading-message">Carregando produtos...</div>
         <div id="error-message" style="display: none;"></div>
+        
+        <p id="search-no-results">Nenhum produto encontrado com esse nome.</p>
     </main>
 
     <footer>
@@ -388,34 +434,31 @@
         const collectionTitle = document.getElementById('collection-title');
         const cartCountEl = document.getElementById('cart-count'); 
         const headerEl = document.getElementById('main-header');
-        const filterDetails = document.getElementById('filter-details'); 
+        const filterDetails = document.getElementById('filter-details');
+        
+        // 🚨 NOVO: Elementos da Busca
+        const searchInput = document.getElementById('search-input');
+        const searchNoResults = document.getElementById('search-no-results');
         
         let currentFilter = 'pronta-entrega';
         let currentSecao = 'todos'; 
 
-        // Textos de Ajuda
         const filterHelpTexts = {
             'pronta-entrega': ".Disponível para retirar em Toyohashi\ne região .",
             'sob-encomenda': ".Disponível para retirar em Toyohashi na próxima quinta-feira após o pedido.\n. Receba por correio entre 3-5 dias , pedido mínimo ¥10.000"
         };
         
-        // 🚨 NOVO (V4.4): Lógica de Instalação PWA 🚨
-        
-        // 1. Registra o Service Worker
+        // PWA Logic
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
-
-        // 2. Lógica para Android (Botão de Instalar)
         let deferredPrompt;
         const installBtn = document.getElementById('install-app-btn');
-
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBtn.style.display = 'block'; // Mostra o botão
+            installBtn.style.display = 'block';
         });
-
         installBtn.addEventListener('click', (e) => {
             installBtn.style.display = 'none';
             if (deferredPrompt) {
@@ -425,27 +468,20 @@
                 });
             }
         });
-        
-        // 3. Lógica para iPhone (Aviso de Rodapé)
         const isIos = () => {
           const userAgent = window.navigator.userAgent.toLowerCase();
           return /iphone|ipad|ipod/.test(userAgent);
         }
         const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
-
         if (isIos() && !isInStandaloneMode()) {
-            // Se for iPhone e NÃO estiver instalado ainda
             const iosBanner = document.getElementById('ios-install-banner');
             iosBanner.style.display = 'block';
-            
             document.getElementById('close-ios-banner').addEventListener('click', () => {
                 iosBanner.style.display = 'none';
             });
         }
 
-        // --- FIM DA LÓGICA PWA ---
-        
-        // Easter Egg para Admin (Clicar 3x no Logo)
+        // Easter Egg
         let logoClickCount = 0;
         let logoClickTimer = null;
         headerEl.addEventListener('click', (e) => {
@@ -467,7 +503,6 @@
             return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} };
         }
 
-        // updateCartIcon agora soma as QUANTIDADES
         function updateCartIcon() {
             const cart = getCart();
             let count = 0;
@@ -483,33 +518,26 @@
             }
         }
         
-        // FUNÇÃO fetchProducts (V4.0)
         async function fetchProducts() {
             loadingMsg.style.display = 'block';
             errorMsg.style.display = 'none';
             grid.innerHTML = '';
+            searchNoResults.style.display = 'none'; // Esconde msg de erro de busca
             
-            // Atualiza o título
             const secaoText = document.querySelector(`.secao-button[data-secao="${currentSecao}"]`).textContent;
             const filterText = document.querySelector(`.filter-button[data-filter="${currentFilter}"]`).textContent;
             collectionTitle.textContent = `${secaoText} | ${filterText}`;
             
-            // Atualiza o texto de ajuda
             filterDetails.textContent = filterHelpTexts[currentFilter];
 
             try {
-                // 1. Inicia a consulta
                 let query = db.collection("products");
                 
-                // 2. Filtro de Seção (se não for "Todas")
                 if (currentSecao !== 'todos') {
                     query = query.where("secao", "==", currentSecao);
                 }
                 
-                // 3. Filtro de Disponibilidade (Pronta Entrega / Encomenda)
                 query = query.where("source", "==", currentFilter);
-                
-                // 4. Ordenação
                 query = query.orderBy("createdAt", "desc");
                 
                 const snapshot = await query.get();
@@ -560,6 +588,11 @@
                 });
 
                 loadingMsg.style.display = 'none';
+                
+                // 🚨 NOVO (V5.0): Re-aplica o filtro de busca se já houver texto digitado
+                if(searchInput.value.trim() !== '') {
+                    filterProductsBySearch(searchInput.value.trim());
+                }
 
             } catch (error) {
                 console.error("Erro ao carregar produtos:", error);
@@ -570,7 +603,36 @@
             }
         }
         
-        // Carrega o Logo
+        // 🚨 NOVO (V5.0): Lógica de Busca 🚨
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            filterProductsBySearch(searchTerm);
+        });
+        
+        function filterProductsBySearch(term) {
+            const cards = document.querySelectorAll('.product-card');
+            const lowerTerm = term.toLowerCase();
+            let hasVisible = false;
+
+            cards.forEach(card => {
+                const name = card.querySelector('.product-name').textContent.toLowerCase();
+                if (name.includes(lowerTerm)) {
+                    card.style.display = 'block'; // Mostra se combinar
+                    hasVisible = true;
+                } else {
+                    card.style.display = 'none'; // Esconde se não combinar
+                }
+            });
+            
+            // Mostra/Esconde mensagem de "Nenhum resultado"
+            if (!hasVisible && term !== '') {
+                searchNoResults.style.display = 'block';
+            } else {
+                searchNoResults.style.display = 'none';
+            }
+        }
+        
+
         async function fetchSiteConfig() {
             try {
                 const doc = await db.collection("configuracoes").doc("siteInfo").get();
@@ -585,7 +647,6 @@
             }
         }
 
-        // Lógica dos Filtros de Seção
         secaoButtons.forEach(button => {
             button.addEventListener('click', () => {
                 secaoButtons.forEach(btn => btn.classList.remove('active'));
@@ -595,19 +656,17 @@
             });
         });
 
-        // Lógica dos Filtros de Disponibilidade
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 currentFilter = button.dataset.filter;
-                fetchProducts();
+                fetchProducts(); 
             });
         });
 
-        // Carregamento Inicial
         document.addEventListener('DOMContentLoaded', () => {
-            fetchProducts();
+            fetchProducts(); 
             updateCartIcon(); 
             fetchSiteConfig(); 
         });
