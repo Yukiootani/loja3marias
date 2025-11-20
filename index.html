@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     
-    <title>3 Marias Moda Feminina (V5.1)</title>
+    <title>3 Marias Moda Feminina (V5.4)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -65,7 +65,7 @@
         
         main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
         
-        /* Barra de Busca */
+        /* Busca */
         #search-container {
             position: relative;
             margin-bottom: 20px;
@@ -254,7 +254,7 @@
             color: var(--light-text); font-size: 0.9em; border-top: 1px solid var(--border-color);
         }
 
-        /* --- CSS DO CARRINHO WHATSAPP --- */
+        /* Carrinho */
         #cart-icon {
             position: fixed;
             bottom: 20px;
@@ -291,7 +291,7 @@
             display: none; 
         }
 
-        /* Botão e Aviso de Instalação (PWA) */
+        /* Botões PWA */
         #install-app-btn {
             display: none; 
             width: 100%;
@@ -302,9 +302,25 @@
             padding: 12px;
             border: none;
             cursor: pointer;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
+        
+        /* 🚨 NOVO: Botão de Ativar Notificação */
+        #enable-push-btn {
+            display: none; /* Aparece via JS */
+            width: 100%;
+            background-color: #333;
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
         #ios-install-banner {
             display: none; 
             position: fixed;
@@ -338,14 +354,12 @@
             color: #888;
             line-height: 1;
         }
-        
-        /* 🚨 NOVO: Ícone de Compartilhar iOS correto (quadrado com seta) */
         .ios-share-icon {
             display: inline-block;
             vertical-align: middle;
             margin: 0 3px;
             font-size: 1.2em;
-            color: #007AFF; /* Azul padrão do iOS */
+            color: #007AFF; 
         }
 
         @media (min-width: 768px) {
@@ -358,6 +372,7 @@
 <body>
     
     <button id="install-app-btn">📲 Instalar Aplicativo 3 Marias</button>
+    <button id="enable-push-btn">🔔 Ativar Notificações de Ofertas</button>
     
     <header id="main-header">
         <h1>3 MARIAS MODA FEMININA</h1> 
@@ -390,12 +405,10 @@
             </button>
         </div>
         
-        <div id="filter-details">
-            </div>
+        <div id="filter-details"></div>
 
         <h2 id="collection-title" class="section-title">Carregando...</h2>
-        <div id="products-grid">
-            </div>
+        <div id="products-grid"></div>
         <div id="loading-message">Carregando produtos...</div>
         <div id="error-message" style="display: none;"></div>
         
@@ -418,6 +431,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
     <script>
         // 🚨 CHAVES CORRETAS DA LOJA 3 MARIAS 🚨
         const firebaseConfig = {
@@ -432,6 +446,16 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        
+        // Lógica de Messaging
+        let messaging;
+        try {
+            if (firebase.messaging.isSupported()) {
+                messaging = firebase.messaging();
+            }
+        } catch (e) {
+            console.log("Messaging não suportado neste navegador");
+        }
 
         // Elementos do DOM
         const grid = document.getElementById('products-grid');
@@ -445,7 +469,7 @@
         const filterDetails = document.getElementById('filter-details');
         const searchInput = document.getElementById('search-input');
         const searchNoResults = document.getElementById('search-no-results');
-        const cartIcon = document.getElementById('cart-icon'); // 🚨 NOVO: Para mover o ícone
+        const cartIcon = document.getElementById('cart-icon'); 
         
         let currentFilter = 'pronta-entrega';
         let currentSecao = 'todos'; 
@@ -476,7 +500,6 @@
             }
         });
         
-        // 🚨 Lógica iOS Ajustada (Move o botão do WhatsApp)
         const isIos = () => {
           const userAgent = window.navigator.userAgent.toLowerCase();
           return /iphone|ipad|ipod/.test(userAgent);
@@ -486,16 +509,57 @@
         if (isIos() && !isInStandaloneMode()) {
             const iosBanner = document.getElementById('ios-install-banner');
             iosBanner.style.display = 'block';
-            
-            // 🚨 SOBE O ÍCONE DO WHATSAPP
             if(cartIcon) cartIcon.style.bottom = '100px';
-            
             document.getElementById('close-ios-banner').addEventListener('click', () => {
                 iosBanner.style.display = 'none';
-                // 🚨 VOLTA O ÍCONE PARA O LUGAR
                 if(cartIcon) cartIcon.style.bottom = '20px';
             });
         }
+
+        // 🚨 LÓGICA DE PUSH NOTIFICATION (Manual) 🚨
+        const pushBtn = document.getElementById('enable-push-btn');
+        
+        async function checkPushPermission() {
+            if (!messaging) return;
+            if (Notification.permission === 'default') {
+                pushBtn.style.display = 'block';
+            } else if (Notification.permission === 'granted') {
+                saveToken(); // Garante que temos o token
+            }
+        }
+
+        if (pushBtn) {
+            pushBtn.addEventListener('click', async () => {
+                try {
+                    const permission = await Notification.requestPermission();
+                    if (permission === 'granted') {
+                        await saveToken();
+                        pushBtn.style.display = 'none';
+                        alert("Notificações Ativadas! Você receberá nossas novidades. 🔔");
+                    } else {
+                        alert("Você bloqueou as notificações. Para ativar, mude nas configurações do navegador.");
+                    }
+                } catch (error) {
+                    console.error("Erro ao pedir permissão:", error);
+                }
+            });
+        }
+
+        async function saveToken() {
+            try {
+                const token = await messaging.getToken({ vapidKey: '' }); 
+                if (token) {
+                    await db.collection('push_tokens').doc(token).set({
+                        token: token,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    console.log("Token salvo:", token);
+                }
+            } catch (error) {
+                console.log("Erro ao pegar token:", error);
+            }
+        }
+
 
         // Easter Egg
         let logoClickCount = 0;
@@ -682,6 +746,7 @@
             fetchProducts(); 
             updateCartIcon(); 
             fetchSiteConfig(); 
+            checkPushPermission(); // Verifica se deve mostrar o botão
         });
     </script>
 </body>
