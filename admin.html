@@ -3,351 +3,561 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin V10 (Completo) | 3 Marias</title>
+    
+    <meta name="theme-color" content="#b76e86">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    
+    <title>3 Marias Moda Feminina (V6.3)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
         :root {
-            --primary-color: #b76e86;
-            --accent-color: #DAA520;
-            --text-color: #333;
-            --bg-color: #fdf7f9;
-            --border-color: #e0e0e0;
-            --error-color: #dc3545;
+            --primary-color: #b76e86; 
+            --accent-color: #DAA520; 
+            --silver-color: #C0C0C0;
+            --text-color: #333; 
+            --light-text: #666; 
+            --bg-color: #FFFFFF; 
+            --border-color: #f0f0f0; 
+            --whatsapp-green: #28a745; 
         }
-        body { font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
-        h1, h2, h3 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
-        form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 20px; background: #fdf7f9; border-radius: 5px; }
-        label { font-weight: bold; margin-bottom: -10px; }
-        input, textarea, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; }
-        button { background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; }
+
+        @keyframes shimmer-glow {
+            0% { box-shadow: 0 0 5px var(--accent-color); }
+            50% { box-shadow: 0 0 10px var(--silver-color); }
+            100% { box-shadow: 0 0 5px var(--accent-color); }
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+            margin: 0; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            padding-bottom: 80px; 
+        }
         
-        /* Status */
-        #status, #loginStatus { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
-        .success { background-color: #e6f9e6; color: #28a745; }
-        .error { background-color: #fdeeee; color: var(--error-color); }
-        .loading { background-color: #e6f2ff; color: #007bff; }
+        header { 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            padding: 0.5rem 1rem;
+            text-align: center; 
+            border-bottom: 1px solid var(--border-color); 
+            /* Sino está fora daqui agora */
+        }
         
-        /* Tabelas */
-        #products-table-container, #messages-table-container { overflow-x: auto; margin-bottom: 30px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
-        th { background-color: #f9f2f4; }
-        img.thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
-        .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
-        .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; }
+        /* 🚨 SINO FIXO (Correção do desaparecimento) */
+        #notification-bell {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            font-size: 26px;
+            color: var(--primary-color);
+            cursor: pointer;
+            z-index: 2000; /* Acima de tudo */
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            padding: 5px;
+        }
         
-        /* Painel de Notificação */
-        #push-panel { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        #push-panel h3 { color: #856404; border-bottom-color: #856404; }
+        .header-logo {
+            max-width: 250px; 
+            width: 100%;
+            height: auto;     
+            object-fit: contain; 
+            margin: 0 auto;
+            display: block; 
+            cursor: pointer;
+        }
         
-        /* Variantes */
-        #variants-container { border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: #fff; }
-        .variant-entry { border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
-        .variant-row, .variant-size-stock-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .variant-size-stock-group { margin-top: 10px; }
-        .variant-size-stock-group input { width: 60px; padding: 5px; text-align: center; }
+        header p { 
+            font-size: 1em; 
+            color: var(--light-text);
+            margin: 2px 0 0 0;
+            line-height: 1.4;
+        }
         
-        /* Login/Geral */
-        #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
-        #admin-panel { display: none; } 
-        #btnLogout { background-color: #777; margin-top: 20px; }
-        #logo-preview { max-width: 250px; display: block; margin: 0 auto; }
+        main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+        
+        /* Barra de Busca */
+        #search-container {
+            position: relative;
+            margin-bottom: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #search-input {
+            width: 100%;
+            padding: 12px 40px 12px 20px; 
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        #search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(183, 110, 134, 0.2);
+        }
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+        #search-no-results {
+            display: none;
+            text-align: center;
+            color: var(--light-text);
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        /* Filtros */
+        #secao-filters {
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .secao-button {
+            background-color: #f5f5f5;
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .secao-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        #controls {
+            display: flex; 
+            flex-direction: row; 
+            gap: 10px; 
+            margin-bottom: 10px; 
+            padding: 10px; 
+            background-color: var(--bg-color); 
+            border-radius: 8px;
+            justify-content: center;
+        }
+        .filter-button {
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            padding: 10px 15px;
+            border-radius: 20px; 
+            border: 1px solid #ccc; 
+            font-size: 0.9em; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center; 
+            box-sizing: border-box;
+            animation: shimmer-glow 3s ease-in-out infinite; 
+        }
+        .filter-button.active {
+            background-color: var(--accent-color); 
+            color: var(--text-color);
+            border-color: var(--accent-color); 
+            animation: none;
+        }
+        
+        #filter-details {
+            text-align: center;
+            color: var(--light-text);
+            font-size: 0.9em;
+            margin: 0 auto 20px auto;
+            padding: 0 15px;
+            max-width: 500px;
+            line-height: 1.5;
+            white-space: pre-line; 
+        }
+        
+        .section-title { 
+            font-size: 1.5em;
+            color: var(--text-color); 
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: none; 
+        }
+        
+        /* Grid de Produtos */
+        #products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px;
+        }
+        .product-card {
+            background-color: white; 
+            border-radius: 8px;
+            box-shadow: none; 
+            border: 1px solid var(--border-color); 
+            overflow: hidden; 
+            text-decoration: none; 
+            color: var(--text-color);
+            transition: transform 0.2s; 
+            position: relative;
+        }
+        .product-card:hover { 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
+        }
+        .product-image-container {
+            width: 100%;
+            padding-top: 150%; 
+            position: relative;
+            background-color: #f0f0f0;
+        }
+        .product-image {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover; 
+        }
+        .product-info { padding: 15px; text-align: left; }
+        .product-name { font-size: 1em; font-weight: 600; margin: 0 0 5px 0; }
+        .product-price { font-size: 1.1em; font-weight: 700; color: var(--primary-color); margin: 0 0 15px 0; }
+        
+        .details-button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            font-size: 0.9em;
+            width: 100%; 
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .details-button:hover { background-color: #a15a70; }
+        
+        .badge {
+            position: absolute; top: 10px; left: 10px;
+            padding: 5px 10px; border-radius: 5px;
+            font-size: 0.9em; font-weight: bold;
+            color: white;
+            z-index: 10;
+        }
+        .badge-novo { background-color: var(--accent-color); color: #333; }
+        .badge-destaque { background-color: var(--whatsapp-green); }
+        .badge-esgotado {
+            background-color: rgba(100, 100, 100, 0.9);
+            color: white;
+            top: 10px;
+            right: 10px; 
+            left: auto;  
+        }
+        
+        footer {
+            text-align: center; padding: 20px; margin-top: 40px;
+            color: var(--light-text); font-size: 0.9em; border-top: 1px solid var(--border-color);
+        }
+
+        /* Carrinho */
+        #cart-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--whatsapp-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.2s;
+            text-decoration: none; 
+        }
+        #cart-icon:hover {
+            transform: scale(1.1);
+        }
+        #cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 7px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid white;
+            display: none; 
+        }
+
+        /* Botões PWA */
+        #install-app-btn {
+            display: none; 
+            width: 100%;
+            background-color: var(--accent-color);
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+            padding: 12px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Modal de Permissão */
+        #push-permission-modal {
+            display: none; 
+            position: fixed;
+            z-index: 3000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center; align-items: center;
+        }
+        .push-modal-content {
+            background-color: #fff;
+            width: 85%; max-width: 350px;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        .push-icon { font-size: 40px; color: var(--accent-color); margin-bottom: 15px; }
+        .push-title { font-size: 1.2em; font-weight: bold; color: var(--text-color); margin-bottom: 10px; }
+        .push-text { font-size: 0.95em; color: #666; margin-bottom: 20px; line-height: 1.5; }
+        .push-btn-allow {
+            background-color: var(--primary-color); color: white;
+            border: none; padding: 12px 20px; border-radius: 25px;
+            font-weight: bold; font-size: 1em; width: 100%; cursor: pointer;
+            margin-bottom: 10px; transition: 0.3s;
+        }
+        .push-btn-deny {
+            background-color: transparent; color: #999;
+            border: none; font-size: 0.9em; cursor: pointer; text-decoration: underline;
+        }
+
+        /* Aviso iOS */
+        #ios-install-banner {
+            display: none; 
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.98);
+            border-top: 1px solid #ccc;
+            padding: 20px 15px;
+            text-align: center;
+            z-index: 2000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        #ios-install-banner p { margin: 0; font-size: 0.9em; color: #333; line-height: 1.5; }
+        #ios-install-banner span { font-weight: bold; color: var(--primary-color); }
+        #close-ios-banner { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #888; line-height: 1; }
+        .ios-share-icon { display: inline-block; vertical-align: middle; margin: 0 3px; font-size: 1.2em; color: #007AFF; }
+        
+        @media (min-width: 768px) { #products-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); } }
+
+        /* Modal Inbox */
+        #inbox-modal { display: none; position: fixed; z-index: 2500; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: start; padding-top: 60px; }
+        .inbox-content { background-color: #fff; width: 90%; max-width: 400px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); overflow: hidden; }
+        .inbox-header { background-color: var(--primary-color); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        #inbox-close { cursor: pointer; font-size: 20px; }
+        #inbox-list { max-height: 60vh; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+        .inbox-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; }
+        .inbox-item:hover { background-color: #f9f9f9; }
+        .inbox-title { font-weight: bold; margin-bottom: 5px; color: #333; }
+        .inbox-body { font-size: 0.9em; color: #666; margin-bottom: 8px; }
+        .inbox-date { font-size: 0.75em; color: #aaa; text-align: right; }
+        .inbox-empty { padding: 20px; text-align: center; color: #999; font-style: italic; }
     </style>
 </head>
 <body>
+    
+    <button id="install-app-btn">📲 Instalar Aplicativo 3 Marias</button>
+    
+    <div id="push-permission-modal">
+        <div class="push-modal-content">
+            <div class="push-icon">🔔</div>
+            <div class="push-title">Ativar Notificações?</div>
+            <div class="push-text">Receba avisos sobre reposições, novidades e cupons exclusivos da 3 Marias direto no seu celular.</div>
+            <button class="push-btn-allow" id="allow-push-btn">Sim, eu quero!</button>
+            <button class="push-btn-deny" id="deny-push-btn">Agora não</button>
+        </div>
+    </div>
+    
+    <div id="notification-bell">
+        <i class="fas fa-bell"></i>
+    </div>
+    
+    <header id="main-header">
+        <h1>3 MARIAS MODA FEMININA</h1> 
+        <p>O melhor do Brasil,<br>agora ao seu alcance no Japão.</p>
+    </header>
 
-    <div class="container">
-        <h1>Painel de Administração</h1>
-        <h2>3 Marias - Gestão Completa</h2>
-
-        <section id="login-section">
-            <h3>Login de Admin</h3>
-            <form id="loginForm">
-                <label>Email:</label><input type="email" id="login-email" required>
-                <label>Senha:</label><input type="password" id="login-password" required>
-                <button type="submit" id="btnLogin">Entrar</button>
-            </form>
-            <div id="loginStatus" class="status"></div>
-        </section>
-
-        <section id="admin-panel">
-            <div id="status"></div>
-
-            <div id="push-panel">
-                <h3>📢 Enviar Notificação & Mensagem</h3>
-                <p style="font-size: 0.9em; color: #666;">Envia Push e salva no Histórico (Sino).</p>
-                
-                <label>Título:</label><input type="text" id="push-title" placeholder="Ex: Chegou Reposição!">
-                <label>Mensagem:</label><textarea id="push-body" style="min-height: 60px;" placeholder="Texto da mensagem..."></textarea>
-                <label>Link (opcional):</label><input type="text" id="push-link" value="https://loja3marias.netlify.app">
-                <button id="btn-send-push" style="background-color: #856404; margin-top: 10px;">🚀 Enviar e Salvar</button>
-                
-                <h4 style="margin-top: 20px;">Histórico de Mensagens (Apague para sumir do site)</h4>
-                <div id="messages-table-container">
-                    <table id="messages-table">
-                        <thead><tr><th>Data</th><th>Título</th><th>Mensagem</th><th>Ação</th></tr></thead>
-                        <tbody id="messages-list"></tbody>
-                    </table>
-                </div>
-            </div>
-            <hr>
-
-            <form id="product-form">
-                <h3 id="form-title">Adicionar Novo Produto</h3>
-                <input type="hidden" id="productId"> 
-                <label>Nome:</label><input type="text" id="name" required>
-                <label>Preço (¥):</label><input type="number" id="price" required>
-                <label>Seção:</label>
-                <select id="secao" required>
-                    <option value="">Escolha...</option><option value="calcinhas">Calcinhas</option><option value="sutias">Sutiãs</option><option value="conjuntos">Conjuntos</option><option value="body">Body</option><option value="perfumaria">Perfumaria</option><option value="cremes">Cremes</option><option value="variados">Variados</option>
-                </select>
-                <label>Descrição:</label><textarea id="description" rows="4"></textarea>
-                <label>Variantes:</label><div id="variants-container"></div><button type="button" id="add-variant-btn" style="margin-top:5px;">+ Adicionar Cor</button>
-                <label>Disp.:</label><select id="source" required><option value="pronta-entrega">Pronta Entrega</option><option value="sob-encomenda">Sob Encomenda</option></select>
-                <label>Selo:</label><select id="isFeatured"><option value="nenhum">Nenhum</option><option value="novo">Novidade</option><option value="destaque">Destaque</option></select>
-                <label>Capa:</label><input type="file" id="imageUrl"><label>Vídeo:</label><input type="file" id="videoUrl"><label>Galeria:</label><input type="file" id="galeria" multiple>
-                <button type="submit" id="save-btn" style="margin-top:15px;">Salvar Produto</button>
-                <button type="button" id="cancel-edit-btn" style="display:none; background:#777; margin-top:10px;">Cancelar</button>
-            </form>
-            <hr>
-
-            <form id="logo-form">
-                <h3>Gerir Logo</h3>
-                <img id="logo-preview" src="" alt="Logo">
-                <input type="file" id="logo-upload">
-                <button type="submit" id="save-logo-btn">Salvar Logo</button>
-            </form>
-            <hr>
-
-            <h2>Produtos Cadastrados</h2>
-            <div id="products-table-container">
-                <table id="products-table">
-                    <thead><tr><th>Foto</th><th>Nome</th><th>Seção</th><th>Preço</th><th>Total</th><th>Disp.</th><th>Ações</th></tr></thead>
-                    <tbody id="products-list"></tbody>
-                </table>
-            </div>
-            
-            <button id="btnLogout" style="margin-top:30px;">Sair (Logout)</button>
-        </section>
+    <div id="inbox-modal">
+        <div class="inbox-content">
+            <div class="inbox-header"><span>Novidades & Avisos</span><span id="inbox-close">&times;</span></div>
+            <ul id="inbox-list"></ul>
+        </div>
     </div>
 
+    <main>
+        <div id="search-container"><input type="text" id="search-input" placeholder="Buscar produto (ex: Sutiã, Vermelho)..."><i class="fas fa-search search-icon"></i></div>
+        
+        <div id="secao-filters">
+            <button class="secao-button active" data-secao="todos">Todas</button>
+            <button class="secao-button" data-secao="calcinhas">Calcinhas</button>
+            <button class="secao-button" data-secao="sutias">Sutiãs</button>
+            <button class="secao-button" data-secao="conjuntos">Conjuntos</button>
+            <button class="secao-button" data-secao="body">Body</button>
+            <button class="secao-button" data-secao="perfumaria">Perfumaria</button>
+            <button class="secao-button" data-secao="cremes">Cremes</button>
+            <button class="secao-button" data-secao="variados">Variados</button>
+        </div>
+
+        <div id="controls">
+            <button class="filter-button active" data-filter="pronta-entrega">Pronta Entrega</button>
+            <button class="filter-button" data-filter="sob-encomenda">Sob Encomenda</button>
+        </div>
+        
+        <div id="filter-details"></div>
+
+        <h2 id="collection-title" class="section-title">Carregando...</h2>
+        <div id="products-grid"></div>
+        <div id="loading-message">Carregando produtos...</div>
+        <div id="error-message" style="display: none;"></div>
+        
+        <p id="search-no-results">Nenhum produto encontrado com esse nome.</p>
+    </main>
+
+    <footer><p>© 2025 3Marias. Todos os direitos reservados.</p></footer>
+    <a id="cart-icon" href="carrinho.html"><i class="fas fa-shopping-bag"></i><span id="cart-count">0</span></a>
+    <div id="ios-install-banner"><span id="close-ios-banner">&times;</span><p>Para instalar o App, toque em <strong>Compartilhar</strong> <i class="fas fa-share-square ios-share-icon"></i> e depois em <strong>Adicionar à Tela de Início</strong> <i class="fas fa-plus-square"></i>.</p></div>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script> 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
-
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
     <script>
-        // 🚨 CHAVES (Mantenha as suas aqui)
-        const firebaseConfig = {
-            apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
-            authDomain: "loja3marias-50204.firebaseapp.com",
-            projectId: "loja3marias-50204",
-            storageBucket: "loja3marias-50204.firebasestorage.app",
-            messagingSenderId: "405330133487",
-            appId: "1:405330133487:web:606de41211df52245f761a",
-            measurementId: "G-TK877V6P0S"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI", authDomain: "loja3marias-50204.firebaseapp.com", projectId: "loja3marias-50204", storageBucket: "loja3marias-50204.firebasestorage.app", messagingSenderId: "405330133487", appId: "1:405330133487:web:606de41211df52245f761a", measurementId: "G-TK877V6P0S" };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(); 
-        const storage = firebase.storage(); 
-        const auth = firebase.auth(); 
+        const db = firebase.firestore();
+        
+        let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) { console.log("Messaging não suportado"); }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Refs
-            const loginForm = document.getElementById('loginForm'), loginSection = document.getElementById('login-section'), adminPanel = document.getElementById('admin-panel'), btnLogout = document.getElementById('btnLogout'), loginStatusDiv = document.getElementById('loginStatus'), statusDiv = document.getElementById('status');
-            let statusTimeout;
+        const grid=document.getElementById('products-grid'), loadingMsg=document.getElementById('loading-message'), errorMsg=document.getElementById('error-message'), filterButtons=document.querySelectorAll('.filter-button'), secaoButtons=document.querySelectorAll('.secao-button'), collectionTitle=document.getElementById('collection-title'), cartCountEl=document.getElementById('cart-count'), headerEl=document.getElementById('main-header'), filterDetails=document.getElementById('filter-details'), searchInput=document.getElementById('search-input'), searchNoResults=document.getElementById('search-no-results'), cartIcon=document.getElementById('cart-icon');
+        let currentFilter='pronta-entrega', currentSecao='todos';
+        const filterHelpTexts={'pronta-entrega':".Disponível para retirar em Toyohashi\ne região .",'sob-encomenda':".Disponível para retirar em Toyohashi na próxima quinta-feira após o pedido.\n. Receba por correio entre 3-5 dias , pedido mínimo ¥10.000"};
+        
+        if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
+        let deferredPrompt; const installBtn=document.getElementById('install-app-btn');
+        window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;installBtn.style.display='block'});
+        installBtn.addEventListener('click',()=>{installBtn.style.display='none';if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null})}});
+        const isIos=()=>{const u=window.navigator.userAgent.toLowerCase();return /iphone|ipad|ipod/.test(u)};
+        const isInStandaloneMode=()=>('standalone' in window.navigator)&&(window.navigator.standalone);
+        if(isIos()&&!isInStandaloneMode()){const b=document.getElementById('ios-install-banner');b.style.display='block';if(cartIcon)cartIcon.style.bottom='100px';document.getElementById('close-ios-banner').addEventListener('click',()=>{b.style.display='none';if(cartIcon)cartIcon.style.bottom='20px'})}
 
-            function showStatus(div, msg, type) {
-                if(!div) return; clearTimeout(statusTimeout);
-                div.textContent = msg; div.className = 'status ' + type; div.style.display = 'block';
-                if (type !== 'loading') statusTimeout = setTimeout(() => { div.style.display = 'none'; }, 4000);
-            }
-
-            // --- 1. SISTEMA DE NOTIFICAÇÕES (Netlify + Histórico) ---
-            const btnSendPush = document.getElementById('btn-send-push');
-            const messagesList = document.getElementById('messages-list');
-
-            async function fetchMessages() {
-                try {
-                    messagesList.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
-                    const snapshot = await db.collection('site_messages').orderBy('createdAt', 'desc').get();
-                    if (snapshot.empty) { messagesList.innerHTML = '<tr><td colspan="4">Nenhuma mensagem.</td></tr>'; return; }
-                    
-                    let html = '';
-                    snapshot.forEach(doc => {
-                        const m = doc.data();
-                        const d = m.createdAt ? m.createdAt.toDate().toLocaleDateString('pt-BR') : '-';
-                        html += `<tr><td>${d}</td><td>${m.title}</td><td>${m.body}</td><td><button class="delete-btn del-msg" data-id="${doc.id}">Excluir</button></td></tr>`;
-                    });
-                    messagesList.innerHTML = html;
-                } catch (e) { console.error(e); }
-            }
-
-            // Evento: Excluir Mensagem
-            if(messagesList) {
-                messagesList.addEventListener('click', async (e) => {
-                    if(e.target.classList.contains('del-msg')) {
-                        if(!confirm("Apagar mensagem?")) return;
-                        await db.collection('site_messages').doc(e.target.dataset.id).delete();
-                        fetchMessages();
-                        showStatus(statusDiv, "Mensagem apagada!", "success");
-                    }
+        // Inbox (Sino Fixo)
+        const bell=document.getElementById('notification-bell'), inboxModal=document.getElementById('inbox-modal'), inboxList=document.getElementById('inbox-list'), inboxClose=document.getElementById('inbox-close');
+        bell.addEventListener('click',async()=>{
+            inboxModal.style.display='flex'; inboxList.innerHTML='<li class="inbox-empty">Carregando...</li>';
+            try{
+                const snap=await db.collection('site_messages').orderBy('createdAt','desc').limit(10).get();
+                inboxList.innerHTML=''; if(snap.empty){inboxList.innerHTML='<li class="inbox-empty">Nenhuma novidade.</li>';return}
+                snap.forEach(d=>{
+                    const m=d.data(), dt=m.createdAt?m.createdAt.toDate().toLocaleDateString('pt-BR'):'';
+                    const li=document.createElement('li'); li.className='inbox-item';
+                    li.innerHTML=`<div class="inbox-title">${m.title}</div><div class="inbox-body">${m.body}</div><div class="inbox-date">${dt}</div>`;
+                    if(m.link) li.addEventListener('click',()=>window.location.href=m.link);
+                    inboxList.appendChild(li);
                 });
-            }
-
-            // Evento: Enviar Notificação
-            if(btnSendPush) {
-                btnSendPush.addEventListener('click', async () => {
-                    const title = document.getElementById('push-title').value;
-                    const body = document.getElementById('push-body').value;
-                    const link = document.getElementById('push-link').value;
-
-                    if(!title || !body) return alert("Preencha título e mensagem!");
-                    if(!confirm("Enviar para TODOS?")) return;
-
-                    showStatus(statusDiv, "Enviando...", "loading");
-                    btnSendPush.disabled = true;
-
-                    try {
-                        // 1. Salva no Banco
-                        await db.collection('site_messages').add({
-                            title, body, link, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-
-                        // 2. Envia Push via Netlify
-                        const response = await fetch('/.netlify/functions/send-push', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ title, body, link })
-                        });
-                        const result = await response.json();
-
-                        showStatus(statusDiv, `Salvo! Push enviado para ${result.successCount || 0} clientes.`, "success");
-                        document.getElementById('push-title').value = "";
-                        document.getElementById('push-body').value = "";
-                        fetchMessages();
-
-                    } catch (error) {
-                        console.error(error);
-                        showStatus(statusDiv, "Salvo no Histórico! (Push falhou: " + error.message + ")", "success");
-                        fetchMessages();
-                    } finally { btnSendPush.disabled = false; }
-                });
-            }
-
-            // --- 2. GESTÃO DE PRODUTOS ---
-            const form=document.getElementById('product-form'), productsList=document.getElementById('products-list'), nameField=document.getElementById('name'), priceField=document.getElementById('price'), descField=document.getElementById('description'), secaoField=document.getElementById('secao'), sourceField=document.getElementById('source'), isFeaturedField=document.getElementById('isFeatured'), imageUrlInput=document.getElementById('imageUrl'), videoUrlInput=document.getElementById('videoUrl'), galeriaInput=document.getElementById('galeria');
-            let oldImageUrl='', oldVideoUrl='', oldGaleria=[];
-
-            async function uploadFile(file,path){ const ref=storage.ref(path); await ref.put(file); return await ref.getDownloadURL(); }
-
-            const predefinedColors = [{name:"Preto",value:"#000000"},{name:"Branco",value:"#FFFFFF"},{name:"Marfim",value:"#FFFFF0"},{name:"Cinza Claro",value:"#E0E0E0"},{name:"Cinza Mescla",value:"#D3D3D3"},{name:"Grafite",value:"#404040"},{name:"Prata",value:"#C0C0C0"},{name:"Cetim",value:"#D2B48C"},{name:"Nude Rosado",value:"#E3BC9A"},{name:"Nude Bege",value:"#F5F5DC"},{name:"Marrom",value:"#8B4513"},{name:"Chocolate",value:"#D2691E"},{name:"Terracota",value:"#E2725B"},{name:"Rosa Bebê",value:"#F4C2C2"},{name:"Rosa Claro",value:"#FFC0CB"},{name:"Rosa Antigo",value:"#b76e86"},{name:"Pink",value:"#FFC0CB"},{name:"Fúcsia",value:"#FF00FF"},{name:"Vermelho",value:"#FF0000"},{name:"Cereja",value:"#D2042D"},{name:"Vinho",value:"#800000"},{name:"Bordô",value:"#800000"},{name:"Marsala",value:"#B1907F"},{name:"Azul Bebê",value:"#E0FFFF"},{name:"Azul Serenity",value:"#98b6d4"},{name:"Azul Royal",value:"#0000CD"},{name:"Azul Tiffany",value:"#AFEEEE"},{name:"Azul Petróleo",value:"#008080"},{name:"Azul Marinho",value:"#000080"},{name:"Verde Menta",value:"#98FF98"},{name:"Verde Água",value:"#AFEEEE"},{name:"Verde Musgo Claro",value:"#ADBC9F"},{name:"Verde Oliva",value:"#808000"},{name:"Verde Musgo",value:"#556B2F"},{name:"Verde Esmeralda",value:"#50C878"},{name:"Lilás",value:"#C8A2C8"},{name:"Lavanda",value:"#E6E6FA"},{name:"Odalisca",value:"#C8A2C8"},{name:"Roxo",value:"#800080"},{name:"Violeta",value:"#EE82EE"},{name:"Amarelo",value:"#FFFF00"},{name:"Dourado",value:"#FFD700"},{name:"Laranja",value:"#FFA500"},{name:"Coral",value:"#FF7F50"},{name:"Estampado",value:"#cccccc"}];
-            
-            const variantsContainer = document.getElementById('variants-container');
-            document.getElementById('add-variant-btn').addEventListener('click', () => createVariantEntry());
-
-            function createVariantEntry(color='', stock={P:0,M:0,G:0,GG:0}) {
-                const id = Date.now() + Math.random();
-                const div = document.createElement('div'); div.className = 'variant-entry'; div.id = 'v-'+id;
-                const dark = ["#000000","#404040","#8B4513","#D2691E","#b76e86","#D2042D","#800000","#000080","#0000CD","#008080","#556B2F","#808000","#50C878","#800080"];
-                let opts = predefinedColors.map(c => `<option value="${c.name}" style="background-color:${c.value};color:${dark.includes(c.value)?'white':'black'}">${c.name}</option>`).join('');
-                let isC = color && !predefinedColors.find(c => c.name === color);
-                div.innerHTML = `<div class="variant-row"><select class="variant-color-select"><option value="">Cor...</option>${opts}<option value="custom">Outra</option></select><input class="variant-color-custom" style="display:${isC?'block':'none'}" value="${isC?color:''}" placeholder="Cor"></div><div class="variant-size-stock-group"><label>P:</label><input type="number" data-size="P" value="${stock.P||0}"><label>M:</label><input type="number" data-size="M" value="${stock.M||0}"><label>G:</label><input type="number" data-size="G" value="${stock.G||0}"><label>GG:</label><input type="number" data-size="GG" value="${stock.GG||0}"></div><button type="button" class="remove-variant-btn" onclick="this.parentElement.remove()">X</button>`;
-                variantsContainer.appendChild(div);
-                const sel = div.querySelector('select'); sel.value = isC ? 'custom' : color;
-                sel.onchange = function(){ div.querySelector('.variant-color-custom').style.display = this.value==='custom'?'block':'none'; };
-            }
-
-            function getVariants() {
-                let v = {};
-                variantsContainer.querySelectorAll('.variant-entry').forEach(e => {
-                    let sel = e.querySelector('select').value, cust = e.querySelector('input[type=text]').value, col = sel==='custom'?cust:sel;
-                    if(col) { let st={}; e.querySelectorAll('input[type=number]').forEach(i => st[i.dataset.size] = parseInt(i.value)||0); v[col] = st; }
-                }); return v;
-            }
-            function calcTotal(v) { let t=0; for(let c in v) for(let s in v[c]) t += v[c][s]; return t; }
-            function setVariants(v) { variantsContainer.innerHTML=''; if(v) for(let c in v) createVariantEntry(c,v[c]); }
-
-            async function fetchProducts() {
-                try {
-                    productsList.innerHTML = '<tr><td colspan="7">Carregando...</td></tr>';
-                    const snap = await db.collection("products").orderBy("createdAt", "desc").get();
-                    let h = '';
-                    snap.forEach(d => {
-                        let p = d.data();
-                        h += `<tr id="${d.id}"><td><img src="${p.imageUrl||''}" class="thumb"></td><td>${p.name}</td><td>${p.secao||'-'}</td><td>¥${p.price}</td><td>${p.estoqueTotal||0}</td><td>${p.source}</td><td><button class="edit-btn" data-id="${d.id}">Editar</button> <button class="delete-btn" data-id="${d.id}">Excluir</button></td></tr>`;
-                    });
-                    productsList.innerHTML = h || '<tr><td colspan="7">Vazio.</td></tr>';
-                } catch(e) { showStatus(statusDiv, e.message, 'error'); }
-            }
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if(!document.getElementById('secao').value) return alert("Seção!");
-                showStatus(statusDiv, "Salvando...", "loading");
-                const id = document.getElementById('productId').value || `pid_${Date.now()}`;
-                try {
-                    let img=oldImageUrl, vid=oldVideoUrl, gal=oldGaleria;
-                    if(imageUrlInput.files[0]) img = await uploadFile(imageUrlInput.files[0], `products/${id}/capa`);
-                    if(videoUrlInput.files[0]) vid = await uploadFile(videoUrlInput.files[0], `products/${id}/vid`);
-                    if(galeriaInput.files.length) { gal=[]; for(let f of galeriaInput.files) gal.push(await uploadFile(f, `products/${id}/gal_${f.name}`)); }
-                    let v = getVariants(), t = calcTotal(v);
-                    let data = { name:nameField.value, price:parseFloat(priceField.value), secao:secaoField.value, description:descField.value, variantes:v, estoqueTotal:t, source:sourceField.value, isFeatured:isFeaturedField.value, imageUrl:img, videoUrl:vid, galeria:gal };
-                    
-                    if(document.getElementById('productId').value) await db.collection("products").doc(id).update(data);
-                    else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("products").doc(id).set(data); }
-                    
-                    cancelEditMode(); fetchProducts(); showStatus(statusDiv, "Salvo!", "success");
-                } catch(e) { showStatus(statusDiv, e.message, 'error'); }
-            });
-
-            productsList.addEventListener('click', async (e) => {
-                let id = e.target.dataset.id;
-                if(e.target.classList.contains('delete-btn') && confirm("Excluir?")) { await db.collection("products").doc(id).delete(); fetchProducts(); }
-                if(e.target.classList.contains('edit-btn')) {
-                    let d = await db.collection("products").doc(id).get(), p = d.data();
-                    document.getElementById('productId').value = id; nameField.value = p.name; priceField.value = p.price; secaoField.value = p.secao; descField.value = p.description;
-                    setVariants(p.variantes); sourceField.value = p.source; isFeaturedField.value = p.isFeatured;
-                    oldImageUrl = p.imageUrl; oldVideoUrl = p.videoUrl; oldGaleria = p.galeria||[];
-                    document.getElementById('form-title').textContent = "Editando"; document.getElementById('save-btn').textContent = "Atualizar"; document.getElementById('cancel-edit-btn').style.display="block"; window.scrollTo(0,0);
-                }
-            });
-
-            document.getElementById('cancel-edit-btn').addEventListener('click', cancelEditMode);
-            function cancelEditMode() { document.getElementById('productId').value=''; form.reset(); variantsContainer.innerHTML=''; oldImageUrl=''; document.getElementById('form-title').textContent="Novo Produto"; document.getElementById('save-btn').textContent="Salvar"; document.getElementById('cancel-edit-btn').style.display="none"; }
-
-            // LOGO
-            const logoForm = document.getElementById('logo-form');
-            const logoUpload = document.getElementById('logo-upload');
-            const logoPrev = document.getElementById('logo-preview');
-            async function loadSiteConfig() { try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists) logoPrev.src=d.data().logoUrl; }catch(e){} }
-            logoForm.addEventListener('submit', async (e) => { e.preventDefault(); const f=logoUpload.files[0]; if(f){ showStatus(statusDiv,"Enviando...","loading"); const u=await uploadFile(f,"configuracoes/logo_principal"); await db.collection("configuracoes").doc("siteInfo").set({logoUrl:u},{merge:true}); logoPrev.src=u; showStatus(statusDiv,"Logo Salvo!","success"); } });
-
-            // --- LOGIN E INICIALIZAÇÃO ---
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                showStatus(document.getElementById('loginStatus'), "Entrando...", "loading");
-                try { await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value); } 
-                catch(e) { showStatus(document.getElementById('loginStatus'), "Erro: "+e.message, "error"); }
-            });
-
-            btnLogout.addEventListener('click', () => auth.signOut());
-
-            auth.onAuthStateChanged(user => {
-                if(user) {
-                    loginSection.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    fetchProducts();
-                    loadSiteConfig();
-                    fetchMessages(); // Carrega o histórico
-                } else {
-                    loginSection.style.display = 'block';
-                    adminPanel.style.display = 'none';
-                }
-            });
-
+            }catch(e){inboxList.innerHTML='<li class="inbox-empty">Erro ao carregar.</li>'}
         });
+        inboxClose.addEventListener('click',()=>inboxModal.style.display='none'); inboxModal.addEventListener('click',(e)=>{if(e.target===inboxModal)inboxModal.style.display='none'});
+
+        // Modal Push Automático
+        const pushModal = document.getElementById('push-permission-modal');
+        const allowBtn = document.getElementById('allow-push-btn');
+        const denyBtn = document.getElementById('deny-push-btn');
+
+        async function checkPushPermission() {
+            if (!messaging) return;
+            if (Notification.permission === 'default') {
+                setTimeout(() => { pushModal.style.display = 'flex'; }, 2000);
+            }
+        }
+        if (allowBtn) {
+            allowBtn.addEventListener('click', async () => {
+                pushModal.style.display = 'none'; 
+                try {
+                    const permission = await Notification.requestPermission();
+                    if (permission === 'granted') { await saveToken(); alert("Obrigado! Você receberá nossas ofertas. 🔔"); }
+                } catch (error) { console.error("Erro:", error); }
+            });
+        }
+        if (denyBtn) { denyBtn.addEventListener('click', () => { pushModal.style.display = 'none'; }); }
+
+        async function saveToken(){ try{ const t=await messaging.getToken({vapidKey:'BInIXSUQdmOW6xyauTrERRsEgA0QtupR2fmDrhIckU-QA2sLBCJQnKsJk1eK40esRAW3EGYWQMz1WOnVHaIsPPA'}); if(t)await db.collection('push_tokens').doc(t).set({token:t,createdAt:firebase.firestore.FieldValue.serverTimestamp()}) }catch(e){console.log(e)}}
+        
+        // 🚨 NOVO: Correção Android (Site Aberto)
+        if(messaging) {
+            messaging.onMessage((payload) => {
+                console.log('Mensagem site aberto:', payload);
+                const { title, body } = payload.notification;
+                alert(`🔔 ${title}\n\n${body}`);
+            });
+        }
+
+        let lc=0, lt=null; headerEl.addEventListener('click',(e)=>{if(e.target.closest('.header-logo')){lc++;if(lt)clearTimeout(lt);if(lc===3){window.location.href='admin.html';lc=0}else{lt=setTimeout(()=>{lc=0},1500)}}});
+        function getCart(){return JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}}
+        function updateCartIcon(){const c=getCart();let q=0;Object.values(c.items).forEach(i=>q+=i.quantity);if(q>0){cartCountEl.textContent=q;cartCountEl.style.display='flex'}else{cartCountEl.style.display='none'}}
+        
+        async function fetchProducts(){
+            loadingMsg.style.display='block'; errorMsg.style.display='none'; grid.innerHTML=''; searchNoResults.style.display='none';
+            const st=document.querySelector(`.secao-button[data-secao="${currentSecao}"]`).textContent;
+            const ft=document.querySelector(`.filter-button[data-filter="${currentFilter}"]`).textContent;
+            collectionTitle.textContent=`${st} | ${ft}`; filterDetails.textContent=filterHelpTexts[currentFilter];
+            try{
+                let q=db.collection("products"); if(currentSecao!=='todos')q=q.where("secao","==",currentSecao);
+                q=q.where("source","==",currentFilter).orderBy("createdAt","desc");
+                const snap=await q.get();
+                if(snap.empty){loadingMsg.style.display='none';grid.innerHTML='<p style="text-align:center;grid-column:1/-1">Nenhum produto encontrado.</p>';return}
+                snap.forEach(d=>{
+                    const p=d.data(), id=d.id, pf=(p.price||0).toLocaleString('ja-JP');
+                    let b=''; if(p.isFeatured==='novo')b='<span class="badge badge-novo">✨ Novidade</span>';else if(p.isFeatured==='destaque')b='<span class="badge badge-destaque">🔥 Destaque</span>';
+                    let sb=''; if((p.estoqueTotal||0)<=0 && p.source==='pronta-entrega') sb='<span class="badge badge-esgotado">Esgotado</span>';
+                    const c=document.createElement('a'); c.href=`detalhes.html?id=${id}`; c.className='product-card';
+                    c.innerHTML=`${b}${sb}<div class="product-image-container"><img src="${p.imageUrl||'https://via.placeholder.com/400'}" class="product-image"></div><div class="product-info"><h3 class="product-name">${p.name}</h3><p class="product-price">¥${pf}</p><span class="details-button">Ver Detalhes</span></div>`;
+                    grid.appendChild(c);
+                });
+                loadingMsg.style.display='none'; if(searchInput.value.trim()) filterProductsBySearch(searchInput.value.trim());
+            }catch(e){loadingMsg.style.display='none';errorMsg.style.display='block';errorMsg.innerHTML='Erro ao carregar produtos.';}
+        }
+        
+        searchInput.addEventListener('input',(e)=>filterProductsBySearch(e.target.value.trim()));
+        function filterProductsBySearch(t){const c=document.querySelectorAll('.product-card'), l=t.toLowerCase(); let h=false; c.forEach(card=>{if(card.querySelector('.product-name').textContent.toLowerCase().includes(l)){card.style.display='block';h=true}else{card.style.display='none'}}); searchNoResults.style.display=(!h&&t!=='')?'block':'none'}
+        async function fetchSiteConfig(){try{const d=await db.collection("configuracoes").doc("siteInfo").get();if(d.exists&&d.data().logoUrl)headerEl.innerHTML=`<img src="${d.data().logoUrl}" class="header-logo"><p>O melhor do Brasil,<br>agora ao seu alcance no Japão.</p>`}catch(e){}}
+        secaoButtons.forEach(b=>b.addEventListener('click',()=>{secaoButtons.forEach(bt=>bt.classList.remove('active'));b.classList.add('active');currentSecao=b.dataset.secao;fetchProducts()}));
+        filterButtons.forEach(b=>b.addEventListener('click',()=>{filterButtons.forEach(bt=>bt.classList.remove('active'));b.classList.add('active');currentFilter=b.dataset.filter;fetchProducts()}));
+
+        document.addEventListener('DOMContentLoaded',()=>{fetchProducts();updateCartIcon();fetchSiteConfig();checkPushPermission()});
     </script>
 </body>
 </html>
