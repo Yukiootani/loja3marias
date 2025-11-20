@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin V7 (Profissional) | 3 Marias</title>
+    <title>Admin V8.1 (Completo) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -13,20 +13,68 @@
             --border-color: #e0e0e0;
             --error-color: #dc3545;
         }
-        body { font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
-        h1, h2, h3 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
-        form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 20px; background: #fdf7f9; border-radius: 5px; }
-        label { font-weight: bold; margin-bottom: -10px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: #fff; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+        }
+        h1, h2, h3 { 
+            color: var(--primary-color); 
+            text-align: center; 
+            border-bottom: 2px solid var(--accent-color); 
+            padding-bottom: 10px; 
+        }
+        form { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            background: #fdf7f9; 
+            border-radius: 5px; 
+        }
+        label { 
+            font-weight: bold; 
+            margin-bottom: -10px; 
+        }
         input[type="text"], input[type="number"], textarea, select, input[type="file"], input[type="password"], input[type="email"] {
-            width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 4px; 
+            box-sizing: border-box;
         }
         textarea { min-height: 100px; }
         button {
-            background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer;
+            background-color: var(--primary-color); 
+            color: white; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 4px; 
+            font-size: 1em; 
+            font-weight: bold; 
+            cursor: pointer;
         }
+        
         /* DIV DE STATUS */
-        #status, #loginStatus { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
+        #status, #loginStatus { 
+            text-align: center; 
+            font-weight: bold; 
+            padding: 10px; 
+            border-radius: 4px; 
+            margin-bottom: 15px; 
+            display: none; 
+        }
         .success { background-color: #e6f9e6; color: #28a745; }
         .error { background-color: #fdeeee; color: var(--error-color); }
         .loading { background-color: #e6f2ff; color: #007bff; }
@@ -34,27 +82,56 @@
         /* Tabela de Gerenciamento */
         #products-table-container { overflow-x: auto; }
         #products-table { width: 100%; border-collapse: collapse; }
-        #products-table th, #products-table td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
+        #products-table th, #products-table td { 
+            border: 1px solid var(--border-color); 
+            padding: 8px; 
+            text-align: left; 
+        }
         #products-table th { background-color: #f9f2f4; }
-        #products-table img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+        #products-table img { 
+            width: 50px; 
+            height: 50px; 
+            object-fit: cover; 
+            border-radius: 4px; 
+        }
         .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
         .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; }
         
-        /* Estilo das Variantes (com Stock) */
-        #variants-container { border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: #fff; }
-        .variant-entry { border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
+        /* Estilo das Variantes */
+        #variants-container { 
+            border: 1px solid var(--border-color); 
+            padding: 10px; 
+            border-radius: 4px; 
+            background: #fff; 
+        }
+        .variant-entry { 
+            border-bottom: 1px dashed var(--border-color); 
+            padding-bottom: 10px; 
+            margin-bottom: 10px; 
+        }
         .variant-entry:last-child { border-bottom: none; }
-        .variant-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .variant-row { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+        }
         .variant-row select, .variant-row input[type="text"] { width: auto; min-width: 150px; }
         .remove-variant-btn { background: var(--error-color); width: auto; padding: 5px 8px; font-size: 0.8em; }
         #add-variant-btn { background: var(--accent-color); color: #333; width: auto; padding: 8px 12px; margin-top: 10px; }
         
         .variant-size-stock-group {
-            display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px;
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            margin-top: 10px;
         }
         .variant-size-stock-group label { font-weight: normal; margin: 0; }
         .variant-size-stock-group input[type="number"] {
-            width: 60px; padding: 5px; text-align: center;
+            width: 60px; 
+            padding: 5px; 
+            text-align: center;
         }
         
         /* Estilo de Login */
@@ -80,7 +157,7 @@
 <body>
 
     <div class="container">
-        <h1>Painel de Administração (V7)</h1>
+        <h1>Painel de Administração (V8)</h1>
         <h2>3 Marias - Gestão Completa</h2>
 
         <section id="login-section">
@@ -99,19 +176,19 @@
             <div id="status"></div>
 
             <div id="push-panel">
-                <h3>📢 Enviar Notificação Push (App)</h3>
-                <p style="font-size: 0.9em; color: #666;">Envie novidades para todos os clientes que instalaram o App.</p>
+                <h3>📢 Enviar Notificação & Mensagem</h3>
+                <p style="font-size: 0.9em; color: #666;">Isso envia o Push para os celulares e salva a mensagem no "Sininho" do site.</p>
                 
-                <label>Título:</label>
-                <input type="text" id="push-title" placeholder="Ex: Chegou Reposição!">
+                <label>Título (ex: Chegou Reposição!):</label>
+                <input type="text" id="push-title" placeholder="Título curto">
                 
-                <label>Mensagem:</label>
-                <textarea id="push-body" style="min-height: 60px;" placeholder="Ex: Confira as novas cores..."></textarea>
+                <label>Mensagem (ex: Confira as novas cores...):</label>
+                <textarea id="push-body" style="min-height: 60px;" placeholder="Mensagem para o cliente"></textarea>
                 
                 <label>Link (opcional):</label>
                 <input type="text" id="push-link" value="https://loja3marias.netlify.app" placeholder="https://...">
 
-                <button id="btn-send-push" style="background-color: #856404; margin-top: 10px;">🚀 Enviar Notificação</button>
+                <button id="btn-send-push" style="background-color: #856404; margin-top: 10px;">🚀 Enviar e Salvar</button>
             </div>
             
             <hr>
@@ -244,7 +321,7 @@
             const cancelEditBtn = document.getElementById('cancel-edit-btn');
             const addVariantBtn = document.getElementById('add-variant-btn');
             const variantsContainer = document.getElementById('variants-container');
-            const btnSendPush = document.getElementById('btn-send-push'); // 🚨 NOVO
+            const btnSendPush = document.getElementById('btn-send-push'); // Botão de Push
 
             // Elementos de Login
             const loginSection = document.getElementById('login-section');
@@ -304,25 +381,30 @@
                     }, 4000);
                 }
             }
-
-            // 🚨 NOVA LÓGICA: Enviar Push via Netlify Functions (Seguro) 🚨
-            if (btnSendPush) {
+            
+            // 🚨 NOVA LÓGICA DE ENVIO: Netlify Functions + Histórico 🚨
+            if(btnSendPush) {
                 btnSendPush.addEventListener('click', async () => {
                     const title = document.getElementById('push-title').value;
                     const body = document.getElementById('push-body').value;
                     const link = document.getElementById('push-link').value;
 
-                    if(!title || !body) {
-                        alert("Preencha título e mensagem!");
-                        return;
-                    }
-                    if(!confirm("Tem certeza que deseja enviar essa mensagem para TODOS os clientes?")) return;
+                    if(!title || !body) return alert("Preencha título e mensagem!");
+                    if(!confirm("Enviar mensagem para TODOS os clientes?")) return;
 
-                    showStatus(statusDiv, "Enviando notificação via sistema seguro...", "loading");
+                    showStatus(statusDiv, "Enviando...", "loading");
                     btnSendPush.disabled = true;
 
                     try {
-                        // Chama a nossa função no Netlify
+                        // 1. SALVA NO HISTÓRICO (Sininho do Site)
+                        await db.collection('site_messages').add({
+                            title: title,
+                            body: body,
+                            link: link,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        // 2. TENTA MANDAR O PUSH (Via Netlify Functions - Modo Seguro)
                         const response = await fetch('/.netlify/functions/send-push', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -332,30 +414,34 @@
                         const result = await response.json();
 
                         if (response.ok) {
-                            showStatus(statusDiv, `Sucesso! Enviado para ${result.successCount} clientes.`, "success");
-                            document.getElementById('push-title').value = "";
-                            document.getElementById('push-body').value = "";
+                            showStatus(statusDiv, `Mensagem salva e Push enviado para ${result.successCount} clientes!`, "success");
                         } else {
-                            throw new Error(result.error || "Erro desconhecido no servidor.");
+                            // Se o Push falhar (ex: Netlify não configurado ainda), avisa, mas o histórico está salvo!
+                            console.error("Erro no Push:", result);
+                            showStatus(statusDiv, "Mensagem salva no histórico! (Push não enviado: Verifique o Netlify)", "success");
                         }
 
+                        document.getElementById('push-title').value = "";
+                        document.getElementById('push-body').value = "";
+
                     } catch (error) {
-                        console.error("Erro no envio:", error);
-                        showStatus(statusDiv, "Erro ao enviar: " + error.message, "error");
+                        console.error(error);
+                        showStatus(statusDiv, "Erro ao processar: " + error.message, "error");
                     } finally {
                         btnSendPush.disabled = false;
                     }
                 });
             }
 
-            // Lógica de Upload
+
+            // --- LÓGICA DE UPLOAD ---
             async function uploadFile(file, path) {
                 const storageRef = storage.ref(path);
                 const uploadTask = await storageRef.put(file);
                 return await uploadTask.ref.getDownloadURL();
             }
 
-            // Lógica de Variantes (V3.5 - Paleta Completa)
+            // --- LÓGICA DE VARIANTES (V5 - Paleta Completa) ---
             const predefinedColors = [
                 { name: "Preto", value: "#000000" }, { name: "Branco", value: "#FFFFFF" }, { name: "Marfim", value: "#FFFFF0" },
                 { name: "Cinza Claro", value: "#E0E0E0" }, { name: "Cinza Mescla", value: "#D3D3D3" }, { name: "Grafite", value: "#404040" }, { name: "Prata", value: "#C0C0C0" },
@@ -370,7 +456,9 @@
                 { name: "Estampado", value: "#cccccc" }
             ];
 
-            addVariantBtn.addEventListener('click', () => { createVariantEntry(); });
+            addVariantBtn.addEventListener('click', () => {
+                createVariantEntry(); 
+            });
             
             function createVariantEntry(color = '', stockData = { P: 0, M: 0, G: 0, GG: 0 }) {
                 const entryId = Date.now() + Math.random(); 
@@ -400,10 +488,13 @@
                     <div class="variant-size-stock-group">
                         <label for="p-${entryId}">P:</label>
                         <input type="number" id="p-${entryId}" class="variant-size-stock" data-size="P" value="${stockData.P || 0}" min="0">
+                        
                         <label for="m-${entryId}">M:</label>
                         <input type="number" id="m-${entryId}" class="variant-size-stock" data-size="M" value="${stockData.M || 0}" min="0">
+                        
                         <label for="g-${entryId}">G:</label>
                         <input type="number" id="g-${entryId}" class="variant-size-stock" data-size="G" value="${stockData.G || 0}" min="0">
+                        
                         <label for="gg-${entryId}">GG:</label>
                         <input type="number" id="gg-${entryId}" class="variant-size-stock" data-size="GG" value="${stockData.GG || 0}" min="0">
                     </div>
@@ -416,6 +507,7 @@
                     const customInput = variantEntry.querySelector('.variant-color-custom');
                     customInput.style.display = (this.value === 'custom') ? 'block' : 'none';
                 });
+                
                 variantEntry.querySelector('.remove-variant-btn').addEventListener('click', function() {
                     document.getElementById(`variant-${this.dataset.id}`).remove();
                 });
@@ -442,7 +534,9 @@
             function calculateTotalStock(variants) {
                 let total = 0;
                 for (const color in variants) {
-                    for (const size in variants[color]) { total += (parseInt(variants[color][size]) || 0); }
+                    for (const size in variants[color]) {
+                        total += (parseInt(variants[color][size]) || 0);
+                    }
                 }
                 return total;
             }
@@ -450,16 +544,23 @@
             function setVariantsInForm(variants) {
                 variantsContainer.innerHTML = ''; 
                 if (!variants || Object.keys(variants).length === 0) return;
-                for (const color in variants) { const stockData = variants[color]; createVariantEntry(color, stockData); }
+                for (const color in variants) {
+                    const stockData = variants[color]; 
+                    createVariantEntry(color, stockData);
+                }
             }
 
-            // CARREGAR PRODUTOS
+
+            // 1. CARREGAR PRODUTOS
             async function fetchProducts() {
                 try {
                     productsList.innerHTML = '<tr><td colspan="7">Carregando produtos...</td></tr>';
                     const snapshot = await db.collection("products").orderBy("createdAt", "desc").get();
                     
-                    if (snapshot.empty) { productsList.innerHTML = '<tr><td colspan="7">Nenhum produto cadastrado ainda.</td></tr>'; return; }
+                    if (snapshot.empty) {
+                        productsList.innerHTML = '<tr><td colspan="7">Nenhum produto cadastrado ainda.</td></tr>';
+                        return;
+                    }
                     
                     let html = '';
                     snapshot.forEach(doc => {
@@ -475,19 +576,30 @@
                                 <td>¥${precoFormatado}</td>
                                 <td>${product.estoqueTotal || 0}</td> 
                                 <td>${product.source === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda'}</td>
-                                <td><button class="edit-btn" data-id="${id}">Editar</button> <button class="delete-btn" data-id="${id}">Excluir</button></td>
+                                <td>
+                                    <button class="edit-btn" data-id="${id}">Editar</button>
+                                    <button class="delete-btn" data-id="${id}">Excluir</button>
+                                </td>
                             </tr>
                         `;
                     });
                     productsList.innerHTML = html;
-                } catch (error) { console.error("Erro ao carregar produtos:", error); showStatus(statusDiv, "Erro ao carregar produtos: " + String(error.message), "error"); }
+                } catch (error) {
+                    console.error("Erro ao carregar produtos:", error);
+                    showStatus(statusDiv, "Erro ao carregar produtos: " + String(error.message), "error");
+                }
             }
 
-            // SALVAR PRODUTO
+            // 2. SALVAR/ATUALIZAR PRODUTO
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 saveBtn.disabled = true;
-                if (secaoField.value === "") { showStatus(statusDiv, "Erro: Por favor, escolha uma seção para o produto.", "error"); saveBtn.disabled = false; return; }
+                
+                if (secaoField.value === "") {
+                    showStatus(statusDiv, "Erro: Por favor, escolha uma seção para o produto.", "error");
+                    saveBtn.disabled = false;
+                    return;
+                }
 
                 showStatus(statusDiv, "Salvando... Por favor, aguarde o upload.", "loading");
                 const currentProductId = productIdField.value || `pid_${Date.now()}`;
@@ -521,7 +633,9 @@
                     
                     const productVariants = getVariantsFromForm();
                     const totalStock = calculateTotalStock(productVariants);
-                    const productData = { name: nameField.value, price: parseFloat(priceField.value), secao: secaoField.value, description: descField.value, variantes: productVariants, estoqueTotal: totalStock, source: sourceField.value, isFeatured: isFeaturedField.value, imageUrl: imageUrl, videoUrl: videoUrl, galeria: galeriaUrls };
+                    const productData = {
+                        name: nameField.value, price: parseFloat(priceField.value), secao: secaoField.value, description: descField.value, variantes: productVariants, estoqueTotal: totalStock, source: sourceField.value, isFeatured: isFeaturedField.value, imageUrl: imageUrl, videoUrl: videoUrl, galeria: galeriaUrls
+                    };
 
                     if (productIdField.value) {
                         showStatus(statusDiv, "Atualizando produto no banco de dados...", "loading");
@@ -534,31 +648,28 @@
                         showStatus(statusDiv, "Produto salvo com sucesso!", "success");
                     }
                     cancelEditMode(); fetchProducts(); 
-                } catch (error) { console.error("Erro ao salvar:", error); showStatus(statusDiv, "Erro ao salvar: " + String(error.message), "error"); } finally { saveBtn.disabled = false; }
+                } catch (error) {
+                    console.error("Erro ao salvar:", error);
+                    showStatus(statusDiv, "Erro ao salvar: " + String(error.message), "error");
+                } finally {
+                    saveBtn.disabled = false;
+                }
             });
 
-            // EXCLUIR E EDITAR
+            // 3. EXCLUIR E EDITAR
             productsList.addEventListener('click', async (e) => {
                 const target = e.target;
                 const id = target.dataset.id;
-
                 if (target.classList.contains('delete-btn')) {
                     if (!confirm("Tem certeza que deseja excluir este produto?")) return;
-                    try { await db.collection("products").doc(id).delete(); showStatus(statusDiv, "Produto excluído com sucesso!", "success"); fetchProducts(); } 
-                    catch (error) { console.error("Erro ao excluir:", error); showStatus(statusDiv, "Erro ao excluir: " + String(error.message), "error"); }
+                    try { await db.collection("products").doc(id).delete(); showStatus(statusDiv, "Produto excluído com sucesso!", "success"); fetchProducts(); } catch (error) { console.error("Erro ao excluir:", error); showStatus(statusDiv, "Erro ao excluir: " + String(error.message), "error"); }
                 }
-                
                 if (target.classList.contains('edit-btn')) {
                     try {
                         const doc = await db.collection("products").doc(id).get();
                         if (!doc.exists) { showStatus(statusDiv, "Erro: Produto não encontrado.", "error"); return; }
                         const product = doc.data();
-                        productIdField.value = id; nameField.value = product.name || ''; priceField.value = product.price || 0; secaoField.value = product.secao || ''; descField.value = product.description || '';
-                        setVariantsInForm(product.variantes || {});
-                        sourceField.value = product.source || 'pronta-entrega'; isFeaturedField.value = product.isFeatured || 'nenhum';
-                        oldImageUrl = product.imageUrl || ''; oldVideoUrl = product.videoUrl || ''; oldGaleria = product.galeria || [];
-                        imageUrlInput.value = ''; videoUrlInput.value = ''; galeriaInput.value = '';
-                        formTitle.textContent = "2. Editando Produto"; saveBtn.textContent = "Atualizar Produto"; cancelEditBtn.style.display = "block"; window.scrollTo(0, 0); 
+                        productIdField.value = id; nameField.value = product.name || ''; priceField.value = product.price || 0; secaoField.value = product.secao || ''; descField.value = product.description || ''; setVariantsInForm(product.variantes || {}); sourceField.value = product.source || 'pronta-entrega'; isFeaturedField.value = product.isFeatured || 'nenhum'; oldImageUrl = product.imageUrl || ''; oldVideoUrl = product.videoUrl || ''; oldGaleria = product.galeria || []; imageUrlInput.value = ''; videoUrlInput.value = ''; galeriaInput.value = ''; formTitle.textContent = "2. Editando Produto"; saveBtn.textContent = "Atualizar Produto"; cancelEditBtn.style.display = "block"; window.scrollTo(0, 0); 
                     } catch (error) { showStatus(statusDiv, "Erro ao carregar para edição: " + String(error.message), "error"); }
                 }
             });
@@ -566,38 +677,32 @@
             cancelEditBtn.addEventListener('click', cancelEditMode);
             function cancelEditMode() { productIdField.value = ''; form.reset(); variantsContainer.innerHTML = ''; oldImageUrl = ''; oldVideoUrl = ''; oldGaleria = []; formTitle.textContent = "1. Adicionar Novo Produto"; saveBtn.textContent = "Salvar Produto"; cancelEditBtn.style.display = "none"; }
 
-            // LÓGICA DO LOGO
+            // LOGO
             async function loadSiteConfig() {
-                try { const doc = await db.collection("configuracoes").doc("siteInfo").get(); if (doc.exists && doc.data().logoUrl) { logoPreview.src = doc.data().logoUrl; } else { logoPreview.src = "https://via.placeholder.com/250x100?text=Sem+Logo"; } } 
-                catch (e) { console.error("Erro ao carregar logo:", e); logoPreview.src = "https://via.placeholder.com/250x100?text=Erro+ao+carregar"; }
+                try { const doc = await db.collection("configuracoes").doc("siteInfo").get(); if (doc.exists && doc.data().logoUrl) { logoPreview.src = doc.data().logoUrl; } else { logoPreview.src = "https://via.placeholder.com/250x100?text=Sem+Logo"; } } catch (e) { console.error("Erro ao carregar logo:", e); logoPreview.src = "https://via.placeholder.com/250x100?text=Erro+ao+carregar"; }
             }
             logoForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const file = logoUploadInput.files[0];
                 if (!file) { showStatus(statusDiv, "Por favor, escolha um ficheiro de logo.", "error"); return; }
                 showStatus(statusDiv, "Fazendo upload do novo logo...", "loading");
-                try {
-                    const path = "configuracoes/logo_principal"; const logoUrl = await uploadFile(file, path);
-                    await db.collection("configuracoes").doc("siteInfo").set({ logoUrl: logoUrl }, { merge: true });
-                    showStatus(statusDiv, "Novo logo salvo com sucesso!", "success"); logoPreview.src = logoUrl; logoUploadInput.value = '';
-                } catch (error) { console.error("Erro ao salvar logo:", error); showStatus(statusDiv, "Erro ao salvar logo: " + String(error.message), "error"); }
+                try { const path = "configuracoes/logo_principal"; const logoUrl = await uploadFile(file, path); await db.collection("configuracoes").doc("siteInfo").set({ logoUrl: logoUrl }, { merge: true }); showStatus(statusDiv, "Novo logo salvo com sucesso!", "success"); logoPreview.src = logoUrl; logoUploadInput.value = ''; } catch (error) { console.error("Erro ao salvar logo:", error); showStatus(statusDiv, "Erro ao salvar logo: " + String(error.message), "error"); }
             });
 
-            // LÓGICA DE LOGIN
+            // LOGIN
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
                 showLoginStatus('Tentando entrar...', 'loading');
-                try { await auth.signInWithEmailAndPassword(email, password); } 
-                catch (error) { showLoginStatus(`Erro de Acesso: ${error.message}`, 'error'); }
+                try { await auth.signInWithEmailAndPassword(email, password); } catch (error) { showLoginStatus(`Erro de Acesso: ${error.message}`, 'error'); }
             });
             btnLogout.addEventListener('click', async () => { await auth.signOut(); });
             auth.onAuthStateChanged((user) => {
-                if (user) { loginSection.style.display = 'none'; adminPanel.style.display = 'block'; fetchProducts(); loadSiteConfig(); } 
-                else { loginSection.style.display = 'block'; adminPanel.style.display = 'none'; }
+                if (user) { loginSection.style.display = 'none'; adminPanel.style.display = 'block'; fetchProducts(); loadSiteConfig(); } else { loginSection.style.display = 'block'; adminPanel.style.display = 'none'; }
             });
-        });
+        
+        }); 
     </script>
 </body>
 </html>
