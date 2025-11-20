@@ -3,21 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin V9 (Gerenciador de Msgs) | 3 Marias</title>
+    <title>Admin V9.1 (Completo Real) | 3 Marias</title>
     <style>
-        /* ... (CSS MANTIDO IGUAL AO ANTERIOR) ... */
-        :root { --primary-color: #b76e86; --accent-color: #DAA520; --text-color: #333; --bg-color: #fdf7f9; --border-color: #e0e0e0; --error-color: #dc3545; }
+        :root {
+            --primary-color: #b76e86;
+            --accent-color: #DAA520;
+            --text-color: #333;
+            --bg-color: #fdf7f9;
+            --border-color: #e0e0e0;
+            --error-color: #dc3545;
+        }
         body { font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
         .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
         h1, h2, h3 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
         form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 20px; background: #fdf7f9; border-radius: 5px; }
         label { font-weight: bold; margin-bottom: -10px; }
-        input, textarea, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; }
-        button { background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; }
+        input[type="text"], input[type="number"], textarea, select, input[type="file"], input[type="password"], input[type="email"] {
+            width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;
+        }
+        textarea { min-height: 100px; }
+        button {
+            background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer;
+        }
+        /* DIV DE STATUS */
         #status, #loginStatus { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
         .success { background-color: #e6f9e6; color: #28a745; }
         .error { background-color: #fdeeee; color: var(--error-color); }
         .loading { background-color: #e6f2ff; color: #007bff; }
+        
+        /* Tabela de Gerenciamento */
         #products-table-container { overflow-x: auto; }
         #products-table { width: 100%; border-collapse: collapse; }
         #products-table th, #products-table td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
@@ -25,28 +39,53 @@
         #products-table img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
         .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
         .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; }
+        
+        /* Estilo das Variantes */
         #variants-container { border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: #fff; }
         .variant-entry { border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
+        .variant-entry:last-child { border-bottom: none; }
         .variant-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .variant-size-stock-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
-        .variant-size-stock-group input[type="number"] { width: 60px; padding: 5px; text-align: center; }
+        .variant-row select, .variant-row input[type="text"] { width: auto; min-width: 150px; }
+        .remove-variant-btn { background: var(--error-color); width: auto; padding: 5px 8px; font-size: 0.8em; }
+        #add-variant-btn { background: var(--accent-color); color: #333; width: auto; padding: 8px 12px; margin-top: 10px; }
+        
+        .variant-size-stock-group {
+            display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px;
+        }
+        .variant-size-stock-group label { font-weight: normal; margin: 0; }
+        .variant-size-stock-group input[type="number"] {
+            width: 60px; padding: 5px; text-align: center;
+        }
+        
+        /* Estilo de Login */
         #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
         #admin-panel { display: none; } 
         #btnLogout { background-color: #777; margin-top: 20px; }
+
+        /* Estilo do Preview do Logo */
         #logo-preview-container { text-align: center; margin-bottom: 15px; }
         #logo-preview { max-width: 250px; max-height: 100px; border: 1px dashed var(--border-color); padding: 5px; }
-        #push-panel { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+
+        /* Painel de Notificação */
+        #push-panel {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
         #push-panel h3 { color: #856404; border-bottom-color: #856404; }
         
-        /* 🚨 NOVO: Tabela de Mensagens */
+        /* Tabela de Mensagens */
         #messages-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         #messages-table th, #messages-table td { border: 1px solid #e0e0e0; padding: 8px; text-align: left; font-size: 0.9em; }
         #messages-table th { background-color: #fdf7f9; }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>Painel de Administração (V9)</h1>
+        <h1>Painel de Administração (V9.1)</h1>
         <h2>3 Marias - Gestão Completa</h2>
 
         <section id="login-section">
@@ -64,9 +103,17 @@
 
             <div id="push-panel">
                 <h3>📢 Enviar Notificação & Mensagem</h3>
-                <label>Título:</label><input type="text" id="push-title" placeholder="Ex: Chegou Reposição!">
-                <label>Mensagem:</label><textarea id="push-body" style="min-height: 60px;" placeholder="Ex: Confira as novas cores..."></textarea>
-                <label>Link (opcional):</label><input type="text" id="push-link" value="https://loja3marias.netlify.app" placeholder="https://...">
+                <p style="font-size: 0.9em; color: #666;">Isso envia o Push para os celulares e salva a mensagem no "Sininho" do site.</p>
+                
+                <label>Título:</label>
+                <input type="text" id="push-title" placeholder="Ex: Chegou Reposição!">
+                
+                <label>Mensagem:</label>
+                <textarea id="push-body" style="min-height: 60px;" placeholder="Ex: Confira as novas cores..."></textarea>
+                
+                <label>Link (opcional):</label>
+                <input type="text" id="push-link" value="https://loja3marias.netlify.app" placeholder="https://...">
+
                 <button id="btn-send-push" style="background-color: #856404; margin-top: 10px;">🚀 Enviar e Salvar</button>
                 
                 <h4 style="margin-top: 20px; border-bottom: 1px solid #ffeeba; padding-bottom: 5px;">Histórico (Visível no Site)</h4>
@@ -81,26 +128,94 @@
             <form id="product-form">
                 <h3 id="form-title">1. Adicionar Novo Produto</h3>
                 <input type="hidden" id="productId"> 
-                <label>Nome:</label><input type="text" id="name" required>
-                <label>Preço (¥):</label><input type="number" id="price" required>
-                <label>Seção:</label>
+                
+                <label>Nome do Produto:</label>
+                <input type="text" id="name" required>
+
+                <label>Preço (¥):</label>
+                <input type="number" id="price" required>
+                
+                <label>Seção (Categoria):</label>
                 <select id="secao" required>
-                    <option value="">Escolha...</option><option value="calcinhas">Calcinhas</option><option value="sutias">Sutiãs</option><option value="conjuntos">Conjuntos</option><option value="body">Body</option><option value="perfumaria">Perfumaria</option><option value="cremes">Cremes</option><option value="variados">Variados</option>
+                    <option value="">Escolha uma seção...</option>
+                    <option value="calcinhas">Calcinhas</option>
+                    <option value="sutias">Sutiãs</option>
+                    <option value="conjuntos">Conjuntos</option>
+                    <option value="body">Body</option>
+                    <option value="perfumaria">Perfumaria</option>
+                    <option value="cremes">Cremes</option>
+                    <option value="variados">Variados</option>
                 </select>
-                <label>Descrição:</label><textarea id="description" rows="4"></textarea>
-                <label>Variantes:</label><div id="variants-container"></div><button type="button" id="add-variant-btn">+ Cor</button>
-                <label>Disp.:</label><select id="source" required><option value="pronta-entrega">Pronta Entrega</option><option value="sob-encomenda">Sob Encomenda</option></select>
-                <label>Selo:</label><select id="isFeatured"><option value="nenhum">Nenhum</option><option value="novo">Novidade</option><option value="destaque">Destaque</option></select>
-                <label>Capa:</label><input type="file" id="imageUrl"><label>Vídeo:</label><input type="file" id="videoUrl"><label>Galeria:</label><input type="file" id="galeria" multiple>
-                <button type="submit" id="save-btn">Salvar</button><button type="button" id="cancel-edit-btn" style="display:none;background:#777">Cancelar</button>
+
+                <label>Descrição:</label>
+                <textarea id="description" rows="4"></textarea>
+
+                <label>Variantes (Cores e Stock por Tamanho):</label>
+                <div id="variants-container">
+                </div>
+                <button type="button" id="add-variant-btn">+ Adicionar Cor</button>
+
+                <label>Disponibilidade:</label>
+                <select id="source" required>
+                    <option value="pronta-entrega">Pronta Entrega</option>
+                    <option value="sob-encomenda">Sob Encomenda (3-5 dias)</option>
+                </select>
+
+                <label>Selo:</label>
+                <select id="isFeatured">
+                    <option value="nenhum">Nenhum</option>
+                    <option value="novo">✨ Novidade</option>
+                    <option value="destaque">🔥 Destaque</option>
+                </select>
+
+                <label>Imagem de Capa (Upload):</label>
+                <input type="file" id="imageUrl" accept="image/png, image/jpeg">
+                
+                <label>Vídeo (Upload Opcional):</label>
+                <input type="file" id="videoUrl" accept="video/mp4, video/webm">
+
+                <label>Galeria (Upload Múltiplo):</label>
+                <input type="file" id="galeria" multiple accept="image/png, image/jpeg">
+                
+                <button type="submit" id="save-btn">Salvar Produto</button>
+                <button type="button" id="cancel-edit-btn" style="display:none; background-color: #777;">Cancelar Edição</button>
             </form>
+            
             <hr>
+
             <form id="logo-form">
-                <h3>3. Gerir Logo</h3><div id="logo-preview-container"><img id="logo-preview"></div><label>Novo Logo:</label><input type="file" id="logo-upload"><button type="submit" id="save-logo-btn">Salvar</button>
+                <h3>3. Gerir Logo do Site</h3>
+                <div id="logo-preview-container">
+                    <label>Logo Atual:</label>
+                    <img id="logo-preview" src="" alt="Logo Atual">
+                </div>
+                <label>Fazer Upload de Novo Logo:</label>
+                <input type="file" id="logo-upload" accept="image/png, image/jpeg, image/svg+xml">
+                <button type="submit" id="save-logo-btn">Salvar Novo Logo</button>
             </form>
+            
             <hr>
-            <h2>Produtos</h2><div id="products-table-container"><table id="products-table"><thead><tr><th>Foto</th><th>Nome</th><th>Seção</th><th>Preço</th><th>Total</th><th>Disp.</th><th>Ações</th></tr></thead><tbody id="products-list"></tbody></table></div>
-            <button id="btnLogout">Sair</button>
+
+            <h2>Gerenciar Produtos Existentes</h2>
+            <div id="products-table-container">
+                <table id="products-table">
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Nome</th>
+                            <th>Seção</th>
+                            <th>Preço (¥)</th>
+                            <th>Estoque (Total)</th>
+                            <th>Disponibilidade</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-list">
+                        </tbody>
+                </table>
+            </div>
+            
+            <button id="btnLogout">Sair (Logout)</button>
         </section>
     </div>
 
@@ -110,18 +225,51 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI", authDomain: "loja3marias-50204.firebaseapp.com", projectId: "loja3marias-50204", storageBucket: "loja3marias-50204.firebasestorage.app", messagingSenderId: "405330133487", appId: "1:405330133487:web:606de41211df52245f761a", measurementId: "G-TK877V6P0S" };
+        // 🚨 CHAVES DO FIREBASE 🚨
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
+            authDomain: "loja3marias-50204.firebaseapp.com",
+            projectId: "loja3marias-50204",
+            storageBucket: "loja3marias-50204.firebasestorage.app",
+            messagingSenderId: "405330133487",
+            appId: "1:405330133487:web:606de41211df52245f761a",
+            measurementId: "G-TK877V6P0S"
+        };
+
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(); const storage = firebase.storage(); const auth = firebase.auth(); 
+        const db = firebase.firestore(); 
+        const storage = firebase.storage(); 
+        const auth = firebase.auth(); 
         
-        // 🚨 CHAVE DO SERVIDOR (Pendente) 🚨
-        const FCM_SERVER_KEY = "Yv86ZsXr650VL40z16DvFX6_rr-gRaRVoMUmlFnrSPo"; 
+        // 🚨 AQUI FICA A SUA CHAVE DO SERVIDOR (QUANDO TIVER) 🚨
+        const FCM_SERVER_KEY = "Yv86ZsXr650VL40z16DvFX6_rr-gRaRVoMUmlFnrSPo"; // (A chave certa vai aqui depois)
 
         document.addEventListener('DOMContentLoaded', () => {
-            const btnSendPush = document.getElementById('btn-send-push'), statusDiv = document.getElementById('status');
-            const messagesList = document.getElementById('messages-list'); // 🚨 NOVO
+            
+            // Elementos DOM
+            const form = document.getElementById('product-form');
+            const productsList = document.getElementById('products-list');
+            const messagesList = document.getElementById('messages-list');
+            const btnSendPush = document.getElementById('btn-send-push');
+            const statusDiv = document.getElementById('status');
 
-            // 🚨 NOVA FUNÇÃO: Carregar Histórico de Mensagens
+            // Função de Status
+            let statusTimeout; 
+            function showStatus(div, message, type) {
+                clearTimeout(statusTimeout); 
+                div.textContent = String(message); 
+                div.className = 'status ' + type;
+                div.style.display = 'block'; 
+                if (type !== 'loading') { 
+                    statusTimeout = setTimeout(() => { 
+                        div.textContent = ''; 
+                        div.className = '';
+                        div.style.display = 'none'; 
+                    }, 4000);
+                }
+            }
+
+            // 🚨 FUNÇÃO: Carregar Histórico de Mensagens
             async function fetchMessages() {
                 try {
                     messagesList.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
@@ -147,35 +295,35 @@
                     });
                     messagesList.innerHTML = html;
 
-                    // Adiciona evento de clique aos botões de excluir msg
                     document.querySelectorAll('.delete-msg-btn').forEach(btn => {
                         btn.addEventListener('click', async (e) => {
                             if(!confirm("Excluir esta mensagem? Ela sumirá do site.")) return;
                             const id = e.target.dataset.id;
                             await db.collection('site_messages').doc(id).delete();
-                            fetchMessages(); // Recarrega
+                            fetchMessages(); 
+                            showStatus(statusDiv, "Mensagem excluída!", "success");
                         });
                     });
-
                 } catch (error) {
                     console.error("Erro ao carregar msgs:", error);
                 }
             }
 
+            // 🚨 LÓGICA DE ENVIO (Recuperada e Completa) 🚨
             if(btnSendPush) {
                 btnSendPush.addEventListener('click', async () => {
                     const title = document.getElementById('push-title').value;
                     const body = document.getElementById('push-body').value;
                     const link = document.getElementById('push-link').value;
 
-                    if(!title || !body) return alert("Preencha tudo!");
-                    if(!confirm("Enviar?")) return;
+                    if(!title || !body) return alert("Preencha título e mensagem!");
+                    if(!confirm("Enviar mensagem para TODOS os clientes?")) return;
 
                     showStatus(statusDiv, "Enviando...", "loading");
                     btnSendPush.disabled = true;
 
                     try {
-                        // 1. SALVA NO HISTÓRICO
+                        // 1. SALVA NO HISTÓRICO (Banco de Dados)
                         await db.collection('site_messages').add({
                             title: title,
                             body: body,
@@ -183,47 +331,222 @@
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
 
-                        // 2. TENTA PUSH (Se tiver chave certa)
-                        // ... (Lógica de envio mantida) ...
-                        
-                        fetchMessages(); // 🚨 Atualiza a tabela
-                        showStatus(statusDiv, "Mensagem salva!", "success");
+                        // 2. TENTA MANDAR O PUSH (Google)
+                        const snapshot = await db.collection('push_tokens').get();
+                        if (!snapshot.empty) {
+                            const tokens = snapshot.docs.map(doc => doc.data().token);
+                            
+                            // Envio Direto
+                            const promises = tokens.map(token => {
+                                return fetch('https://fcm.googleapis.com/fcm/send', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': 'key=' + FCM_SERVER_KEY
+                                    },
+                                    body: JSON.stringify({
+                                        to: token,
+                                        notification: { title: title, body: body, click_action: link }
+                                    })
+                                });
+                            });
+                            await Promise.all(promises);
+                        }
+
+                        // Atualiza a tabela e limpa campos
+                        fetchMessages(); 
+                        showStatus(statusDiv, "Mensagem salva e enviada!", "success");
                         document.getElementById('push-title').value = "";
                         document.getElementById('push-body').value = "";
 
                     } catch (error) {
                         console.error(error);
-                        showStatus(statusDiv, "Erro: " + error.message, "error");
-                    } finally { btnSendPush.disabled = false; }
+                        showStatus(statusDiv, "Mensagem salva no histórico! (Push falhou: " + error.message + ")", "success");
+                        fetchMessages(); // Mesmo com erro no push, atualiza o histórico
+                    } finally {
+                        btnSendPush.disabled = false;
+                    }
                 });
             }
 
 
-            // ... (RESTO DO CÓDIGO IGUAL - Variáveis, Helpers, Upload, Cores, etc...) ...
-            const form=document.getElementById('product-form'), productsList=document.getElementById('products-list'), loginForm=document.getElementById('loginForm'), loginSection=document.getElementById('login-section'), adminPanel=document.getElementById('admin-panel'), nameField=document.getElementById('name'), priceField=document.getElementById('price'), descField=document.getElementById('description'), secaoField=document.getElementById('secao'), sourceField=document.getElementById('source'), isFeaturedField=document.getElementById('isFeatured'), imageUrlInput=document.getElementById('imageUrl'), videoUrlInput=document.getElementById('videoUrl'), galeriaInput=document.getElementById('galeria'), logoForm=document.getElementById('logo-form'), logoUploadInput=document.getElementById('logo-upload'), logoPreview=document.getElementById('logo-preview');
-            let statusTimeout, oldImageUrl='', oldVideoUrl='', oldGaleria=[];
-            function showStatus(div,msg,type){ clearTimeout(statusTimeout); div.textContent=String(msg); div.className='status '+type; div.style.display='block'; if(type!=='loading'){ statusTimeout=setTimeout(()=>{div.style.display='none'},4000);}}
-            function showLoginStatus(msg,type){ showStatus(document.getElementById('loginStatus'),msg,type); }
-            async function uploadFile(file,path){ const ref=storage.ref(path); await ref.put(file); return await ref.getDownloadURL(); }
-            const predefinedColors = [{name:"Preto",value:"#000000"},{name:"Branco",value:"#FFFFFF"},{name:"Marfim",value:"#FFFFF0"},{name:"Cinza Claro",value:"#E0E0E0"},{name:"Cinza Mescla",value:"#D3D3D3"},{name:"Grafite",value:"#404040"},{name:"Prata",value:"#C0C0C0"},{name:"Cetim",value:"#D2B48C"},{name:"Nude Rosado",value:"#E3BC9A"},{name:"Nude Bege",value:"#F5F5DC"},{name:"Marrom",value:"#8B4513"},{name:"Chocolate",value:"#D2691E"},{name:"Terracota",value:"#E2725B"},{name:"Rosa Bebê",value:"#F4C2C2"},{name:"Rosa Claro",value:"#FFC0CB"},{name:"Rosa Antigo",value:"#b76e86"},{name:"Pink",value:"#FFC0CB"},{name:"Fúcsia",value:"#FF00FF"},{name:"Vermelho",value:"#FF0000"},{name:"Cereja",value:"#D2042D"},{name:"Vinho",value:"#800000"},{name:"Bordô",value:"#800000"},{name:"Marsala",value:"#B1907F"},{name:"Azul Bebê",value:"#E0FFFF"},{name:"Azul Serenity",value:"#98b6d4"},{name:"Azul Royal",value:"#0000CD"},{name:"Azul Tiffany",value:"#AFEEEE"},{name:"Azul Petróleo",value:"#008080"},{name:"Azul Marinho",value:"#000080"},{name:"Verde Menta",value:"#98FF98"},{name:"Verde Água",value:"#AFEEEE"},{name:"Verde Musgo Claro",value:"#ADBC9F"},{name:"Verde Oliva",value:"#808000"},{name:"Verde Musgo",value:"#556B2F"},{name:"Verde Esmeralda",value:"#50C878"},{name:"Lilás",value:"#C8A2C8"},{name:"Lavanda",value:"#E6E6FA"},{name:"Odalisca",value:"#C8A2C8"},{name:"Roxo",value:"#800080"},{name:"Violeta",value:"#EE82EE"},{name:"Amarelo",value:"#FFFF00"},{name:"Dourado",value:"#FFD700"},{name:"Laranja",value:"#FFA500"},{name:"Coral",value:"#FF7F50"},{name:"Estampado",value:"#cccccc"}];
-            const variantsContainer=document.getElementById('variants-container'); document.getElementById('add-variant-btn').addEventListener('click',()=>{createVariantEntry()});
-            function createVariantEntry(color='',stockData={P:0,M:0,G:0,GG:0}){ const id=Date.now()+Math.random(), div=document.createElement('div'); div.className='variant-entry'; div.id='v-'+id; const dark=["#000000","#404040","#8B4513","#D2691E","#b76e86","#D2042D","#800000","#000080","#0000CD","#008080","#556B2F","#808000","#50C878","#800080"]; let opts=predefinedColors.map(c=>`<option value="${c.name}" style="background-color:${c.value};color:${dark.includes(c.value)?'white':'black'}">${c.name}</option>`).join(''); let isC=color&&!predefinedColors.find(c=>c.name===color); div.innerHTML=`<div class="variant-row"><select class="variant-color-select"><option value="">Cor...</option>${opts}<option value="custom">Outra</option></select><input class="variant-color-custom" style="display:${isC?'block':'none'}" value="${isC?color:''}" placeholder="Cor"></div><div class="variant-size-stock-group"><label>P:</label><input type="number" data-size="P" value="${stockData.P||0}"><label>M:</label><input type="number" data-size="M" value="${stockData.M||0}"><label>G:</label><input type="number" data-size="G" value="${stockData.G||0}"><label>GG:</label><input type="number" data-size="GG" value="${stockData.GG||0}"></div><button type="button" class="remove-variant-btn" onclick="this.parentElement.remove()">X</button>`; variantsContainer.appendChild(div); const sel=div.querySelector('select'); sel.value=isC?'custom':color; sel.onchange=function(){div.querySelector('.variant-color-custom').style.display=(this.value==='custom'?'block':'none')}; }
-            function getVariants(){ let v={}; variantsContainer.querySelectorAll('.variant-entry').forEach(e=>{ let s=e.querySelector('select').value, c=e.querySelector('input[type=text]').value, col=s==='custom'?c:s; if(col){ let st={}; e.querySelectorAll('input[type=number]').forEach(i=>st[i.dataset.size]=parseInt(i.value)||0); v[col]=st; } }); return v; }
-            function calcTotal(v){ let t=0; for(let c in v)for(let s in v[c])t+=v[c][s]; return t; }
-            function setVariants(v){ variantsContainer.innerHTML=''; if(v)for(let c in v)createVariantEntry(c,v[c]); }
+            // --- (CÓDIGOS ORIGINAIS DE PRODUTOS E LOGIN - RESTAURADOS) ---
             
-            async function fetchProds(){ try{ productsList.innerHTML='<tr><td colspan="7">Carregando...</td></tr>'; const snap=await db.collection("products").orderBy("createdAt","desc").get(); let h=''; snap.forEach(d=>{ let p=d.data(); h+=`<tr id="${d.id}"><td><img src="${p.imageUrl}"></td><td>${p.name}</td><td>${p.secao||'-'}</td><td>¥${p.price}</td><td>${p.estoqueTotal||0}</td><td>${p.source}</td><td><button class="edit-btn" data-id="${d.id}">Editar</button> <button class="delete-btn" data-id="${d.id}">Excluir</button></td></tr>`; }); productsList.innerHTML=h||'<tr><td colspan="7">Vazio.</td></tr>'; }catch(e){showStatus(document.getElementById('status'),e.message,'error')} }
-            form.addEventListener('submit',async(e)=>{ e.preventDefault(); if(!secaoField.value)return alert("Seção!"); showStatus(document.getElementById('status'),"Salvando...","loading"); const id=document.getElementById('productId').value||`pid_${Date.now()}`; try{ let img=oldImageUrl, vid=oldVideoUrl, gal=oldGaleria; if(imageUrlInput.files[0]) img=await uploadFile(imageUrlInput.files[0],`products/${id}/capa`); if(videoUrlInput.files[0]) vid=await uploadFile(videoUrlInput.files[0],`products/${id}/vid`); if(galeriaInput.files.length){ gal=[]; for(let f of galeriaInput.files) gal.push(await uploadFile(f,`products/${id}/gal_${f.name}`)); } let v=getVariants(), t=calcTotal(v); let d={name:nameField.value, price:parseFloat(priceField.value), secao:secaoField.value, description:descField.value, variantes:v, estoqueTotal:t, source:sourceField.value, isFeatured:isFeaturedField.value, imageUrl:img, videoUrl:vid, galeria:gal}; if(document.getElementById('productId').value) await db.collection("products").doc(id).update(d); else { d.createdAt=firebase.firestore.FieldValue.serverTimestamp(); await db.collection("products").doc(id).set(d); } cancelEditMode(); fetchProds(); showStatus(document.getElementById('status'),"Salvo!","success"); }catch(e){showStatus(document.getElementById('status'),e.message,'error')} });
-            productsList.addEventListener('click',async(e)=>{ let id=e.target.dataset.id; if(e.target.classList.contains('delete-btn') && confirm("Excluir?")){ await db.collection("products").doc(id).delete(); fetchProds(); } if(e.target.classList.contains('edit-btn')){ let d=await db.collection("products").doc(id).get(), p=d.data(); document.getElementById('productId').value=id; nameField.value=p.name; priceField.value=p.price; secaoField.value=p.secao; descField.value=p.description; setVariants(p.variantes); sourceField.value=p.source; isFeaturedField.value=p.isFeatured; oldImageUrl=p.imageUrl; oldVideoUrl=p.videoUrl; oldGaleria=p.galeria||[]; document.getElementById('form-title').textContent="Editando"; document.getElementById('save-btn').textContent="Atualizar"; document.getElementById('cancel-edit-btn').style.display="block"; window.scrollTo(0,0); } });
-            document.getElementById('cancel-edit-btn').addEventListener('click',cancelEditMode); function cancelEditMode(){ productIdField.value=''; form.reset(); variantsContainer.innerHTML=''; oldImageUrl=''; document.getElementById('form-title').textContent="Novo Produto"; document.getElementById('save-btn').textContent="Salvar"; document.getElementById('cancel-edit-btn').style.display="none"; }
-            async function loadSiteConfig(){ try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists&&d.data().logoUrl) logoPreview.src=d.data().logoUrl; }catch(e){} }
-            logoForm.addEventListener('submit',async(e)=>{ e.preventDefault(); const f=logoUploadInput.files[0]; if(!f)return; showStatus(document.getElementById('status'),"Enviando Logo...","loading"); try{ const u=await uploadFile(f,"configuracoes/logo_principal"); await db.collection("configuracoes").doc("siteInfo").set({logoUrl:u},{merge:true}); logoPreview.src=u; showStatus(document.getElementById('status'),"Logo Salvo!","success"); }catch(e){alert(e.message)} });
+            async function uploadFile(file, path) {
+                const storageRef = storage.ref(path);
+                const uploadTask = await storageRef.put(file);
+                return await uploadTask.ref.getDownloadURL();
+            }
+
+            const predefinedColors = [
+                { name: "Preto", value: "#000000" }, { name: "Branco", value: "#FFFFFF" }, { name: "Marfim", value: "#FFFFF0" },
+                { name: "Cinza Claro", value: "#E0E0E0" }, { name: "Cinza Mescla", value: "#D3D3D3" }, { name: "Grafite", value: "#404040" }, { name: "Prata", value: "#C0C0C0" },
+                { name: "Cetim", value: "#D2B48C" }, { name: "Nude Rosado", value: "#E3BC9A" }, { name: "Nude Bege", value: "#F5F5DC" }, { name: "Marrom", value: "#8B4513" },
+                { name: "Chocolate", value: "#D2691E" }, { name: "Terracota", value: "#E2725B" },
+                { name: "Rosa Bebê", value: "#F4C2C2" }, { name: "Rosa Claro", value: "#FFC0CB" }, { name: "Rosa Antigo", value: "#b76e86" }, { name: "Pink", value: "#FFC0CB" }, { name: "Fúcsia", value: "#FF00FF" },
+                { name: "Vermelho", value: "#FF0000" }, { name: "Cereja", value: "#D2042D" }, { name: "Vinho", value: "#800000" }, { name: "Bordô", value: "#800000" }, { name: "Marsala", value: "#B1907F" },
+                { name: "Azul Bebê", value: "#E0FFFF" }, { name: "Azul Serenity", value: "#98b6d4" }, { name: "Azul Royal", value: "#0000CD" }, { name: "Azul Tiffany", value: "#AFEEEE" }, { name: "Azul Petróleo", value: "#008080" }, { name: "Azul Marinho", value: "#000080" },
+                { name: "Verde Menta", value: "#98FF98" }, { name: "Verde Água", value: "#AFEEEE" }, { name: "Verde Musgo Claro", value: "#ADBC9F" }, { name: "Verde Oliva", value: "#808000" }, { name: "Verde Musgo", value: "#556B2F" }, { name: "Verde Esmeralda", value: "#50C878" },
+                { name: "Lilás", value: "#C8A2C8" }, { name: "Lavanda", value: "#E6E6FA" }, { name: "Odalisca", value: "#C8A2C8" }, { name: "Roxo", value: "#800080" }, { name: "Violeta", value: "#EE82EE" },
+                { name: "Amarelo", value: "#FFFF00" }, { name: "Dourado", value: "#FFD700" }, { name: "Laranja", value: "#FFA500" }, { name: "Coral", value: "#FF7F50" },
+                { name: "Estampado", value: "#cccccc" }
+            ];
+
+            const variantsContainer = document.getElementById('variants-container');
+            document.getElementById('add-variant-btn').addEventListener('click', () => { createVariantEntry(); });
             
-            loginForm.addEventListener('submit',async(e)=>{ e.preventDefault(); try{ await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value); }catch(e){alert(e.message)} });
-            document.getElementById('btnLogout').addEventListener('click',()=>auth.signOut());
+            function createVariantEntry(color = '', stockData = { P: 0, M: 0, G: 0, GG: 0 }) {
+                const entryId = Date.now() + Math.random(); 
+                const variantEntry = document.createElement('div');
+                variantEntry.className = 'variant-entry';
+                variantEntry.id = `variant-${entryId}`;
+                const darkColors = ["#000000", "#404040", "#8B4513", "#D2691E", "#b76e86", "#D2042D", "#800000", "#000080", "#0000CD", "#008080", "#556B2F", "#808000", "#50C878", "#800080"];
+                let colorOptions = predefinedColors.map(c => {
+                    const textColor = darkColors.includes(c.value) ? 'white' : 'black';
+                    return `<option value="${c.name}" style="background-color:${c.value}; color:${textColor};">${c.name}</option>`;
+                }).join('');
+                let isCustom = color && !predefinedColors.find(c => c.name === color);
+                let customValue = isCustom ? color : '';
+                let selectValue = isCustom ? 'custom' : color;
+                
+                variantEntry.innerHTML = `<div class="variant-row"><select class="variant-color-select"><option value="">Escolha uma cor...</option>${colorOptions}<option value="custom">Outra (Personalizada)</option></select><input type="text" class="variant-color-custom" placeholder="Cor Personalizada" style="display:${isCustom ? 'block' : 'none'};" value="${customValue}"></div><div class="variant-size-stock-group"><label>P:</label><input type="number" class="variant-size-stock" data-size="P" value="${stockData.P || 0}" min="0"><label>M:</label><input type="number" class="variant-size-stock" data-size="M" value="${stockData.M || 0}" min="0"><label>G:</label><input type="number" class="variant-size-stock" data-size="G" value="${stockData.G || 0}" min="0"><label>GG:</label><input type="number" class="variant-size-stock" data-size="GG" value="${stockData.GG || 0}" min="0"></div><button type="button" class="remove-variant-btn" onclick="this.parentElement.remove()">X</button>`;
+                variantsContainer.appendChild(variantEntry);
+                
+                const sel = variantEntry.querySelector('.variant-color-select');
+                sel.value = selectValue;
+                sel.addEventListener('change', function() {
+                    const customInput = variantEntry.querySelector('.variant-color-custom');
+                    customInput.style.display = (this.value === 'custom') ? 'block' : 'none';
+                });
+            }
+
+            function getVariantsFromForm() {
+                const variants = {};
+                const entries = variantsContainer.querySelectorAll('.variant-entry');
+                entries.forEach(entry => {
+                    const select = entry.querySelector('.variant-color-select');
+                    const custom = entry.querySelector('.variant-color-custom');
+                    let color = (select.value === 'custom') ? custom.value : select.value;
+                    if (color) {
+                        const stocks = {};
+                        entry.querySelectorAll('.variant-size-stock').forEach(input => {
+                            stocks[input.dataset.size] = parseInt(input.value) || 0;
+                        });
+                        variants[color] = stocks;
+                    }
+                });
+                return variants;
+            }
             
-            // 🚨 NOVO: Carrega histórico ao entrar
-            auth.onAuthStateChanged(u=>{ if(u){loginSection.style.display='none';adminPanel.style.display='block';fetchProds();fetchMessages();loadSiteConfig();}else{loginSection.style.display='block';adminPanel.style.display='none'} });
+            function calculateTotalStock(variants) {
+                let total = 0;
+                for (const color in variants) {
+                    for (const size in variants[color]) { total += (parseInt(variants[color][size]) || 0); }
+                }
+                return total;
+            }
+
+            function setVariantsInForm(variants) {
+                variantsContainer.innerHTML = ''; 
+                if (!variants || Object.keys(variants).length === 0) return;
+                for (const color in variants) {
+                    const stockData = variants[color]; 
+                    createVariantEntry(color, stockData);
+                }
+            }
+
+            // CARREGAR PRODUTOS
+            async function fetchProducts() {
+                try {
+                    productsList.innerHTML = '<tr><td colspan="7">Carregando produtos...</td></tr>';
+                    const snapshot = await db.collection("products").orderBy("createdAt", "desc").get();
+                    if (snapshot.empty) { productsList.innerHTML = '<tr><td colspan="7">Nenhum produto cadastrado ainda.</td></tr>'; return; }
+                    
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const product = doc.data();
+                        const id = doc.id;
+                        const precoFormatado = (product.price || 0).toLocaleString('ja-JP');
+                        html += `<tr id="product-${id}"><td><img src="${product.imageUrl || 'https://via.placeholder.com/50'}" alt="${product.name}"></td><td>${product.name || 'Sem nome'}</td><td>${product.secao || 'N/A'}</td><td>¥${precoFormatado}</td><td>${product.estoqueTotal || 0}</td> <td>${product.source === 'pronta-entrega' ? 'Pronta Entrega' : 'Sob Encomenda'}</td><td><button class="edit-btn" data-id="${id}">Editar</button> <button class="delete-btn" data-id="${id}">Excluir</button></td></tr>`;
+                    });
+                    productsList.innerHTML = html;
+                } catch (error) {
+                    console.error("Erro ao carregar produtos:", error);
+                    showStatus(statusDiv, "Erro ao carregar produtos: " + String(error.message), "error");
+                }
+            }
+
+            // SALVAR PRODUTO
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                saveBtn.disabled = true;
+                if (document.getElementById('secao').value === "") { showStatus(statusDiv, "Erro: Escolha uma seção.", "error"); saveBtn.disabled = false; return; }
+                showStatus(statusDiv, "Salvando...", "loading");
+                const currentProductId = document.getElementById('productId').value || `pid_${Date.now()}`;
+                
+                try {
+                    let imageUrl = oldImageUrl; let videoUrl = oldVideoUrl; let galeriaUrls = oldGaleria;
+                    if (imageUrlInput.files[0]) { imageUrl = await uploadFile(imageUrlInput.files[0], `products/${currentProductId}/capa`); }
+                    if (videoUrlInput.files[0]) { videoUrl = await uploadFile(videoUrlInput.files[0], `products/${currentProductId}/video`); }
+                    if (galeriaInput.files.length > 0) { galeriaUrls = []; for (const file of galeriaInput.files) { galeriaUrls.push(await uploadFile(file, `products/${currentProductId}/gal_${file.name}`)); } }
+                    
+                    const productVariants = getVariantsFromForm();
+                    const totalStock = calculateTotalStock(productVariants);
+                    const productData = { name: nameField.value, price: parseFloat(priceField.value), secao: document.getElementById('secao').value, description: descField.value, variantes: productVariants, estoqueTotal: totalStock, source: document.getElementById('source').value, isFeatured: document.getElementById('isFeatured').value, imageUrl: imageUrl, videoUrl: videoUrl, galeria: galeriaUrls };
+
+                    if (document.getElementById('productId').value) { await db.collection("products").doc(currentProductId).update(productData); } 
+                    else { productData.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("products").doc(currentProductId).set(productData); }
+                    
+                    cancelEditMode(); fetchProducts(); showStatus(statusDiv, "Salvo com sucesso!", "success");
+                } catch (error) { showStatus(statusDiv, "Erro: " + error.message, "error"); } finally { saveBtn.disabled = false; }
+            });
+
+            productsList.addEventListener('click', async (e) => {
+                const id = e.target.dataset.id;
+                if (e.target.classList.contains('delete-btn') && confirm("Excluir?")) { await db.collection("products").doc(id).delete(); fetchProducts(); }
+                if (e.target.classList.contains('edit-btn')) {
+                    const doc = await db.collection("products").doc(id).get();
+                    const p = doc.data();
+                    document.getElementById('productId').value = id; nameField.value = p.name; priceField.value = p.price; document.getElementById('secao').value = p.secao; descField.value = p.description;
+                    setVariantsInForm(p.variantes); document.getElementById('source').value = p.source; document.getElementById('isFeatured').value = p.isFeatured;
+                    oldImageUrl = p.imageUrl; oldVideoUrl = p.videoUrl; oldGaleria = p.galeria || [];
+                    document.getElementById('form-title').textContent = "Editando"; saveBtn.textContent = "Atualizar"; document.getElementById('cancel-edit-btn').style.display = "block"; window.scrollTo(0, 0);
+                }
+            });
+
+            document.getElementById('cancel-edit-btn').addEventListener('click', cancelEditMode);
+            function cancelEditMode() { document.getElementById('productId').value = ''; form.reset(); variantsContainer.innerHTML = ''; oldImageUrl = ''; document.getElementById('form-title').textContent = "Novo Produto"; saveBtn.textContent = "Salvar"; document.getElementById('cancel-edit-btn').style.display = "none"; }
+
+            // LOGO E LOGIN
+            async function loadSiteConfig() { try { const doc = await db.collection("configuracoes").doc("siteInfo").get(); if (doc.exists && doc.data().logoUrl) logoPreview.src = doc.data().logoUrl; } catch (e) {} }
+            logoForm.addEventListener('submit', async (e) => { e.preventDefault(); const file = logoUploadInput.files[0]; if (file) { const url = await uploadFile(file, "configuracoes/logo_principal"); await db.collection("configuracoes").doc("siteInfo").set({ logoUrl: url }, { merge: true }); logoPreview.src = url; showStatus(statusDiv, "Logo Salvo!", "success"); } });
+            
+            const loginForm = document.getElementById('loginForm');
+            const loginStatusDiv = document.getElementById('loginStatus');
+            const loginSection = document.getElementById('login-section');
+            const adminPanel = document.getElementById('admin-panel');
+            const btnLogout = document.getElementById('btnLogout');
+
+            function showLoginStatus(msg, type) { loginStatusDiv.textContent = msg; loginStatusDiv.className = 'status ' + type; loginStatusDiv.style.display = 'block'; }
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try { await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value); } catch (error) { showLoginStatus("Erro: " + error.message, "error"); }
+            });
+            btnLogout.addEventListener('click', async () => { await auth.signOut(); });
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    loginSection.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    fetchProducts();
+                    fetchMessages(); // 🚨 AGORA SIM CARREGA AS MENSAGENS
+                    loadSiteConfig();
+                } else {
+                    loginSection.style.display = 'block';
+                    adminPanel.style.display = 'none';
+                }
+            });
         });
     </script>
 </body>
