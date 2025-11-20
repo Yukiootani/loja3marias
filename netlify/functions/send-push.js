@@ -1,62 +1,55 @@
 var admin = require("firebase-admin");
 
-// Verifica se já conectou antes para não dar erro
 if (admin.apps.length === 0) {
-  // Pega a chave mestra que vamos colocar no Netlify
   var serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-  
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
 }
 
 exports.handler = async function(event, context) {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
+  if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
 
   try {
     const data = JSON.parse(event.body);
-    const { title, body, link } = data;
-
-    // 1. Busca todos os tokens no banco de dados
     const db = admin.firestore();
     const snapshot = await db.collection('push_tokens').get();
     
-    if (snapshot.empty) {
-      return { statusCode: 200, body: JSON.stringify({ message: "Nenhum cliente cadastrado." }) };
-    }
+    if (snapshot.empty) return { statusCode: 200, body: JSON.stringify({ message: "Nenhum cliente." }) };
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
-
-    // 2. Prepara a mensagem
+    
+    // 🚨 AQUI ESTÁ A CORREÇÃO PARA ANDROID 🚨
     const message = {
-      notification: {
-        title: title,
-        body: body
+      notification: { 
+        title: data.title, 
+        body: data.body 
       },
-      webpush: {
-        fcm_options: {
-          link: link || 'https://loja3marias.netlify.app'
+      // Configuração específica para acordar o Android
+      android: {
+        priority: 'high',
+        notification: {
+          sound: 'default',
+          click_action: data.link || 'https://loja3marias.netlify.app'
         }
+      },
+      // Configuração para Web (PC/iPhone)
+      webpush: { 
+        headers: {
+          Urgency: "high"
+        },
+        fcm_options: { 
+          link: data.link || 'https://loja3marias.netlify.app' 
+        } 
       },
       tokens: tokens
     };
 
-    // 3. Envia para todos (Multicast)
     const response = await admin.messaging().sendEachForMulticast(message);
-    
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ 
-        success: true, 
-        successCount: response.successCount, 
-        failureCount: response.failureCount 
-      })
-    };
+    return { statusCode: 200, body: JSON.stringify({ success: true, count: response.successCount }) };
 
   } catch (error) {
-    console.error("Erro no envio:", error);
+    console.error(error);
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
 };
