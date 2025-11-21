@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin V11 (Código Completo) | 3 Marias</title>
+    <title>Admin V11 (Completo) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -79,7 +79,7 @@
         .loading { background-color: #e6f2ff; color: #007bff; }
         
         /* Tabelas */
-        #products-table-container, #messages-table-container { 
+        #products-table-container, #messages-table-container, .table-container { 
             overflow-x: auto; 
             margin-bottom: 30px;
         }
@@ -112,6 +112,16 @@
         }
         #push-panel h3 { color: #856404; border-bottom-color: #856404; }
         
+        /* Painel de Avaliações */
+        #reviews-panel { 
+            background-color: #e3f2fd; 
+            border: 1px solid #bbdefb; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 30px; 
+        }
+        #reviews-panel h3 { color: #0d47a1; border-bottom-color: #0d47a1; }
+
         /* Variantes */
         #variants-container { 
             border: 1px solid var(--border-color); 
@@ -124,6 +134,7 @@
             padding-bottom: 10px; 
             margin-bottom: 10px; 
         }
+        .variant-entry:last-child { border-bottom: none; }
         .variant-row { 
             display: flex; 
             gap: 10px; 
@@ -149,7 +160,7 @@
 <body>
 
     <div class="container">
-        <h1>Painel de Administração (V11)</h1>
+        <h1>Painel de Administração</h1>
         <h2>3 Marias - Gestão Completa</h2>
 
         <section id="login-section">
@@ -157,10 +168,8 @@
             <form id="loginForm">
                 <label>Email:</label>
                 <input type="email" id="login-email" required>
-                
                 <label>Senha:</label>
                 <input type="password" id="login-password" required>
-                
                 <button type="submit" id="btnLogin">Entrar</button>
             </form>
             <div id="loginStatus" class="status"></div>
@@ -171,7 +180,7 @@
 
             <div id="push-panel">
                 <h3>📢 Enviar Notificação & Mensagem</h3>
-                <p style="font-size: 0.9em; color: #666;">Envia Push (Prioridade Alta) e salva no Histórico (Sino).</p>
+                <p style="font-size: 0.9em; color: #666;">Envia Push e salva no Histórico (Sino).</p>
                 
                 <label>Título:</label>
                 <input type="text" id="push-title" placeholder="Ex: Chegou Reposição!">
@@ -196,6 +205,36 @@
                             </tr>
                         </thead>
                         <tbody id="messages-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="reviews-panel">
+                <h3>⭐ Cadastrar Avaliação</h3>
+                
+                <label>Escolha o Produto:</label>
+                <select id="review-product-select"><option value="">Carregando...</option></select>
+                
+                <label>Nome da Cliente:</label>
+                <input type="text" id="review-name">
+                
+                <label>Nota:</label>
+                <select id="review-rating">
+                    <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                    <option value="4">⭐⭐⭐⭐ (4)</option>
+                    <option value="3">⭐⭐⭐ (3)</option>
+                </select>
+                
+                <label>Comentário:</label>
+                <textarea id="review-text" rows="3"></textarea>
+                
+                <button id="btn-save-review" style="background-color: #0d47a1; margin-top:10px">Salvar Avaliação</button>
+
+                <h4 style="margin-top:20px">Últimas Avaliações</h4>
+                <div class="table-container">
+                    <table id="reviews-table">
+                        <thead><tr><th>Produto</th><th>Cliente</th><th>Nota</th><th>Ação</th></tr></thead>
+                        <tbody id="reviews-list"></tbody>
                     </table>
                 </div>
             </div>
@@ -308,13 +347,10 @@
         const db = firebase.firestore(); 
         const storage = firebase.storage(); 
         const auth = firebase.auth(); 
-        
-        // Como estamos usando Netlify Functions, não precisa de chave aqui.
-        // Se você conseguir a Legacy Key no futuro, pode trocar a lógica.
 
         document.addEventListener('DOMContentLoaded', () => {
             
-            // Elementos de Login e Geral
+            // Elementos de Login
             const loginForm = document.getElementById('loginForm');
             const loginSection = document.getElementById('login-section');
             const adminPanel = document.getElementById('admin-panel');
@@ -354,7 +390,6 @@
                 
                 try {
                     await auth.signInWithEmailAndPassword(email, password);
-                    // O onAuthStateChanged cuidará do resto
                 } catch (error) {
                     console.error(error);
                     showLoginStatus(`Erro de Acesso: ${error.message}`, 'error');
@@ -370,17 +405,17 @@
                 if (user) {
                     loginSection.style.display = 'none';
                     adminPanel.style.display = 'block';
-                    // Carrega tudo
                     fetchProducts(); 
                     loadSiteConfig();
                     fetchMessages();
+                    fetchReviews(); // Carrega Avaliações
                 } else {
                     loginSection.style.display = 'block';
                     adminPanel.style.display = 'none';
                 }
             });
 
-            // --- 1. SISTEMA DE NOTIFICAÇÕES (Netlify + Histórico) ---
+            // --- 1. SISTEMA DE NOTIFICAÇÕES ---
             const btnSendPush = document.getElementById('btn-send-push');
             const messagesList = document.getElementById('messages-list');
 
@@ -409,7 +444,6 @@
                     });
                     messagesList.innerHTML = html;
 
-                    // Adicionar eventos aos botões de excluir
                     document.querySelectorAll('.del-msg').forEach(btn => {
                         btn.addEventListener('click', async (e) => {
                             if(!confirm("Excluir esta mensagem? Ela sumirá do site.")) return;
@@ -445,7 +479,6 @@
                         });
 
                         // 2. TENTA MANDAR O PUSH (Via Netlify Functions)
-                        // ⚠️ Se der "Load Failed", é porque o Netlify ainda não instalou a função.
                         const response = await fetch('/.netlify/functions/send-push', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -458,7 +491,7 @@
                             showStatus(statusDiv, `Salvo! Push enviado para ${result.successCount || 0} clientes.`, "success");
                         } else {
                             console.error("Erro Push:", result);
-                            showStatus(statusDiv, "Salvo no Histórico! (Push falhou: " + (result.error || 'Erro de Conexão') + ")", "success");
+                            showStatus(statusDiv, "Salvo no Histórico! (Push falhou: " + (result.error || 'Erro Netlify') + ")", "success");
                         }
                         
                         document.getElementById('push-title').value = "";
@@ -475,8 +508,50 @@
                 });
             }
 
-            // --- 2. GESTÃO DE PRODUTOS ---
-            // Referências
+            // --- 2. AVALIAÇÕES (Reviews) ---
+            const reviewProductSelect = document.getElementById('review-product-select');
+            const reviewsList = document.getElementById('reviews-list');
+
+            async function fetchReviews() {
+                reviewsList.innerHTML = '';
+                const snap = await db.collection('reviews').orderBy('createdAt', 'desc').limit(20).get();
+                snap.forEach(doc => {
+                    const r = doc.data();
+                    reviewsList.innerHTML += `<tr><td>${r.productName}</td><td>${r.customerName}</td><td>${r.rating}⭐</td><td><button class="delete-btn del-rev" data-id="${doc.id}">X</button></td></tr>`;
+                });
+                document.querySelectorAll('.del-rev').forEach(b => b.addEventListener('click', async (e) => {
+                    if(confirm("Apagar avaliação?")) { await db.collection('reviews').doc(e.target.dataset.id).delete(); fetchReviews(); }
+                }));
+            }
+
+            document.getElementById('btn-save-review').addEventListener('click', async () => {
+                const pid = reviewProductSelect.value;
+                const name = document.getElementById('review-name').value;
+                const text = document.getElementById('review-text').value;
+                const rating = parseInt(document.getElementById('review-rating').value);
+                
+                if(!pid || !name || !text) return alert("Preencha tudo!");
+                
+                const productName = reviewProductSelect.options[reviewProductSelect.selectedIndex].text;
+
+                showStatus(statusDiv, "Salvando...", "loading");
+                try {
+                    await db.collection('reviews').add({
+                        productId: pid,
+                        productName: productName,
+                        customerName: name,
+                        text: text,
+                        rating: rating,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showStatus(statusDiv, "Avaliação Salva!", "success");
+                    document.getElementById('review-name').value = "";
+                    document.getElementById('review-text').value = "";
+                    fetchReviews();
+                } catch(e) { showStatus(statusDiv, e.message, "error"); }
+            });
+
+            // --- 3. GESTÃO DE PRODUTOS ---
             const nameField=document.getElementById('name');
             const priceField=document.getElementById('price');
             const descField=document.getElementById('description');
@@ -487,7 +562,6 @@
             const videoUrlInput=document.getElementById('videoUrl');
             const galeriaInput=document.getElementById('galeria');
             
-            // Variáveis globais de edição
             let oldImageUrl='', oldVideoUrl='', oldGaleria=[];
 
             async function uploadFile(file, path) {
@@ -496,7 +570,6 @@
                 return await ref.getDownloadURL();
             }
 
-            // Lista de Cores Completa
             const predefinedColors = [
                 {name:"Preto",value:"#000000"},{name:"Branco",value:"#FFFFFF"},{name:"Marfim",value:"#FFFFF0"},
                 {name:"Cinza Claro",value:"#E0E0E0"},{name:"Cinza Mescla",value:"#D3D3D3"},{name:"Grafite",value:"#404040"},{name:"Prata",value:"#C0C0C0"},
@@ -520,11 +593,10 @@
                 div.className = 'variant-entry';
                 div.id = 'v-'+id;
                 
-                const darkColors = ["#000000","#404040","#8B4513","#D2691E","#b76e86","#D2042D","#800000","#000080","#0000CD","#008080","#556B2F","#808000","#50C878","#800080"];
-                
+                const darkColors = ["#000000", "#404040", "#8B4513", "#D2691E", "#b76e86", "#D2042D", "#800000", "#000080", "#0000CD", "#008080", "#556B2F", "#808000", "#50C878", "#800080"];
                 let opts = predefinedColors.map(c => {
-                    const textC = darkColors.includes(c.value) ? 'white' : 'black';
-                    return `<option value="${c.name}" style="background-color:${c.value};color:${textC}">${c.name}</option>`;
+                    const textColor = darkColors.includes(c.value) ? 'white' : 'black';
+                    return `<option value="${c.name}" style="background-color:${c.value}; color:${textColor};">${c.name}</option>`;
                 }).join('');
                 
                 let isCustom = color && !predefinedColors.find(c => c.name === color);
@@ -560,7 +632,7 @@
             function getVariants() {
                 let v = {};
                 variantsContainer.querySelectorAll('.variant-entry').forEach(e => {
-                    let s = e.querySelector('select').value;
+                    let sel = e.querySelector('select').value;
                     let c = e.querySelector('input[type=text]').value;
                     let col = s==='custom'?c:s;
                     if(col) {
@@ -591,16 +663,23 @@
                     productsList.innerHTML = '<tr><td colspan="7">Carregando...</td></tr>';
                     const snap = await db.collection("products").orderBy("createdAt", "desc").get();
                     
-                    let h = '';
-                    snap.forEach(d => {
-                        let p = d.data();
-                        h += `<tr id="${d.id}">
+                    let html = '';
+                    // 🚨 Preenche a tabela e o Select de Avaliações
+                    reviewProductSelect.innerHTML = '<option value="">Escolha...</option>';
+
+                    snap.forEach(doc => {
+                        let p = doc.data();
+                        // Tabela
+                        html += `<tr id="${d.id}">
                             <td><img src="${p.imageUrl||''}" class="thumb"></td>
                             <td>${p.name}</td><td>${p.secao||'-'}</td><td>¥${p.price}</td><td>${p.estoqueTotal||0}</td><td>${p.source}</td>
                             <td><button class="edit-btn" data-id="${d.id}">Editar</button> <button class="delete-btn" data-id="${d.id}">Excluir</button></td>
                         </tr>`;
+                        // Select Avaliação
+                        let opt = document.createElement('option'); opt.value = doc.id; opt.text = p.name;
+                        reviewProductSelect.appendChild(opt);
                     });
-                    productsList.innerHTML = h || '<tr><td colspan="7">Vazio.</td></tr>';
+                    productsList.innerHTML = html || '<tr><td colspan="7">Vazio.</td></tr>';
                 } catch(e) { showStatus(statusDiv, e.message, 'error'); }
             }
 
