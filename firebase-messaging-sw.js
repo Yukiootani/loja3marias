@@ -1,7 +1,7 @@
 importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js');
 
-// 🚨 SUAS CHAVES (Confirme se estão certas)
+// SUAS CHAVES REAIS
 const firebaseConfig = {
     apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
     authDomain: "loja3marias-50204.firebaseapp.com",
@@ -13,21 +13,21 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Recebido em background:', payload);
-
+  console.log('[firebase-messaging-sw.js] Mensagem recebida: ', payload);
+  
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: 'https://i.imgur.com/BIXdM6M.png', // Ícone do App
+    icon: 'https://i.imgur.com/BIXdM6M.png', // Ícone
     
-    // 🚨 NOVAS OPÇÕES PARA FORÇAR O ANDROID 🚨
-    tag: 'push-notification-tag', // Evita empilhar muitas mensagens
-    renotify: true, // Vibra mesmo se tiver outra notificação antiga
-    requireInteraction: true, // A mensagem não some sozinha, exige clique
+    // 🚨 TRUQUE PARA ANDROID TELA BLOQUEADA 🚨
+    tag: 'push-alert-' + Date.now(), // Tag única para sempre tocar
+    renotify: true, // Força vibração/som
+    requireInteraction: true, // Fica na tela até clicar
+    
     data: {
         url: payload.notification.click_action || 'https://loja3marias.netlify.app'
     }
@@ -36,7 +36,6 @@ messaging.onBackgroundMessage((payload) => {
   return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// 🚨 NOVO: Ao clicar na notificação, abre o App
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   event.waitUntil(
