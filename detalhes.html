@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto (V6.0 - Avaliações) | 3 Marias</title>
+    <title>Detalhes do Produto (V6.1) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -44,7 +44,7 @@
             padding: 0 15px;
         }
         
-        /* ÁREA DO PRODUTO */
+        /* PRODUTO */
         #product-details {
             display: flex;
             flex-wrap: wrap;
@@ -138,7 +138,7 @@
             border-radius: 4px;
             font-weight: 500;
             display: inline-block;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             border: 1px solid transparent;
         }
         .status-pronta-entrega { background-color: #e6f9e6; color: var(--whatsapp-green); border-color: #d0edd4; }
@@ -188,8 +188,8 @@
         .modal-size-guide-content img { width: 100%; height: auto; max-height: 80vh; object-fit: contain; }
         #modal-size-guide-close { cursor: pointer; position: absolute; top: -10px; right: -10px; color: white; background-color: black; font-size: 25px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; line-height: 1; border: 2px solid white; }
 
-        /* 🚨 NOVO: Estilos para Avaliações 🚨 */
-        #product-rating-display { margin-bottom: 15px; font-size: 1.1em; color: #FFD700; }
+        /* AVALIAÇÕES */
+        #product-rating-display { margin-bottom: 15px; font-size: 1.2em; color: #FFD700; font-weight: bold; }
         #reviews-section { margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; display: none; }
         .reviews-title { font-size: 1.3em; font-weight: 700; margin-bottom: 15px; color: var(--text-color); }
         .review-item { background: #f9f9f9; padding: 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #eee; }
@@ -296,7 +296,7 @@
                 parsedVariants = product.variantes || {};
                 
                 if (product.secao) fetchRelatedProducts(product.secao, id);
-                fetchReviews(id); // 🚨 NOVO: Busca avaliações
+                fetchReviews(id); // Carrega Avaliações
 
                 // Mídia
                 let galleryUrls = product.galeria || []; allMediaUrls = []; 
@@ -335,7 +335,9 @@
                     <div class="info-area">
                         <span class="status-badge ${statusClass}">${statusText}</span>
                         <h1>${productName}</h1>
+                        
                         <div id="product-rating-display"></div>
+                        
                         <p class="price">${precoFormatado}</p>
                         ${variantsHTML} 
                         <h3 style="margin-top: 20px;">Descrição</h3>
@@ -360,14 +362,21 @@
             } catch (error) { showError(`Erro: ${error.message}`); }
         }
         
-        // 🚨 LÓGICA DE AVALIAÇÕES 🚨
+        // 🚨 BUSCAR AVALIAÇÕES 🚨
         async function fetchReviews(productId) {
             const reviewsContainer = document.getElementById('reviews-container');
             const reviewsSection = document.getElementById('reviews-section');
             const ratingDisplay = document.getElementById('product-rating-display');
             
+            // 🚨 REMOVIDO orderBy para evitar erro de índice no início
+            // Apenas filtra pelo ID. O Firebase não exige índice composto para filtro simples.
             const snap = await db.collection('reviews').where('productId', '==', productId).get();
-            if (snap.empty) return;
+            
+            if (snap.empty) {
+                ratingDisplay.innerHTML = '';
+                reviewsSection.style.display = 'none';
+                return;
+            }
             
             let totalStars = 0, count = 0, html = '';
             snap.forEach(doc => {
@@ -378,12 +387,13 @@
             
             const avg = (totalStars / count).toFixed(1);
             const avgStars = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+            
             ratingDisplay.innerHTML = `${avgStars} (${avg})`;
             reviewsContainer.innerHTML = html;
             reviewsSection.style.display = 'block';
         }
 
-        // ... (RESTO DO CÓDIGO IGUAL: getCart, saveCart, handleAddToCart, Variants, getSafeColor, Zoom, Relacionados) ...
+        // ... (RESTO DO CÓDIGO IGUAL) ...
         async function fetchRelatedProducts(secao,currentId){try{const snap=await db.collection("products").where("secao","==",secao).limit(5).get();if(snap.empty)return;let c=0;relatedGrid.innerHTML='';snap.forEach(d=>{if(c>=4)return;if(d.id===currentId)return;const p=d.data(),pf=(p.price||0).toLocaleString('ja-JP');const card=document.createElement('a');card.href=`detalhes.html?id=${d.id}`;card.className='product-card';card.innerHTML=`<div class="product-image-container"><img src="${p.imageUrl}" class="product-image"></div><div class="product-info"><div class="product-name">${p.name}</div><div class="product-price">¥${pf}</div></div>`;relatedGrid.appendChild(card);c++});if(c>0)relatedSection.style.display='block'}catch(e){}}
         function getCart(){return JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}}
         function saveCart(cart){localStorage.setItem('whatsappCart',JSON.stringify(cart));updateCartIcon()}
