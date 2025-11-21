@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin V12 (Estável) | 3 Marias</title>
+    <title>Admin V13 (Final) | 3 Marias</title>
     <style>
         :root {
             --primary-color: #b76e86;
@@ -13,43 +13,148 @@
             --border-color: #e0e0e0;
             --error-color: #dc3545;
         }
-        body { font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
-        h1, h2, h3 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
-        form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 20px; background: #fdf7f9; border-radius: 5px; }
-        label { font-weight: bold; margin-bottom: -10px; }
-        input, textarea, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; }
-        button { background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; }
-        #status, #loginStatus { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: #fff; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+        }
+        h1, h2, h3 { 
+            color: var(--primary-color); 
+            text-align: center; 
+            border-bottom: 2px solid var(--accent-color); 
+            padding-bottom: 10px; 
+        }
+        form { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            background: #fdf7f9; 
+            border-radius: 5px; 
+        }
+        label { 
+            font-weight: bold; 
+            margin-bottom: -10px; 
+        }
+        input, textarea, select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+        }
+        button { 
+            background-color: var(--primary-color); 
+            color: white; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 4px; 
+            font-size: 1em; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
+        
+        /* Status e Avisos */
+        #status, #loginStatus { 
+            text-align: center; 
+            font-weight: bold; 
+            padding: 10px; 
+            border-radius: 4px; 
+            margin-bottom: 15px; 
+            display: none; 
+        }
         .success { background-color: #e6f9e6; color: #28a745; }
         .error { background-color: #fdeeee; color: var(--error-color); }
         .loading { background-color: #e6f2ff; color: #007bff; }
         
-        #products-table-container, #messages-table-container { overflow-x: auto; margin-bottom: 30px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
+        /* Tabelas */
+        #products-table-container, #messages-table-container, .table-container { 
+            overflow-x: auto; 
+            margin-bottom: 30px;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        th, td { 
+            border: 1px solid var(--border-color); 
+            padding: 8px; 
+            text-align: left; 
+        }
         th { background-color: #f9f2f4; }
-        img.thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+        img.thumb { 
+            width: 50px; 
+            height: 50px; 
+            object-fit: cover; 
+            border-radius: 4px; 
+        }
         .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
         .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; }
         
-        #push-panel { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        /* Painel de Notificação */
+        #push-panel { 
+            background-color: #fff3cd; 
+            border: 1px solid #ffeeba; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 30px; 
+        }
         #push-panel h3 { color: #856404; border-bottom-color: #856404; }
         
-        #variants-container { border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: #fff; }
-        .variant-entry { border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
-        .variant-row, .variant-size-stock-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .variant-size-stock-group { margin-top: 10px; }
+        /* Painel de Avaliações */
+        #reviews-panel { 
+            background-color: #e3f2fd; 
+            border: 1px solid #bbdefb; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 30px; 
+        }
+        #reviews-panel h3 { color: #0d47a1; border-bottom-color: #0d47a1; }
+
+        /* Variantes */
+        #variants-container { 
+            border: 1px solid var(--border-color); 
+            padding: 10px; 
+            border-radius: 4px; 
+            background: #fff; 
+        }
+        .variant-entry { 
+            border-bottom: 1px dashed var(--border-color); 
+            padding-bottom: 10px; 
+            margin-bottom: 10px; 
+        }
+        .variant-entry:last-child { border-bottom: none; }
+        .variant-row { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+        }
+        .variant-size-stock-group { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            margin-top: 10px; 
+        }
         .variant-size-stock-group input { width: 60px; padding: 5px; text-align: center; }
         
+        /* Login/Geral */
         #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
         #admin-panel { display: none; } 
         #btnLogout { background-color: #777; margin-top: 20px; }
         #logo-preview { max-width: 250px; display: block; margin: 0 auto; }
-        
-        /* 🚨 NOVO: Estilo para Avaliações */
-        #reviews-panel { background-color: #e3f2fd; border: 1px solid #bbdefb; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        #reviews-panel h3 { color: #0d47a1; border-bottom-color: #0d47a1; }
     </style>
 </head>
 <body>
@@ -61,61 +166,165 @@
         <section id="login-section">
             <h3>Login de Admin</h3>
             <form id="loginForm">
-                <label>Email:</label><input type="email" id="login-email" required>
-                <label>Senha:</label><input type="password" id="login-password" required>
-                <button type="submit">Entrar</button>
+                <label>Email:</label>
+                <input type="email" id="login-email" required>
+                <label>Senha:</label>
+                <input type="password" id="login-password" required>
+                <button type="submit" id="btnLogin">Entrar</button>
             </form>
-            <div id="loginStatus"></div>
+            <div id="loginStatus" class="status"></div>
         </section>
 
         <section id="admin-panel">
             <div id="status"></div>
 
             <div id="push-panel">
-                <h3>📢 Notificações</h3>
-                <label>Título:</label><input type="text" id="push-title">
-                <label>Mensagem:</label><textarea id="push-body" style="min-height: 60px;"></textarea>
-                <label>Link:</label><input type="text" id="push-link" value="https://loja3marias.netlify.app">
+                <h3>📢 Enviar Notificação & Mensagem</h3>
+                <p style="font-size: 0.9em; color: #666;">Envia Push (Prioridade Alta) e salva no Histórico (Sino).</p>
+                
+                <label>Título:</label>
+                <input type="text" id="push-title" placeholder="Ex: Chegou Reposição!">
+                
+                <label>Mensagem:</label>
+                <textarea id="push-body" style="min-height: 60px;" placeholder="Texto da mensagem..."></textarea>
+                
+                <label>Link (opcional):</label>
+                <input type="text" id="push-link" value="https://loja3marias.netlify.app">
+                
                 <button id="btn-send-push" style="background-color: #856404; margin-top: 10px;">🚀 Enviar e Salvar</button>
                 
-                <h4 style="margin-top: 20px;">Histórico</h4>
+                <h4 style="margin-top: 20px;">Histórico de Mensagens</h4>
                 <div id="messages-table-container">
-                    <table id="messages-table"><thead><tr><th>Data</th><th>Msg</th><th>Ação</th></tr></thead><tbody id="messages-list"></tbody></table>
+                    <table id="messages-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Título</th>
+                                <th>Mensagem</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="messages-list"></tbody>
+                    </table>
                 </div>
             </div>
-            
+
             <div id="reviews-panel">
                 <h3>⭐ Cadastrar Avaliação</h3>
-                <label>Produto:</label><select id="review-product-select"><option value="">Carregando...</option></select>
-                <label>Cliente:</label><input type="text" id="review-name">
-                <label>Nota:</label><select id="review-rating"><option value="5">5 Estrelas</option><option value="4">4 Estrelas</option><option value="3">3 Estrelas</option></select>
-                <label>Texto:</label><textarea id="review-text"></textarea>
+                
+                <label>Escolha o Produto:</label>
+                <select id="review-product-select">
+                    <option value="">Carregando produtos...</option>
+                </select>
+                
+                <label>Nome da Cliente:</label>
+                <input type="text" id="review-name" placeholder="Ex: Ana K.">
+                
+                <label>Nota:</label>
+                <select id="review-rating">
+                    <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                    <option value="4">⭐⭐⭐⭐ (4)</option>
+                    <option value="3">⭐⭐⭐ (3)</option>
+                </select>
+                
+                <label>Comentário:</label>
+                <textarea id="review-text" rows="3" placeholder="Ex: Amei o produto!"></textarea>
+                
                 <button id="btn-save-review" style="background-color: #0d47a1; margin-top:10px">Salvar Avaliação</button>
+
                 <h4 style="margin-top:20px">Últimas Avaliações</h4>
-                <div style="overflow-x:auto"><table id="reviews-table"><thead><tr><th>Prod</th><th>Cli</th><th>Nota</th><th>Ação</th></tr></thead><tbody id="reviews-list"></tbody></table></div>
+                <div class="table-container">
+                    <table id="reviews-table">
+                        <thead><tr><th>Produto</th><th>Cliente</th><th>Nota</th><th>Ação</th></tr></thead>
+                        <tbody id="reviews-list"></tbody>
+                    </table>
+                </div>
             </div>
+            <hr>
 
             <form id="product-form">
-                <h3 id="form-title">Produto</h3>
+                <h3 id="form-title">Adicionar Novo Produto</h3>
                 <input type="hidden" id="productId"> 
-                <label>Nome:</label><input type="text" id="name" required>
-                <label>Preço:</label><input type="number" id="price" required>
-                <label>Seção:</label><select id="secao" required><option value="">Escolha...</option><option value="calcinhas">Calcinhas</option><option value="sutias">Sutiãs</option><option value="conjuntos">Conjuntos</option><option value="body">Body</option><option value="perfumaria">Perfumaria</option><option value="cremes">Cremes</option><option value="variados">Variados</option></select>
-                <label>Descrição:</label><textarea id="description" rows="4"></textarea>
-                <label>Variantes:</label><div id="variants-container"></div><button type="button" id="add-variant-btn" style="margin-top:5px;">+ Cor</button>
-                <label>Disp.:</label><select id="source" required><option value="pronta-entrega">Pronta Entrega</option><option value="sob-encomenda">Sob Encomenda</option></select>
-                <label>Selo:</label><select id="isFeatured"><option value="nenhum">Nenhum</option><option value="novo">Novidade</option><option value="destaque">Destaque</option></select>
-                <label>Capa:</label><input type="file" id="imageUrl"><label>Vídeo:</label><input type="file" id="videoUrl"><label>Galeria:</label><input type="file" id="galeria" multiple>
-                <button type="submit" id="save-btn" style="margin-top:15px;">Salvar</button>
+                
+                <label>Nome:</label>
+                <input type="text" id="name" required>
+
+                <label>Preço (¥):</label>
+                <input type="number" id="price" required>
+                
+                <label>Seção:</label>
+                <select id="secao" required>
+                    <option value="">Escolha...</option>
+                    <option value="calcinhas">Calcinhas</option>
+                    <option value="sutias">Sutiãs</option>
+                    <option value="conjuntos">Conjuntos</option>
+                    <option value="body">Body</option>
+                    <option value="perfumaria">Perfumaria</option>
+                    <option value="cremes">Cremes</option>
+                    <option value="variados">Variados</option>
+                </select>
+
+                <label>Descrição:</label>
+                <textarea id="description" rows="4"></textarea>
+                
+                <label>Variantes:</label>
+                <div id="variants-container"></div>
+                <button type="button" id="add-variant-btn" style="margin-top:5px;">+ Adicionar Cor</button>
+
+                <label>Disponibilidade:</label>
+                <select id="source" required>
+                    <option value="pronta-entrega">Pronta Entrega</option>
+                    <option value="sob-encomenda">Sob Encomenda</option>
+                </select>
+                
+                <label>Selo:</label>
+                <select id="isFeatured">
+                    <option value="nenhum">Nenhum</option>
+                    <option value="novo">Novidade</option>
+                    <option value="destaque">Destaque</option>
+                </select>
+                
+                <label>Capa:</label>
+                <input type="file" id="imageUrl" accept="image/png, image/jpeg">
+                
+                <label>Vídeo:</label>
+                <input type="file" id="videoUrl" accept="video/mp4, video/webm">
+                
+                <label>Galeria (Múltipla):</label>
+                <input type="file" id="galeria" multiple accept="image/png, image/jpeg">
+                
+                <button type="submit" id="save-btn" style="margin-top:15px;">Salvar Produto</button>
                 <button type="button" id="cancel-edit-btn" style="display:none; background:#777; margin-top:10px;">Cancelar</button>
             </form>
+            <hr>
+
+            <form id="logo-form">
+                <h3>Gerir Logo</h3>
+                <img id="logo-preview" src="" alt="Logo">
+                <input type="file" id="logo-upload">
+                <button type="submit" id="save-logo-btn">Salvar Logo</button>
+            </form>
+            <hr>
+
+            <h2>Produtos Cadastrados</h2>
+            <div id="products-table-container">
+                <table id="products-table">
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Nome</th>
+                            <th>Seção</th>
+                            <th>Preço</th>
+                            <th>Total</th>
+                            <th>Disp.</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-list"></tbody>
+                </table>
+            </div>
             
-            <form id="logo-form"><h3>Logo</h3><img id="logo-preview"><input type="file" id="logo-upload"><button type="submit">Salvar Logo</button></form>
-            
-            <h2>Produtos</h2>
-            <div id="products-table-container"><table id="products-table"><thead><tr><th>Foto</th><th>Nome</th><th>Seção</th><th>Preço</th><th>Total</th><th>Ações</th></tr></thead><tbody id="products-list"></tbody></table></div>
-            
-            <button id="btnLogout" style="margin-top:30px;">Sair</button>
+            <button id="btnLogout" style="margin-top:30px;">Sair (Logout)</button>
         </section>
     </div>
 
@@ -125,87 +334,344 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI", authDomain: "loja3marias-50204.firebaseapp.com", projectId: "loja3marias-50204", storageBucket: "loja3marias-50204.firebasestorage.app", messagingSenderId: "405330133487", appId: "1:405330133487:web:606de41211df52245f761a", measurementId: "G-TK877V6P0S" };
+        // 🚨 CHAVES DO FIREBASE (Mantenha as suas)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtQK3dZKTqoTkXkwTUM2vkviVD41UoHpI",
+            authDomain: "loja3marias-50204.firebaseapp.com",
+            projectId: "loja3marias-50204",
+            storageBucket: "loja3marias-50204.firebasestorage.app",
+            messagingSenderId: "405330133487",
+            appId: "1:405330133487:web:606de41211df52245f761a",
+            measurementId: "G-TK877V6P0S"
+        };
+
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(); const storage = firebase.storage(); const auth = firebase.auth(); 
-        const FCM_SERVER_KEY = "Yv86ZsXr650VL40z16DvFX6_rr-gRaRVoMUmlFnrSPo"; 
+        const db = firebase.firestore(); 
+        const storage = firebase.storage(); 
+        const auth = firebase.auth(); 
 
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. DEFINIÇÃO DE TODAS AS VARIÁVEIS PRIMEIRO
+            
+            // --- REFS DOM ---
             const loginForm = document.getElementById('loginForm');
             const loginSection = document.getElementById('login-section');
             const adminPanel = document.getElementById('admin-panel');
-            const statusDiv = document.getElementById('status');
+            const btnLogout = document.getElementById('btnLogout');
             const loginStatusDiv = document.getElementById('loginStatus');
-            
-            const productForm = document.getElementById('product-form');
-            const productsList = document.getElementById('products-list');
-            const btnSendPush = document.getElementById('btn-send-push');
-            const messagesList = document.getElementById('messages-list');
-            const reviewsList = document.getElementById('reviews-list');
-            const reviewProductSelect = document.getElementById('review-product-select');
-            
-            const nameField=document.getElementById('name'), priceField=document.getElementById('price'), descField=document.getElementById('description'), secaoField=document.getElementById('secao'), sourceField=document.getElementById('source'), isFeaturedField=document.getElementById('isFeatured'), imageUrlInput=document.getElementById('imageUrl'), videoUrlInput=document.getElementById('videoUrl'), galeriaInput=document.getElementById('galeria');
-            let oldImageUrl='', oldVideoUrl='', oldGaleria=[];
+            const statusDiv = document.getElementById('status');
 
-            // Funções de Status
+            // --- STATUS HELPERS ---
             let statusTimeout;
-            function showStatus(div, msg, type) { if(!div)return; clearTimeout(statusTimeout); div.textContent=msg; div.className='status '+type; div.style.display='block'; if(type!=='loading') statusTimeout=setTimeout(()=>{div.style.display='none'},4000); }
-
-            // --- FUNÇÕES DE DADOS ---
-            async function fetchProducts() {
-                try {
-                    productsList.innerHTML = '<tr><td colspan="7">Carregando...</td></tr>';
-                    reviewProductSelect.innerHTML = '<option value="">Escolha...</option>';
-                    const snap = await db.collection("products").orderBy("createdAt", "desc").get();
-                    let h = '';
-                    snap.forEach(doc => {
-                        let p = doc.data();
-                        h += `<tr id="${doc.id}"><td><img src="${p.imageUrl||''}" class="thumb"></td><td>${p.name}</td><td>${p.secao||'-'}</td><td>${p.price}</td><td>${p.estoqueTotal||0}</td><td><button class="edit-btn" data-id="${doc.id}">Editar</button> <button class="delete-btn" data-id="${doc.id}">Excluir</button></td></tr>`;
-                        let opt = document.createElement('option'); opt.value = doc.id; opt.text = p.name; reviewProductSelect.appendChild(opt);
-                    });
-                    productsList.innerHTML = h || '<tr><td colspan="7">Vazio.</td></tr>';
-                } catch(e) { showStatus(statusDiv, e.message, 'error'); }
+            function showStatus(div, msg, type) {
+                if(!div) return;
+                clearTimeout(statusTimeout);
+                div.textContent = msg;
+                div.className = 'status ' + type;
+                div.style.display = 'block';
+                if (type !== 'loading') {
+                    statusTimeout = setTimeout(() => { 
+                        div.style.display = 'none'; 
+                    }, 4000);
+                }
             }
 
-            async function fetchMessages() {
-                try {
-                    messagesList.innerHTML = '<tr><td colspan="4">...</td></tr>';
-                    const snap = await db.collection('site_messages').orderBy('createdAt', 'desc').get();
-                    let h = '';
-                    snap.forEach(d => { const m=d.data(); const date=m.createdAt?m.createdAt.toDate().toLocaleDateString('pt-BR'):'-'; h+=`<tr><td>${date}</td><td>${m.title}</td><td>${m.body}</td><td><button class="delete-btn del-msg" data-id="${d.id}">X</button></td></tr>`; });
-                    messagesList.innerHTML = h || '<tr><td colspan="4">Vazio</td></tr>';
-                    document.querySelectorAll('.del-msg').forEach(b => b.addEventListener('click', async (e) => { if(confirm("Apagar?")) { await db.collection('site_messages').doc(e.target.dataset.id).delete(); fetchMessages(); } }));
-                } catch(e){}
+            function showLoginStatus(msg, type) {
+                loginStatusDiv.textContent = msg;
+                loginStatusDiv.className = 'status ' + type;
+                loginStatusDiv.style.display = 'block';
             }
+
+            // --- LOGIN ---
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                showLoginStatus('Conectando...', 'loading');
+                
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                } catch (error) {
+                    console.error(error);
+                    showLoginStatus(`Erro de Acesso: ${error.message}`, 'error');
+                }
+            });
+
+            btnLogout.addEventListener('click', async () => {
+                await auth.signOut();
+                window.location.reload();
+            });
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    loginSection.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    
+                    // Carrega dados iniciais
+                    fetchProducts(); 
+                    loadSiteConfig();
+                    fetchMessages();
+                    fetchReviews();
+                } else {
+                    loginSection.style.display = 'block';
+                    adminPanel.style.display = 'none';
+                }
+            });
+
+            // --- AVALIAÇÕES (REVIEWS) ---
+            const reviewProductSelect = document.getElementById('review-product-select');
+            const reviewsList = document.getElementById('reviews-list');
+            const btnSaveReview = document.getElementById('btn-save-review');
 
             async function fetchReviews() {
                 try {
-                    reviewsList.innerHTML = '<tr><td colspan="4">...</td></tr>';
+                    reviewsList.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
                     const snap = await db.collection('reviews').orderBy('createdAt', 'desc').limit(20).get();
-                    let h = '';
-                    snap.forEach(d => { const r=d.data(); h+=`<tr><td>${r.productName}</td><td>${r.customerName}</td><td>${r.rating}⭐</td><td><button class="delete-btn del-rev" data-id="${d.id}">X</button></td></tr>`; });
-                    reviewsList.innerHTML = h || '<tr><td colspan="4">Vazio</td></tr>';
-                    document.querySelectorAll('.del-rev').forEach(b => b.addEventListener('click', async (e) => { if(confirm("Apagar?")) { await db.collection('reviews').doc(e.target.dataset.id).delete(); fetchReviews(); } }));
+                    
+                    if (snap.empty) {
+                        reviewsList.innerHTML = '<tr><td colspan="4">Nenhuma avaliação.</td></tr>';
+                        return;
+                    }
+
+                    let html = '';
+                    snap.forEach(doc => {
+                        const r = doc.data();
+                        html += `
+                            <tr>
+                                <td>${r.productName}</td>
+                                <td>${r.customerName}</td>
+                                <td>${r.rating}⭐</td>
+                                <td><button class="delete-btn del-rev" data-id="${doc.id}">X</button></td>
+                            </tr>
+                        `;
+                    });
+                    reviewsList.innerHTML = html;
+                    
+                    // Evento Excluir
+                    document.querySelectorAll('.del-rev').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            if(confirm("Apagar avaliação?")) {
+                                await db.collection('reviews').doc(e.target.dataset.id).delete();
+                                fetchReviews();
+                            }
+                        });
+                    });
                 } catch(e){}
             }
 
-            async function uploadFile(file, path) { const ref=storage.ref(path); await ref.put(file); return await ref.getDownloadURL(); }
+            if(btnSaveReview) {
+                btnSaveReview.addEventListener('click', async () => {
+                    const pid = reviewProductSelect.value;
+                    const name = document.getElementById('review-name').value;
+                    const text = document.getElementById('review-text').value;
+                    const rating = parseInt(document.getElementById('review-rating').value);
+                    
+                    if(!pid || !name || !text) return alert("Preencha todos os campos!");
+                    
+                    const productName = reviewProductSelect.options[reviewProductSelect.selectedIndex].text;
 
-            // --- VARIANTES ---
-            const predefinedColors = [{name:"Preto",value:"#000000"},{name:"Branco",value:"#FFFFFF"},{name:"Marfim",value:"#FFFFF0"},{name:"Cinza Claro",value:"#E0E0E0"},{name:"Cinza Mescla",value:"#D3D3D3"},{name:"Grafite",value:"#404040"},{name:"Prata",value:"#C0C0C0"},{name:"Cetim",value:"#D2B48C"},{name:"Nude Rosado",value:"#E3BC9A"},{name:"Nude Bege",value:"#F5F5DC"},{name:"Marrom",value:"#8B4513"},{name:"Chocolate",value:"#D2691E"},{name:"Terracota",value:"#E2725B"},{name:"Rosa Bebê",value:"#F4C2C2"},{name:"Rosa Claro",value:"#FFC0CB"},{name:"Rosa Antigo",value:"#b76e86"},{name:"Pink",value:"#FFC0CB"},{name:"Fúcsia",value:"#FF00FF"},{name:"Vermelho",value:"#FF0000"},{name:"Cereja",value:"#D2042D"},{name:"Vinho",value:"#800000"},{name:"Bordô",value:"#800000"},{name:"Marsala",value:"#B1907F"},{name:"Azul Bebê",value:"#E0FFFF"},{name:"Azul Serenity",value:"#98b6d4"},{name:"Azul Royal",value:"#0000CD"},{name:"Azul Tiffany",value:"#AFEEEE"},{name:"Azul Petróleo",value:"#008080"},{name:"Azul Marinho",value:"#000080"},{name:"Verde Menta",value:"#98FF98"},{name:"Verde Água",value:"#AFEEEE"},{name:"Verde Musgo Claro",value:"#ADBC9F"},{name:"Verde Oliva",value:"#808000"},{name:"Verde Musgo",value:"#556B2F"},{name:"Verde Esmeralda",value:"#50C878"},{name:"Lilás",value:"#C8A2C8"},{name:"Lavanda",value:"#E6E6FA"},{name:"Odalisca",value:"#C8A2C8"},{name:"Roxo",value:"#800080"},{name:"Violeta",value:"#EE82EE"},{name:"Amarelo",value:"#FFFF00"},{name:"Dourado",value:"#FFD700"},{name:"Laranja",value:"#FFA500"},{name:"Coral",value:"#FF7F50"},{name:"Estampado",value:"#cccccc"}];
+                    showStatus(statusDiv, "Salvando Avaliação...", "loading");
+                    try {
+                        await db.collection('reviews').add({
+                            productId: pid,
+                            productName: productName,
+                            customerName: name,
+                            text: text,
+                            rating: rating,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        showStatus(statusDiv, "Avaliação Salva!", "success");
+                        document.getElementById('review-name').value = "";
+                        document.getElementById('review-text').value = "";
+                        fetchReviews();
+                    } catch(e) { showStatus(statusDiv, e.message, "error"); }
+                });
+            }
+
+
+            // --- NOTIFICAÇÕES ---
+            const btnSendPush = document.getElementById('btn-send-push');
+            const messagesList = document.getElementById('messages-list');
+
+            async function fetchMessages() {
+                try {
+                    messagesList.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
+                    const snapshot = await db.collection('site_messages').orderBy('createdAt', 'desc').get();
+                    
+                    if (snapshot.empty) {
+                        messagesList.innerHTML = '<tr><td colspan="4">Nenhuma mensagem.</td></tr>';
+                        return;
+                    }
+
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const m = doc.data();
+                        const d = m.createdAt ? m.createdAt.toDate().toLocaleDateString('pt-BR') : '-';
+                        html += `
+                            <tr>
+                                <td>${d}</td>
+                                <td>${m.title}</td>
+                                <td>${m.body}</td>
+                                <td><button class="delete-btn del-msg" data-id="${doc.id}">Excluir</button></td>
+                            </tr>
+                        `;
+                    });
+                    messagesList.innerHTML = html;
+
+                    document.querySelectorAll('.del-msg').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            if(!confirm("Excluir mensagem?")) return;
+                            await db.collection('site_messages').doc(e.target.dataset.id).delete();
+                            fetchMessages();
+                            showStatus(statusDiv, "Apagada!", "success");
+                        });
+                    });
+                } catch (e) { console.error(e); }
+            }
+
+            if(btnSendPush) {
+                btnSendPush.addEventListener('click', async () => {
+                    const title = document.getElementById('push-title').value;
+                    const body = document.getElementById('push-body').value;
+                    const link = document.getElementById('push-link').value;
+
+                    if(!title || !body) return alert("Preencha!");
+                    if(!confirm("Enviar?")) return;
+
+                    showStatus(statusDiv, "Enviando...", "loading");
+                    btnSendPush.disabled = true;
+
+                    try {
+                        // 1. Salva no Histórico
+                        await db.collection('site_messages').add({
+                            title, body, link,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        // 2. Envia Push (Netlify Functions)
+                        const response = await fetch('/.netlify/functions/send-push', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ title, body, link })
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            showStatus(statusDiv, `Enviado para ${result.successCount || 0} clientes.`, "success");
+                        } else {
+                            console.error("Erro Push:", result);
+                            showStatus(statusDiv, "Salvo no Histórico! (Push Falhou: " + (result.error || 'Load Failed') + ")", "success");
+                        }
+                        
+                        document.getElementById('push-title').value = "";
+                        document.getElementById('push-body').value = "";
+                        fetchMessages();
+
+                    } catch (error) {
+                        console.error(error);
+                        // Se deu erro de rede, ainda assim salvou no banco, então mostramos sucesso parcial
+                        showStatus(statusDiv, "Salvo no Histórico! (Push Falhou: " + error.message + ")", "success");
+                        fetchMessages();
+                    } finally {
+                        btnSendPush.disabled = false;
+                    }
+                });
+            }
+
+            // --- PRODUTOS ---
+            const productsList = document.getElementById('products-list');
+            const productForm = document.getElementById('product-form');
+            // Refs dos campos
+            const nameField=document.getElementById('name'), priceField=document.getElementById('price'), secaoField=document.getElementById('secao'), descField=document.getElementById('description'), sourceField=document.getElementById('source'), isFeaturedField=document.getElementById('isFeatured'), imageUrlInput=document.getElementById('imageUrl'), videoUrlInput=document.getElementById('videoUrl'), galeriaInput=document.getElementById('galeria');
+            
+            let oldImageUrl='', oldVideoUrl='', oldGaleria=[];
+
+            async function fetchProducts() {
+                try {
+                    productsList.innerHTML = '<tr><td colspan="7">Carregando...</td></tr>';
+                    
+                    // Limpa o select de avaliações antes de encher de novo
+                    reviewProductSelect.innerHTML = '<option value="">Escolha...</option>';
+                    
+                    const snap = await db.collection("products").orderBy("createdAt", "desc").get();
+                    
+                    if(snap.empty) {
+                        productsList.innerHTML = '<tr><td colspan="7">Vazio.</td></tr>';
+                        return;
+                    }
+
+                    let html = '';
+                    snap.forEach(doc => {
+                        let p = doc.data();
+                        // Popula Tabela
+                        html += `<tr id="${doc.id}">
+                            <td><img src="${p.imageUrl||''}" class="thumb"></td>
+                            <td>${p.name}</td><td>${p.secao||'-'}</td><td>¥${p.price}</td><td>${p.estoqueTotal||0}</td><td>${p.source}</td>
+                            <td><button class="edit-btn" data-id="${doc.id}">Editar</button> <button class="delete-btn" data-id="${doc.id}">X</button></td>
+                        </tr>`;
+                        
+                        // Popula Select de Avaliação
+                        let opt = document.createElement('option');
+                        opt.value = doc.id;
+                        opt.text = p.name;
+                        reviewProductSelect.appendChild(opt);
+                    });
+                    productsList.innerHTML = html;
+
+                } catch(e) { showStatus(statusDiv, e.message, 'error'); }
+            }
+
+            productForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(!secaoField.value) return alert("Seção!");
+                showStatus(statusDiv, "Salvando...", "loading");
+                const id = document.getElementById('productId').value || `pid_${Date.now()}`;
+                
+                try {
+                    let img=oldImageUrl, vid=oldVideoUrl, gal=oldGaleria;
+                    if(imageUrlInput.files[0]) img = await uploadFile(imageUrlInput.files[0], `products/${id}/capa`);
+                    if(videoUrlInput.files[0]) vid = await uploadFile(videoUrlInput.files[0], `products/${id}/video`);
+                    if(galeriaInput.files.length > 0) {
+                        gal = [];
+                        for(let f of galeriaInput.files) {
+                            gal.push(await uploadFile(f, `products/${id}/gal_${f.name}`));
+                        }
+                    }
+
+                    let variants = getVariants();
+                    let data = {
+                        name: nameField.value, price: parseFloat(priceField.value), secao: secaoField.value, description: descField.value, variantes: variants, estoqueTotal: calcTotal(variants), source: sourceField.value, isFeatured: isFeaturedField.value, imageUrl: img, videoUrl: vid, galeria: gal
+                    };
+
+                    if(document.getElementById('productId').value) {
+                        await db.collection("products").doc(id).update(data);
+                    } else {
+                        data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                        await db.collection("products").doc(id).set(data);
+                    }
+                    
+                    cancelEditMode(); fetchProducts(); showStatus(statusDiv, "Salvo!", "success");
+                } catch(err) { showStatus(statusDiv, err.message, 'error'); }
+            });
+
+            // Variantes Helpers
             const variantsContainer = document.getElementById('variants-container');
+            const predefinedColors = [{name:"Preto",value:"#000000"},{name:"Branco",value:"#FFFFFF"},{name:"Marfim",value:"#FFFFF0"},{name:"Cinza Claro",value:"#E0E0E0"},{name:"Cinza Mescla",value:"#D3D3D3"},{name:"Grafite",value:"#404040"},{name:"Prata",value:"#C0C0C0"},{name:"Cetim",value:"#D2B48C"},{name:"Nude Rosado",value:"#E3BC9A"},{name:"Nude Bege",value:"#F5F5DC"},{name:"Marrom",value:"#8B4513"},{name:"Chocolate",value:"#D2691E"},{name:"Terracota",value:"#E2725B"},{name:"Rosa Bebê",value:"#F4C2C2"},{name:"Rosa Claro",value:"#FFC0CB"},{name:"Rosa Antigo",value:"#b76e86"},{name:"Pink",value:"#FFC0CB"},{name:"Fúcsia",value:"#FF00FF"},{name:"Vermelho",value:"#FF0000"},{name:"Cereja",value:"#D2042D"},{name:"Vinho",value:"#800000"},{name:"Bordô",value:"#800000"},{name:"Marsala",value:"#B1907F"},{name:"Azul Bebê",value:"#E0FFFF"},{name:"Azul Serenity",value:"#98b6d4"},{name:"Azul Royal",value:"#0000CD"},{name:"Azul Tiffany",value:"#AFEEEE"},{name:"Azul Petróleo",value:"#008080"},{name:"Azul Marinho",value:"#000080"},{name:"Verde Menta",value:"#98FF98"},{name:"Verde Água",value:"#AFEEEE"},{name:"Verde Musgo Claro",value:"#ADBC9F"},{name:"Verde Oliva",value:"#808000"},{name:"Verde Musgo",value:"#556B2F"},{name:"Verde Esmeralda",value:"#50C878"},{name:"Lilás",value:"#C8A2C8"},{name:"Lavanda",value:"#E6E6FA"},{name:"Odalisca",value:"#C8A2C8"},{name:"Roxo",value:"#800080"},{name:"Violeta",value:"#EE82EE"},{name:"Amarelo",value:"#FFFF00"},{name:"Dourado",value:"#FFD700"},{name:"Laranja",value:"#FFA500"},{name:"Coral",value:"#FF7F50"},{name:"Estampado",value:"#cccccc"}];
+            
             document.getElementById('add-variant-btn').addEventListener('click', () => createVariantEntry());
 
             function createVariantEntry(color='', stock={P:0,M:0,G:0,GG:0}) {
                 const id = Date.now()+Math.random(); const div = document.createElement('div'); div.className='variant-entry';
-                let opts = predefinedColors.map(x=>`<option value="${x.name}" style="background:${x.value}">${x.name}</option>`).join('');
-                div.innerHTML = `<div class="variant-row"><select>${opts}<option value="custom">Outra</option></select><input style="display:none" placeholder="Cor"></div><div class="variant-size-stock-group"><label>P</label><input type="number" data-s="P" value="${stock.P}"><label>M</label><input type="number" data-s="M" value="${stock.M}"><label>G</label><input type="number" data-s="G" value="${stock.G}"><label>GG</label><input type="number" data-s="GG" value="${stock.GG}"></div><button type="button" class="remove-variant-btn" onclick="this.parentElement.remove()">X</button>`;
+                const dark = ["#000000","#404040","#8B4513","#D2691E","#b76e86","#D2042D","#800000","#000080","#0000CD","#008080","#556B2F","#808000","#50C878","#800080"];
+                let opts = predefinedColors.map(x=>`<option value="${x.name}" style="background:${x.value};color:${dark.includes(x.value)?'white':'black'}">${x.name}</option>`).join('');
+                let isC = color && !predefinedColors.find(c=>c.name===color);
+                div.innerHTML = `<div class="variant-row"><select class="variant-color-select"><option value="">Cor...</option>${opts}<option value="custom">Outra</option></select><input class="variant-color-custom" style="display:${isC?'block':'none'}" value="${isC?color:''}" placeholder="Cor"></div><div class="variant-size-stock-group"><label>P</label><input type="number" data-s="P" value="${stock.P||0}"><label>M</label><input type="number" data-s="M" value="${stock.M||0}"><label>G</label><input type="number" data-s="G" value="${stock.G||0}"><label>GG</label><input type="number" data-s="GG" value="${stock.GG||0}"></div><button type="button" class="remove-variant-btn" onclick="this.parentElement.remove()">X</button>`;
                 variantsContainer.appendChild(div);
-                const sel = div.querySelector('select'); sel.value = color||''; 
-                const inp = div.querySelector('input'); if(!predefinedColors.find(c=>c.name===color) && color) { sel.value='custom'; inp.style.display='block'; inp.value=color; }
-                sel.addEventListener('change', function(){ inp.style.display = this.value==='custom'?'block':'none'; });
+                const sel = div.querySelector('select'); sel.value = isC?'custom':(color||'');
+                sel.addEventListener('change', function(){ div.querySelector('.variant-color-custom').style.display = this.value==='custom'?'block':'none'; });
             }
+
             function getVariants() {
                 let v={}; variantsContainer.querySelectorAll('.variant-entry').forEach(e=>{
                     let s=e.querySelector('select').value, c=e.querySelector('input').value, col=s==='custom'?c:s;
@@ -214,97 +680,23 @@
             }
             function calcTotal(v) { let t=0; for(let c in v) for(let s in v[c]) t += v[c][s]; return t; }
             function setVariants(v) { variantsContainer.innerHTML=''; if(v) for(let c in v) createVariantEntry(c,v[c]); }
-
-            // --- EVENTOS ---
-
-            // 1. Salvar Produto
-            productForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if(!secaoField.value) return alert("Escolha a Seção!");
-                showStatus(statusDiv, "Salvando...", "loading");
-                const id = document.getElementById('productId').value || `pid_${Date.now()}`;
-                try {
-                    let img=oldImageUrl, vid=oldVideoUrl, gal=oldGaleria;
-                    if(imageUrlInput.files[0]) img = await uploadFile(imageUrlInput.files[0], `products/${id}/capa`);
-                    if(videoUrlInput.files[0]) vid = await uploadFile(videoUrlInput.files[0], `products/${id}/video`);
-                    if(galeriaInput.files.length) { gal=[]; for(let f of galeriaInput.files) gal.push(await uploadFile(f, `products/${id}/gal_${f.name}`)); }
-                    
-                    let v = getVariants();
-                    let data = { name:nameField.value, price:parseFloat(priceField.value), secao:secaoField.value, description:descField.value, variantes:v, estoqueTotal:calcTotal(v), source:sourceField.value, isFeatured:isFeaturedField.value, imageUrl:img, videoUrl:vid, galeria:gal };
-                    
-                    if(document.getElementById('productId').value) await db.collection("products").doc(id).update(data);
-                    else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("products").doc(id).set(data); }
-                    
-                    cancelEditMode(); fetchProducts(); showStatus(statusDiv, "Salvo!", "success");
-                } catch(err) { showStatus(statusDiv, err.message, 'error'); }
-            });
-
-            // 2. Editar/Excluir Produto
+            
+            // Edit/Delete/Cancel/Logo
             productsList.addEventListener('click', async (e) => {
-                if(e.target.classList.contains('delete-btn') && confirm("Excluir?")) {
-                    await db.collection("products").doc(e.target.dataset.id).delete(); fetchProducts();
-                }
+                let id = e.target.dataset.id;
+                if(e.target.classList.contains('delete-btn') && confirm("Excluir?")) { await db.collection("products").doc(id).delete(); fetchProducts(); }
                 if(e.target.classList.contains('edit-btn')) {
-                    const doc = await db.collection("products").doc(e.target.dataset.id).get(); const p = doc.data();
-                    document.getElementById('productId').value = doc.id; nameField.value=p.name; priceField.value=p.price; secaoField.value=p.secao; descField.value=p.description; setVariants(p.variantes); sourceField.value=p.source; isFeaturedField.value=p.isFeatured; oldImageUrl=p.imageUrl; oldVideoUrl=p.videoUrl; oldGaleria=p.galeria||[];
+                    let d = await db.collection("products").doc(id).get(), p = d.data();
+                    document.getElementById('productId').value = id; nameField.value=p.name; priceField.value=p.price; secaoField.value=p.secao; descField.value=p.description; setVariants(p.variantes); sourceField.value=p.source; isFeaturedField.value=p.isFeatured; oldImageUrl=p.imageUrl; oldVideoUrl=p.videoUrl; oldGaleria=p.galeria||[];
                     document.getElementById('form-title').textContent="Editando"; document.getElementById('save-btn').textContent="Atualizar"; document.getElementById('cancel-edit-btn').style.display="block"; window.scrollTo(0,0);
                 }
             });
             document.getElementById('cancel-edit-btn').addEventListener('click', cancelEditMode);
-            function cancelEditMode(){ document.getElementById('productId').value=''; productForm.reset(); variantsContainer.innerHTML=''; oldImageUrl=''; document.getElementById('form-title').textContent="Novo"; document.getElementById('save-btn').textContent="Salvar"; document.getElementById('cancel-edit-btn').style.display="none"; }
-
-            // 3. Enviar Push
-            if(btnSendPush) {
-                btnSendPush.addEventListener('click', async () => {
-                    const t=document.getElementById('push-title').value, b=document.getElementById('push-body').value, l=document.getElementById('push-link').value;
-                    if(!t || !b) return alert("Preencha!");
-                    if(!confirm("Enviar?")) return;
-                    showStatus(statusDiv, "Enviando...", "loading");
-                    try {
-                        await db.collection('site_messages').add({ title:t, body:b, link:l, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-                        const snap = await db.collection('push_tokens').get();
-                        if(!snap.empty) {
-                            const tokens = snap.docs.map(d=>d.data().token);
-                            const reqs = tokens.map(tok => fetch('https://fcm.googleapis.com/fcm/send', {
-                                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'key='+FCM_SERVER_KEY },
-                                body: JSON.stringify({ to: tok, notification: { title:t, body:b, click_action:l } })
-                            }));
-                            await Promise.all(reqs);
-                        }
-                        showStatus(statusDiv, "Enviado!", "success"); fetchMessages();
-                    } catch(e) { showStatus(statusDiv, "Salvo no histórico (Erro Push: "+e.message+")", "success"); fetchMessages(); }
-                });
-            }
-
-            // 4. Salvar Avaliação
-            document.getElementById('btn-save-review').addEventListener('click', async () => {
-                const pid = reviewProductSelect.value;
-                const name = document.getElementById('review-name').value;
-                const text = document.getElementById('review-text').value;
-                const rating = parseInt(document.getElementById('review-rating').value);
-                if(!pid || !name || !text) return alert("Preencha tudo!");
-                showStatus(statusDiv, "Salvando...", "loading");
-                try {
-                    await db.collection('reviews').add({ productId: pid, productName: reviewProductSelect.options[reviewProductSelect.selectedIndex].text, customerName: name, text: text, rating: rating, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-                    showStatus(statusDiv, "Salvo!", "success"); document.getElementById('review-text').value=''; fetchReviews();
-                } catch(e){ showStatus(statusDiv, e.message, "error"); }
-            });
-
-            // 5. Salvar Logo
+            function cancelEditMode(){ document.getElementById('productId').value=''; form.reset(); variantsContainer.innerHTML=''; oldImageUrl=''; document.getElementById('form-title').textContent="Novo"; document.getElementById('save-btn').textContent="Salvar"; document.getElementById('cancel-edit-btn').style.display="none"; }
+            
             const logoForm=document.getElementById('logo-form'), logoUpload=document.getElementById('logo-upload'), logoPrev=document.getElementById('logo-preview');
             async function loadSiteConfig() { try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists) logoPrev.src=d.data().logoUrl; }catch(e){} }
-            logoForm.addEventListener('submit', async (e) => { e.preventDefault(); if(logoUpload.files[0]){ const u=await uploadFile(logoUpload.files[0],"configuracoes/logo"); await db.collection("configuracoes").doc("siteInfo").set({logoUrl:u},{merge:true}); logoPrev.src=u; showStatus(statusDiv,"Logo Salvo!","success"); } });
-
-            // 6. Login e Auth
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                try { await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value); } catch(e) { alert(e.message); }
-            });
-            document.getElementById('btnLogout').addEventListener('click', () => auth.signOut());
-            auth.onAuthStateChanged(user => {
-                if(user) { loginSection.style.display='none'; adminPanel.style.display='block'; fetchProducts(); fetchMessages(); fetchReviews(); loadSiteConfig(); }
-                else { loginSection.style.display='block'; adminPanel.style.display='none'; }
-            });
+            logoForm.addEventListener('submit', async (e) => { e.preventDefault(); const f=logoUpload.files[0]; if(f){ showStatus(statusDiv,"Enviando...","loading"); const u=await uploadFile(f,"configuracoes/logo_principal"); await db.collection("configuracoes").doc("siteInfo").set({logoUrl:u},{merge:true}); logoPrev.src=u; showStatus(statusDiv,"Logo Salvo!","success"); } });
 
         });
     </script>
