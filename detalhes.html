@@ -3,165 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto (V6.4) | 3 Marias</title>
+    <title>Detalhes do Produto (V6.5) | 3 Marias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
         /* --- CSS GERAL --- */
-        :root {
-            --primary-color: #b76e86; 
-            --accent-color: #DAA520; 
-            --whatsapp-green: #28a745; 
-            --text-color: #333; 
-            --light-text: #666; 
-            --bg-color: #FFFFFF; 
-            --border-color: #f0f0f0; 
-            --error-color: #dc3545;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            margin: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding-bottom: 80px; 
-        }
-        header {
-            background-color: white; 
-            color: var(--text-color); 
-            padding: 1rem 1rem;
-            text-align: left; 
-            border-bottom: 1px solid var(--border-color); 
-        }
-        header a {
-            color: var(--text-color); 
-            text-decoration: none; 
-            font-size: 1em;
-            font-weight: 500;
-        }
-        main {
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 0 15px;
-        }
+        :root { --primary-color: #b76e86; --accent-color: #DAA520; --whatsapp-green: #28a745; --text-color: #333; --light-text: #666; --bg-color: #FFFFFF; --border-color: #f0f0f0; --error-color: #dc3545; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); padding-bottom: 80px; }
+        header { background-color: white; color: var(--text-color); padding: 1rem 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        header a { color: var(--text-color); text-decoration: none; font-size: 1em; font-weight: 500; }
+        main { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
         
         /* PRODUTO */
-        #product-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        .media-area {
-            flex: 1 1 50%; 
-            min-width: 300px;
-        }
-        #main-media-display {
-            position: relative; 
-            width: 100%;
-            padding-top: 150%; 
-            margin-bottom: 15px;
-            border-radius: 0; 
-            background-color: #f9f9f9;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-        }
-        #main-media-display img, #main-media-display video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain; 
-            background-color: white; 
-        }
-        #thumbnails {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 10px; 
-        }
-        .thumb-container {
-            position: relative;
-            width: 70px; 
-            height: 70px;
-            border-radius: 4px; 
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-            transition: border 0.3s;
-        }
+        #product-details { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 40px; }
+        .media-area { flex: 1 1 50%; min-width: 300px; }
+        #main-media-display { position: relative; width: 100%; padding-top: 150%; margin-bottom: 15px; border-radius: 0; background-color: #f9f9f9; border: 1px solid var(--border-color); overflow: hidden; }
+        #main-media-display img, #main-media-display video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; background-color: white; }
+        #thumbnails { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .thumb-container { position: relative; width: 70px; height: 70px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border-color); transition: border 0.3s; }
         .thumb-container.active { border: 2px solid var(--primary-color); }
-        .thumb-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-        .video-overlay::before {
-            content: '▶';
-            padding: 5px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            line-height: 1;
-            color: var(--primary-color);
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-        }
+        .thumb-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .video-overlay::before { content: '▶'; padding: 5px; background-color: rgba(255, 255, 255, 0.8); border-radius: 50%; line-height: 1; color: var(--primary-color); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; }
         
         /* Lupa */
-        #zoom-loupe {
-            display: none; 
-            position: absolute;
-            width: 150px;
-            height: 150px;
-            border: 2px solid var(--primary-color);
-            border-radius: 50%; 
-            background-repeat: no-repeat;
-            pointer-events: none; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-            z-index: 99;
-        }
+        #zoom-loupe { display: none; position: absolute; width: 150px; height: 150px; border: 2px solid var(--primary-color); border-radius: 50%; background-repeat: no-repeat; pointer-events: none; box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 99; }
         #main-media-display video ~ #zoom-loupe { display: none !important; }
         
-        .info-area {
-            flex: 1 1 40%;
-            padding-top: 10px;
-        }
+        .info-area { flex: 1 1 40%; padding-top: 10px; }
         .info-area h1 { color: var(--text-color); margin-top: 0; font-size: 1.8em; font-weight: 700; margin-bottom: 5px; }
         .info-area .price { font-size: 1.6em; font-weight: 700; color: var(--primary-color); margin: 15px 0; }
         .info-area p { line-height: 1.6; color: var(--light-text); }
-        .status-badge {
-            font-size: 0.9em;
-            padding: 8px 15px;
-            border-radius: 4px;
-            font-weight: 500;
-            display: inline-block;
-            margin-bottom: 20px;
-            border: 1px solid transparent;
-        }
+        .status-badge { font-size: 0.9em; padding: 8px 15px; border-radius: 4px; font-weight: 500; display: inline-block; margin-bottom: 20px; border: 1px solid transparent; }
         .status-pronta-entrega { background-color: #e6f9e6; color: var(--whatsapp-green); border-color: #d0edd4; }
         .status-sob-encomenda { background-color: #f7f7e6; color: #856404; border-color: #eaeaa0; }
         
-        .buy-button {
-            display: block;
-            background-color: var(--primary-color);
-            color: white;
-            text-align: center;
-            padding: 15px;
-            text-decoration: none;
-            font-size: 1.1em;
-            font-weight: bold;
-            border-radius: 5px;
-            margin-top: 30px;
-            transition: background-color 0.3s;
-            cursor: pointer;
-            border: none;
-        }
+        .buy-button { display: block; background-color: var(--primary-color); color: white; text-align: center; padding: 15px; text-decoration: none; font-size: 1.1em; font-weight: bold; border-radius: 5px; margin-top: 30px; transition: background-color 0.3s; cursor: pointer; border: none; }
         .buy-button:hover { background-color: #a15a70; }
         .buy-button:disabled { background-color: #ccc; cursor: not-allowed; }
-        
         #loading, #error { text-align: center; padding: 50px; font-size: 1.2em; color: var(--light-text); }
         
         /* Variantes */
@@ -188,32 +66,22 @@
         .modal-size-guide-content img { width: 100%; height: auto; max-height: 80vh; object-fit: contain; }
         #modal-size-guide-close { cursor: pointer; position: absolute; top: -10px; right: -10px; color: white; background-color: black; font-size: 25px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; line-height: 1; border: 2px solid white; }
 
-        /* 🚨 AVALIAÇÕES (Estilo Corrigido) */
+        /* 🚨 AVALIAÇÕES (Visível e Estilizado) */
         #product-rating-display { margin-bottom: 15px; font-size: 1.2em; color: #FFD700; font-weight: bold; min-height: 20px; }
         
         #reviews-section { 
             margin-top: 40px; 
             border-top: 1px solid #eee; 
             padding-top: 20px; 
-            /* Mostra sempre! */
-            display: block; 
+            /* Força aparecer */
+            display: block !important; 
         }
         .reviews-title { font-size: 1.3em; font-weight: 700; margin-bottom: 15px; color: var(--text-color); }
-        
         .review-item { background: #f9f9f9; padding: 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #eee; }
         .review-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; font-size: 0.9em; color: #333; }
         .review-stars { color: #FFD700; letter-spacing: 2px; }
         .review-text { color: #555; line-height: 1.5; font-style: italic; }
-        
-        /* Mensagem quando não tem avaliação */
-        .no-reviews-msg { 
-            color: #999; 
-            font-style: italic; 
-            text-align: center; 
-            padding: 20px; 
-            border: 1px dashed #ddd;
-            border-radius: 8px;
-        }
+        .no-reviews-msg { color: #999; font-style: italic; text-align: center; padding: 15px; border: 1px dashed #ddd; border-radius: 8px; }
 
         /* Relacionados */
         #related-products-section { margin-top: 60px; border-top: 1px solid var(--border-color); padding-top: 30px; display: none; }
@@ -245,7 +113,7 @@
         <div id="reviews-section">
             <h3 class="reviews-title">O que dizem nossas clientes ❤️</h3>
             <div id="reviews-container">
-                <p class="no-reviews-msg">Carregando avaliações...</p>
+                <p class="no-reviews-msg">Carregando comentários...</p>
             </div>
         </div>
         
@@ -316,9 +184,10 @@
                 parsedVariants = product.variantes || {};
                 
                 if (product.secao) fetchRelatedProducts(product.secao, id);
-                fetchReviews(id); // Chama as avaliações
+                
+                // 🚨 BUSCA AVALIAÇÕES
+                fetchReviews(id); 
 
-                // Mídia
                 let galleryUrls = product.galeria || []; allMediaUrls = []; 
                 if (productImageUrl) allMediaUrls.push({ type: 'image', url: productImageUrl, thumb: productImageUrl }); 
                 galleryUrls.forEach(url => allMediaUrls.push({ type: 'image', url: url, thumb: url })); 
@@ -382,45 +251,57 @@
             } catch (error) { showError(`Erro: ${error.message}`); }
         }
         
-        // 🚨 LÓGICA DE AVALIAÇÕES CORRIGIDA (SEM ÍNDICE COMPLETO) 🚨
+        // 🚨 LÓGICA DE AVALIAÇÕES (CORRIGIDA V6.5) 🚨
         async function fetchReviews(productId) {
             const reviewsContainer = document.getElementById('reviews-container');
             const ratingDisplay = document.getElementById('product-rating-display');
             
-            // 🚨 AQUI: REMOVIDO O ORDERBY PARA NÃO DAR ERRO DE ÍNDICE
-            const snap = await db.collection('reviews').where('productId', '==', productId).get();
-            
-            if (snap.empty) {
-                ratingDisplay.innerHTML = ''; 
-                reviewsContainer.innerHTML = '<p class="no-reviews-msg">Ainda não há avaliações. Seja a primeira a avaliar! ⭐</p>';
-                return;
-            }
-            
-            let totalStars = 0, count = 0, html = '';
-            
-            // Ordena manualmente por data (JavaScript)
-            const reviews = [];
-            snap.forEach(doc => reviews.push(doc.data()));
-            
-            // Se tiver data, ordena. Se não, mostra como veio.
-            reviews.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            try {
+                // Tenta buscar (sem ordenação para não precisar de índice)
+                const snap = await db.collection('reviews').where('productId', '==', productId).get();
+                
+                if (snap.empty) {
+                    ratingDisplay.innerHTML = ''; 
+                    reviewsContainer.innerHTML = '<p class="no-reviews-msg">Seja a primeira a avaliar este produto! ⭐</p>';
+                    return;
+                }
+                
+                let totalStars = 0, count = 0, html = '';
+                
+                // Array para ordenar
+                const reviews = [];
+                snap.forEach(doc => reviews.push(doc.data()));
+                
+                // Ordena por data (mais recente) via JS
+                reviews.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
-            reviews.forEach(r => {
-                totalStars += r.rating;
-                count++;
-                const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
-                html += `<div class="review-item"><div class="review-header"><span>${r.customerName}</span><span class="review-stars">${stars}</span></div><div class="review-text">"${r.text}"</div></div>`;
-            });
-            
-            // Calcula média
-            const avg = (totalStars / count).toFixed(1);
-            const avgStars = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
-            
-            ratingDisplay.innerHTML = `${avgStars} (${avg})`;
-            reviewsContainer.innerHTML = html;
+                reviews.forEach(r => {
+                    totalStars += r.rating;
+                    count++;
+                    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+                    html += `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <span>${r.customerName}</span>
+                                <span class="review-stars">${stars}</span>
+                            </div>
+                            <div class="review-text">"${r.text}"</div>
+                        </div>
+                    `;
+                });
+                
+                const avg = (totalStars / count).toFixed(1);
+                const avgStars = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+                
+                ratingDisplay.innerHTML = `${avgStars} (${avg})`;
+                reviewsContainer.innerHTML = html;
+            } catch (e) {
+                console.error("Erro ao buscar avaliações:", e);
+                reviewsContainer.innerHTML = '<p class="no-reviews-msg">Não foi possível carregar as avaliações.</p>';
+            }
         }
 
-        // ... (RESTO DO CÓDIGO DE CARRINHO, VARIANTES, ETC. MANTIDO IGUAL) ...
+        // ... (RESTO DO CÓDIGO IGUAL: Carrinho, Cores, etc) ...
         async function fetchRelatedProducts(secao,currentId){try{const snap=await db.collection("products").where("secao","==",secao).limit(5).get();if(snap.empty)return;let c=0;relatedGrid.innerHTML='';snap.forEach(d=>{if(c>=4)return;if(d.id===currentId)return;const p=d.data(),pf=(p.price||0).toLocaleString('ja-JP');const card=document.createElement('a');card.href=`detalhes.html?id=${d.id}`;card.className='product-card';card.innerHTML=`<div class="product-image-container"><img src="${p.imageUrl}" class="product-image"></div><div class="product-info"><div class="product-name">${p.name}</div><div class="product-price">¥${pf}</div></div>`;relatedGrid.appendChild(card);c++});if(c>0)relatedSection.style.display='block'}catch(e){}}
         function getCart(){return JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}}
         function saveCart(cart){localStorage.setItem('whatsappCart',JSON.stringify(cart));updateCartIcon()}
