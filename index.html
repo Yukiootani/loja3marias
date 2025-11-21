@@ -9,23 +9,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     
-    <title>3 Marias Moda Feminina (V6.4)</title>
+    <title>3 Marias Moda Feminina (V6.5)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* --- CSS MANTIDO IGUAL (SEM MUDANÇAS VISUAIS) --- */
         :root { --primary-color: #b76e86; --accent-color: #DAA520; --silver-color: #C0C0C0; --text-color: #333; --light-text: #666; --bg-color: #FFFFFF; --border-color: #f0f0f0; --whatsapp-green: #28a745; }
         @keyframes shimmer-glow { 0% { box-shadow: 0 0 5px var(--accent-color); } 50% { box-shadow: 0 0 10px var(--silver-color); } 100% { box-shadow: 0 0 5px var(--accent-color); } }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); padding-bottom: 80px; }
         header { background-color: var(--bg-color); color: var(--text-color); padding: 0.5rem 1rem; text-align: center; border-bottom: 1px solid var(--border-color); }
-        
-        /* Sino (Inbox) */
         #notification-bell { position: fixed; top: 15px; right: 15px; font-size: 26px; color: var(--primary-color); cursor: pointer; z-index: 2000; background-color: rgba(255, 255, 255, 0.8); border-radius: 50%; padding: 5px; }
-        
         .header-logo { max-width: 250px; width: 100%; height: auto; object-fit: contain; margin: 0 auto; display: block; cursor: pointer; }
         header p { font-size: 1em; color: var(--light-text); margin: 2px 0 0 0; line-height: 1.4; }
         main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
-        
-        /* Busca e Filtros */
         #search-container { position: relative; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto; }
         #search-input { width: 100%; padding: 12px 40px 12px 20px; border: 1px solid #ddd; border-radius: 25px; font-size: 1em; outline: none; box-sizing: border-box; transition: border-color 0.3s, box-shadow 0.3s; }
         #search-input:focus { border-color: var(--primary-color); box-shadow: 0 0 8px rgba(183, 110, 134, 0.2); }
@@ -54,18 +50,10 @@
         .badge-destaque { background-color: var(--whatsapp-green); }
         .badge-esgotado { background-color: rgba(100, 100, 100, 0.9); color: white; top: 10px; right: 10px; left: auto; }
         footer { text-align: center; padding: 20px; margin-top: 40px; color: var(--light-text); font-size: 0.9em; border-top: 1px solid var(--border-color); }
-        
         #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1000; transition: transform 0.2s; text-decoration: none; }
         #cart-icon:hover { transform: scale(1.1); }
         #cart-count { position: absolute; top: -5px; right: -5px; background-color: var(--primary-color); color: white; border-radius: 50%; padding: 2px 7px; font-size: 14px; font-weight: bold; border: 2px solid white; display: none; }
         #install-app-btn { display: none; width: 100%; background-color: var(--accent-color); color: #333; font-weight: bold; text-align: center; padding: 12px; border: none; cursor: pointer; margin-bottom: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        #ios-install-banner { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(255, 255, 255, 0.98); border-top: 1px solid #ccc; padding: 20px 15px; text-align: center; z-index: 2000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); box-sizing: border-box; }
-        #ios-install-banner p { margin: 0; font-size: 0.9em; color: #333; line-height: 1.5; }
-        #ios-install-banner span { font-weight: bold; color: var(--primary-color); }
-        #close-ios-banner { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #888; line-height: 1; }
-        .ios-share-icon { display: inline-block; vertical-align: middle; margin: 0 3px; font-size: 1.2em; color: #007AFF; }
-        
-        /* Modais */
         #push-permission-modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; }
         .push-modal-content { background-color: #fff; width: 85%; max-width: 350px; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
         .push-icon { font-size: 40px; color: var(--accent-color); margin-bottom: 15px; }
@@ -73,6 +61,11 @@
         .push-text { font-size: 0.95em; color: #666; margin-bottom: 20px; line-height: 1.5; }
         .push-btn-allow { background-color: var(--primary-color); color: white; border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; font-size: 1em; width: 100%; cursor: pointer; margin-bottom: 10px; transition: 0.3s; }
         .push-btn-deny { background-color: transparent; color: #999; border: none; font-size: 0.9em; cursor: pointer; text-decoration: underline; }
+        #ios-install-banner { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(255, 255, 255, 0.98); border-top: 1px solid #ccc; padding: 20px 15px; text-align: center; z-index: 2000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); box-sizing: border-box; }
+        #ios-install-banner p { margin: 0; font-size: 0.9em; color: #333; line-height: 1.5; }
+        #ios-install-banner span { font-weight: bold; color: var(--primary-color); }
+        #close-ios-banner { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #888; line-height: 1; }
+        .ios-share-icon { display: inline-block; vertical-align: middle; margin: 0 3px; font-size: 1.2em; color: #007AFF; }
         #inbox-modal { display: none; position: fixed; z-index: 2500; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: start; padding-top: 60px; }
         .inbox-content { background-color: #fff; width: 90%; max-width: 400px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); overflow: hidden; }
         .inbox-header { background-color: var(--primary-color); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
@@ -84,22 +77,15 @@
         .inbox-body { font-size: 0.9em; color: #666; margin-bottom: 8px; }
         .inbox-date { font-size: 0.75em; color: #aaa; text-align: right; }
         .inbox-empty { padding: 20px; text-align: center; color: #999; font-style: italic; }
-        
         @media (min-width: 768px) { #products-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); } }
     </style>
 </head>
 <body>
     <button id="install-app-btn">📲 Instalar Aplicativo 3 Marias</button>
     <div id="push-permission-modal"><div class="push-modal-content"><div class="push-icon">🔔</div><div class="push-title">Ativar Notificações?</div><div class="push-text">Receba avisos sobre reposições, novidades e cupons exclusivos da 3 Marias direto no seu celular.</div><button class="push-btn-allow" id="allow-push-btn">Sim, eu quero!</button><button class="push-btn-deny" id="deny-push-btn">Agora não</button></div></div>
-    
     <div id="notification-bell"><i class="fas fa-bell"></i></div>
-    
-    <header id="main-header">
-        <h1>3 MARIAS MODA FEMININA</h1> 
-        <p>O melhor do Brasil,<br>agora ao seu alcance no Japão.</p>
-    </header>
+    <header id="main-header"><h1>3 MARIAS MODA FEMININA</h1><p>O melhor do Brasil,<br>agora ao seu alcance no Japão.</p></header>
     <div id="inbox-modal"><div class="inbox-content"><div class="inbox-header"><span>Novidades & Avisos</span><span id="inbox-close">&times;</span></div><ul id="inbox-list"></ul></div></div>
-
     <main>
         <div id="search-container"><input type="text" id="search-input" placeholder="Buscar produto (ex: Sutiã, Vermelho)..."><i class="fas fa-search search-icon"></i></div>
         <div id="secao-filters"><button class="secao-button active" data-secao="todos">Todas</button><button class="secao-button" data-secao="calcinhas">Calcinhas</button><button class="secao-button" data-secao="sutias">Sutiãs</button><button class="secao-button" data-secao="conjuntos">Conjuntos</button><button class="secao-button" data-secao="body">Body</button><button class="secao-button" data-secao="perfumaria">Perfumaria</button><button class="secao-button" data-secao="cremes">Cremes</button><button class="secao-button" data-secao="variados">Variados</button></div>
@@ -111,7 +97,6 @@
         <div id="error-message" style="display: none;"></div>
         <p id="search-no-results">Nenhum produto encontrado com esse nome.</p>
     </main>
-
     <footer><p>© 2025 3Marias. Todos os direitos reservados.</p></footer>
     <a id="cart-icon" href="carrinho.html"><i class="fas fa-shopping-bag"></i><span id="cart-count">0</span></a>
     <div id="ios-install-banner"><span id="close-ios-banner">&times;</span><p>Para instalar o App, toque em <strong>Compartilhar</strong> <i class="fas fa-share-square ios-share-icon"></i> e depois em <strong>Adicionar à Tela de Início</strong> <i class="fas fa-plus-square"></i>.</p></div>
@@ -125,6 +110,15 @@
         const db = firebase.firestore();
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) { console.log("Messaging não suportado"); }
 
+        // 🚨 FUNÇÃO DE LIMPEZA DO BADGE (ANDROID) 🚨
+        function clearAppBadge() {
+            if ('clearAppBadge' in navigator) {
+                navigator.clearAppBadge().catch(e => console.error(e));
+            } else if ('setAppBadge' in navigator) {
+                navigator.setAppBadge(0).catch(e => console.error(e));
+            }
+        }
+
         const grid=document.getElementById('products-grid'), loadingMsg=document.getElementById('loading-message'), errorMsg=document.getElementById('error-message'), filterButtons=document.querySelectorAll('.filter-button'), secaoButtons=document.querySelectorAll('.secao-button'), collectionTitle=document.getElementById('collection-title'), cartCountEl=document.getElementById('cart-count'), headerEl=document.getElementById('main-header'), filterDetails=document.getElementById('filter-details'), searchInput=document.getElementById('search-input'), searchNoResults=document.getElementById('search-no-results'), cartIcon=document.getElementById('cart-icon');
         let currentFilter='pronta-entrega', currentSecao='todos';
         const filterHelpTexts={'pronta-entrega':".Disponível para retirar em Toyohashi\ne região .",'sob-encomenda':".Disponível para retirar em Toyohashi na próxima quinta-feira após o pedido.\n. Receba por correio entre 3-5 dias , pedido mínimo ¥10.000"};
@@ -137,14 +131,10 @@
         const isInStandaloneMode=()=>('standalone' in window.navigator)&&(window.navigator.standalone);
         if(isIos()&&!isInStandaloneMode()){const b=document.getElementById('ios-install-banner');b.style.display='block';if(cartIcon)cartIcon.style.bottom='100px';document.getElementById('close-ios-banner').addEventListener('click',()=>{b.style.display='none';if(cartIcon)cartIcon.style.bottom='20px'})}
 
-        // Inbox
         const bell=document.getElementById('notification-bell'), inboxModal=document.getElementById('inbox-modal'), inboxList=document.getElementById('inbox-list'), inboxClose=document.getElementById('inbox-close');
         bell.addEventListener('click',async()=>{
+            clearAppBadge(); // 🚨 Limpa badge ao clicar no sino
             inboxModal.style.display='flex'; inboxList.innerHTML='<li class="inbox-empty">Carregando...</li>';
-            
-            // 🚨 1. LIMPA O BADGE QUANDO ABRE O INBOX
-            if ('clearAppBadge' in navigator) { navigator.clearAppBadge().catch(()=>{}); }
-
             try{
                 const snap=await db.collection('site_messages').orderBy('createdAt','desc').limit(10).get();
                 inboxList.innerHTML=''; if(snap.empty){inboxList.innerHTML='<li class="inbox-empty">Nenhuma novidade.</li>';return}
@@ -159,41 +149,21 @@
         });
         inboxClose.addEventListener('click',()=>inboxModal.style.display='none'); inboxModal.addEventListener('click',(e)=>{if(e.target===inboxModal)inboxModal.style.display='none'});
 
-        // Modal Push Automático
         const pushModal = document.getElementById('push-permission-modal');
         const allowBtn = document.getElementById('allow-push-btn');
         const denyBtn = document.getElementById('deny-push-btn');
-
         async function checkPushPermission() {
             if (!messaging) return;
-            // 🚨 2. LIMPA O BADGE QUANDO CARREGA O SITE
-            if ('clearAppBadge' in navigator) { navigator.clearAppBadge().catch(()=>{}); }
-
-            if (Notification.permission === 'default') {
-                setTimeout(() => { pushModal.style.display = 'flex'; }, 2000);
-            }
+            // 🚨 Limpa badge ao abrir o app
+            clearAppBadge(); 
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') clearAppBadge(); });
+            
+            if (Notification.permission === 'default') { setTimeout(() => { pushModal.style.display = 'flex'; }, 2000); }
         }
-        if (allowBtn) {
-            allowBtn.addEventListener('click', async () => {
-                pushModal.style.display = 'none'; 
-                try {
-                    const permission = await Notification.requestPermission();
-                    if (permission === 'granted') { await saveToken(); alert("Obrigado! Você receberá nossas ofertas. 🔔"); }
-                } catch (error) { console.error("Erro:", error); }
-            });
-        }
+        if (allowBtn) { allowBtn.addEventListener('click', async () => { pushModal.style.display = 'none'; try { const permission = await Notification.requestPermission(); if (permission === 'granted') { await saveToken(); alert("Obrigado! Você receberá nossas ofertas. 🔔"); } } catch (error) { console.error("Erro:", error); } }); }
         if (denyBtn) { denyBtn.addEventListener('click', () => { pushModal.style.display = 'none'; }); }
-
         async function saveToken(){ try{ const t=await messaging.getToken({vapidKey:'BInIXSUQdmOW6xyauTrERRsEgA0QtupR2fmDrhIckU-QA2sLBCJQnKsJk1eK40esRAW3EGYWQMz1WOnVHaIsPPA'}); if(t)await db.collection('push_tokens').doc(t).set({token:t,createdAt:firebase.firestore.FieldValue.serverTimestamp()}) }catch(e){console.log(e)}}
-        
-        // 🚨 Correção Android: Site Aberto recebe alerta
-        if(messaging) {
-            messaging.onMessage((payload) => {
-                console.log('Mensagem site aberto:', payload);
-                const { title, body } = payload.notification;
-                alert(`🔔 ${title}\n\n${body}`);
-            });
-        }
+        if(messaging) { messaging.onMessage((payload) => { console.log('Msg foreground:', payload); const { title, body } = payload.notification; alert(`🔔 ${title}\n\n${body}`); }); }
 
         let lc=0, lt=null; headerEl.addEventListener('click',(e)=>{if(e.target.closest('.header-logo')){lc++;if(lt)clearTimeout(lt);if(lc===3){window.location.href='admin.html';lc=0}else{lt=setTimeout(()=>{lc=0},1500)}}});
         function getCart(){return JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}}
